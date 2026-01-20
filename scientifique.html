@@ -95,16 +95,16 @@
     <button onclick="insert('+')" class="operator">+</button><br>
 
     <!-- Fonctions scientifiques -->
-    <button onclick="insert('Math.sin(')">sin</button>
-    <button onclick="insert('Math.cos(')">cos</button>
-    <button onclick="insert('Math.tan(')">tan</button>
-    <button onclick="insert('Math.sqrt(')">√</button><br>
+    <button onclick="insert('sin(')">sin</button>
+    <button onclick="insert('cos(')">cos</button>
+    <button onclick="insert('tan(')">tan</button>
+    <button onclick="insert('√')">√</button><br>
     <button onclick="insert('Math.pow(')">xʸ</button>
-    <button onclick="insert('Math.log(')">ln</button>
-    <button onclick="insert('Math.log10(')">log</button>
-    <button onclick="insert('Math.exp(')">eˣ</button><br>
-    <button onclick="insert('Math.PI')">π</button>
-    <button onclick="insert('Math.E')">e</button>
+    <button onclick="insert('ln(')">ln</button>
+    <button onclick="insert('log(')">log</button>
+    <button onclick="insert('e')">eˣ</button><br>
+    <button onclick="insert('π')">π</button>
+    <button onclick="insert('e)">e</button>
     <button onclick="clearDisplay()" class="clear">C</button>
   </div>
 
@@ -120,9 +120,11 @@
         document.getElementById('display').value = eval(expr);
       } catch {
         document.getElementById('display').value = "Erreur";
+        stop{
       }
     }
-
+}
+    
     function clearDisplay() {
       document.getElementById('display').value = "";
     }
