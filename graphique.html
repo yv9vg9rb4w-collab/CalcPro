@@ -5,23 +5,24 @@
   <title>Calculatrice graphique Lebbar</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    canvas { background: #fff; border: 1px solid #ccc; }
-    body { background: #121212; color: white; font-family: Arial; text-align: center; }
-    input { padding: 10px; font-size: 16px; width: 300px; }
-    button { padding: 10px; font-size: 16px; margin-left: 10px; }
+    body { background:#121212; color:white; font-family:Arial; text-align:center; }
+    input, button { padding:10px; font-size:16px; margin:5px; }
+    canvas { background:#fff; border:1px solid #ccc; margin-top:20px; }
   </style>
 </head>
 <body>
   <h1>📈 Calculatrice graphique Lebbar</h1>
-  <input type="text" id="equation" placeholder="Ex: x*x">
+  <input type="text" id="equation" placeholder="Ex: x*x ou Math.sin(x)">
   <button onclick="draw()">Tracer</button>
-  <br><br>
+  <br>
   <canvas id="graph" width="600" height="400"></canvas>
+
   <script>
     function draw() {
       const canvas = document.getElementById('graph');
       const ctx = canvas.getContext('2d');
       const expr = document.getElementById('equation').value;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Axes
@@ -36,21 +37,25 @@
       // Courbe
       ctx.strokeStyle = "#00ffcc";
       ctx.beginPath();
-      for (let x = -300; x < 300; x++) {
-        let px = canvas.width/2 + x;
+      for (let px = 0; px < canvas.width; px++) {
+        let x = (px - canvas.width/2) / 30; // échelle
         let y;
         try {
-          y = eval(expr.replace(/x/g, `(${x/30})`));
+          y = eval(expr.replace(/x/g, `(${x})`));
         } catch {
-          y = 0;
+          y = NaN;
         }
-        let py = canvas.height/2 - y * 30;
-        if (x === -300) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
+        if (!isNaN(y)) {
+          let py = canvas.height/2 - y * 30;
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
       }
       ctx.stroke();
     }
   </script>
+
   <p><a href="index.html" style="color:#00ffcc;">⬅ Retour à l’accueil</a></p>
 </body>
 </html>
+
