@@ -2,40 +2,106 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Test Calculatrice graphique</title>
+  <title>Calculatrice graphique Lebbar</title>
   <style>
-    body { background:#121212; color:white; text-align:center; }
-    canvas { background:#fff; border:1px solid #ccc; margin-top:20px; }
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    canvas {
+      background: #fff;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>📈 Test Calculatrice graphique</h1>
+  <h1>📈 Calculatrice graphique Lebbar</h1>
+  <input type="text" id="equation" placeholder="Ex: x^2 ou sin(x)">
+  <input type="number" id="xvalue" placeholder="x = ?" step="any">
+  <button onclick="draw()">Tracer</button>
+  <p id="result"></p>
   <canvas id="graph" width="600" height="400"></canvas>
 
   <script>
-    const canvas = document.getElementById('graph');
-    const ctx = canvas.getContext('2d');
-
-    // Axes
-    ctx.strokeStyle = "#888";
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height/2);
-    ctx.lineTo(canvas.width, canvas.height/2);
-    ctx.moveTo(canvas.width/2, 0);
-    ctx.lineTo(canvas.width/2, canvas.height);
-    ctx.stroke();
-
-    // Courbe y = x^2
-    ctx.strokeStyle = "#00ffcc";
-    ctx.beginPath();
-    for (let px = 0; px < canvas.width; px++) {
-      let x = (px - canvas.width/2) / 30; // échelle
-      let y = x * x;
-      let py = canvas.height/2 - y * 30;
-      if (px === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
+    function parseExpr(expr, x) {
+      expr = expr.replace(/\^/g, "**");
+      expr = expr.replace(/sin/g, "Math.sin")
+                 .replace(/cos/g, "Math.cos")
+                 .replace(/tan/g, "Math.tan");
+      return eval(expr.replace(/x/g, `(${x})`));
     }
-    ctx.stroke();
+
+    function draw() {
+      const canvas = document.getElementById('graph');
+      const ctx = canvas.getContext('2d');
+      const expr = document.getElementById('equation').value;
+      const xval = parseFloat(document.getElementById('xvalue').value);
+      const resultBox = document.getElementById('result');
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const scale = 30;
+      const originX = canvas.width / 2;
+      const originY = canvas.height / 2;
+
+      // Axes
+      ctx.strokeStyle = "#888";
+      ctx.beginPath();
+      ctx.moveTo(0, originY);
+      ctx.lineTo(canvas.width, originY);
+      ctx.moveTo(originX, 0);
+      ctx.lineTo(originX, canvas.height);
+      ctx.stroke();
+
+      // Nombres sur les axes
+      ctx.fillStyle = "#000";
+      ctx.font = "12px Arial";
+      for (let i = -10; i <= 10; i++) {
+        if (i !== 0) {
+          ctx.fillText(i, originX + i * scale - 5, originY + 15); // X
+          ctx.fillText(-i, originX + 5, originY - i * scale + 5); // Y
+        }
+      }
+
+      // Courbe
+      ctx.strokeStyle = "#00ffcc";
+      ctx.beginPath();
+      for (let px = 0; px < canvas.width; px++) {
+        let x = (px - originX) / scale;
+        let y;
+        try {
+          y = parseExpr(expr, x);
+        } catch {
+          y = NaN;
+        }
+        if (!isNaN(y)) {
+          let py = originY - y * scale;
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+      }
+      ctx.stroke();
+
+      // Calcul du résultat
+      if (!isNaN(xval)) {
+        try {
+          const yval = parseExpr(expr, xval);
+          resultBox.innerHTML = `📍 Pour x = ${xval}, y = ${yval.toFixed(4)}`;
+        } catch {
+          resultBox.innerHTML = `❌ Erreur dans l'expression`;
+        }
+      } else {
+        resultBox.innerHTML = `ℹ️ Tape une valeur de x pour calculer`;
+      }
+    }
   </script>
 </body>
 </html>
