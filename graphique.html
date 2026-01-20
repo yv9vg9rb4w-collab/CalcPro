@@ -31,82 +31,86 @@
 
   <p id="result"></p>
   <canvas id="graph" width="600" height="400"></canvas>
+<script>
+  function parseExpr(expr, x) {
+    expr = expr.replace(/\^/g, "**");
+    expr = expr.replace(/sin/g, "Math.sin")
+               .replace(/cos/g, "Math.cos")
+               .replace(/tan/g, "Math.tan");
+    return eval(expr.replace(/x/g, `(${x})`));
+  }
 
-  <script>
-    function parseExpr(expr, x) {
-      expr = expr.replace(/\^/g, "**");
-      expr = expr.replace(/sin/g, "Math.sin")
-                 .replace(/cos/g, "Math.cos")
-                 .replace(/tan/g, "Math.tan");
-      return eval(expr.replace(/x/g, `(${x})`));
+  function draw() {
+    const canvas = document.getElementById('graph');
+    const ctx = canvas.getContext('2d');
+    const expr = document.getElementById('equation').value;
+    const xval = parseFloat(document.getElementById('xvalue').value);
+    const resultBox = document.getElementById('result');
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const scale = 30;
+    const originX = canvas.width / 2;
+    const originY = canvas.height / 2;
+
+    // Axes
+    ctx.strokeStyle = "#888";
+    ctx.beginPath();
+    ctx.moveTo(0, originY);
+    ctx.lineTo(canvas.width, originY);
+    ctx.moveTo(originX, 0);
+    ctx.lineTo(originX, canvas.height);
+    ctx.stroke();
+
+    // Nombres sur les axes
+    ctx.fillStyle = "#000";
+    ctx.font = "12px Arial";
+    for (let i = -9; i <= 9; i++) {
+      if (i !== 0) {
+        ctx.fillText(i, originX + i * scale - 5, originY + 15); // X
+        ctx.fillText(i, originX + 5, originY - i * scale + 5); // Y
+      }
     }
 
-    function draw() {
-      const canvas = document.getElementById('graph');
-      const ctx = canvas.getContext('2d');
-      const expr = document.getElementById('equation').value;
-      const xval = parseFloat(document.getElementById('xvalue').value);
-      const resultBox = document.getElementById('result');
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const scale = 30;
-      const originX = canvas.width / 2;
-      const originY = canvas.height / 2;
-
-      // Axes
-      ctx.strokeStyle = "#888";
-      ctx.beginPath();
-      ctx.moveTo(0, originY);
-      ctx.lineTo(canvas.width, originY);
-      ctx.moveTo(originX, 0);
-      ctx.lineTo(originX, canvas.height);
-      ctx.stroke();
-
-      // Nombres sur les axes (positifs et négatifs)
-      ctx.fillStyle = "#000";
-      ctx.font = "12px Arial";
-      for (let i = -9; i <= 9; i++) {
-        if (i !== 0) {
-          // Axe X
-          ctx.fillText(i, originX + i * scale - 5, originY + 15);
-          // Axe Y
-          ctx.fillText(i, originX + 5, originY - i * scale + 5);
-        }
+    // Courbe en noir
+    ctx.strokeStyle = "#000";
+    ctx.beginPath();
+    let started = false;
+    for (let px = 0; px < canvas.width; px++) {
+      let x = (px - originX) / scale;
+      let y;
+      try {
+        y = parseExpr(expr, x);
+      } catch {
+        y = NaN;
       }
-
-      // Courbe en noir
-      ctx.strokeStyle = "#000";
-      ctx.beginPath();
-      for (let px = 0; px < canvas.width; px++) {
-        let x = (px - originX) / scale;
-        let y;
-        try {
-          y = parseExpr(expr, x);
-        } catch {
-          y = NaN;
-        }
-        if (!isNaN(y)) {
-          let py = originY - y * scale;
-          if (px === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
-      }
-      ctx.stroke();
-
-      // Résultat pour x choisi
-      if (!isNaN(xval)) {
-        try {
-          const yval = parseExpr(expr, xval);
-          resultBox.innerHTML = `📍 Résultat : ${yval.toFixed(4)}`;
-        } catch {
-          resultBox.innerHTML = `❌ Erreur dans l'expression`;
+      if (!isNaN(y) && Math.abs(y) < 100) {
+        let py = originY - y * scale;
+        if (!started) {
+          ctx.moveTo(px, py);
+          started = true;
+        } else {
+          ctx.lineTo(px, py);
         }
       } else {
-        resultBox.innerHTML = `ℹ️ Tape une valeur de x pour calculer`;
+        started = false; // coupe la ligne si y est invalide
       }
     }
-  </script>
-</body>
+    ctx.stroke();
+
+    // Résultat pour x choisi
+    if (!isNaN(xval)) {
+      try {
+        const yval = parseExpr(expr, xval);
+        resultBox.innerHTML = `📍 Résultat : ${yval.toFixed(4)}`;
+      } catch {
+        resultBox.innerHTML = `❌ Erreur dans l'expression`;
+      }
+    } else {
+      resultBox.innerHTML = `ℹ️ Tape une valeur de x pour calculer`;
+    }
+  }
+</script>
+ </body>
 </html>
 
