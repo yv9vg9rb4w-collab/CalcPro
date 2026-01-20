@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Desmos Pro</title>
+  <title>CalcPro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -29,6 +29,7 @@
       text-align: center;
       box-shadow: 0 0 10px #00ffcc55;
       transition: transform 0.2s;
+      cursor: pointer;
     }
     .tool:hover {
       transform: scale(1.05);
@@ -37,18 +38,43 @@
       font-size: 40px;
       margin-bottom: 10px;
     }
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
-  <h1>🧮 Desmos Pro</h1>
+  <h1>Bienvenue sur <strong>CalcPro</strong></h1>
   <div class="tool-list">
-    <div class="tool"><div class="icon">📈</div>Calculatrice graphique</div>
-    <div class="tool"><div class="icon">🧪</div>Calculatrice scientifique</div>
-    <div class="tool"><div class="icon">🔢</div>Calculatrice 4 fonctions</div>
-    <div class="tool"><div class="icon">📝</div>Pratique pour l'évaluation</div>
-    <div class="tool"><div class="icon">📊</div>Calculatrice matrices</div>
-    <div class="tool"><div class="icon">📐</div>Outil géométrie</div>
-    <div class="tool"><div class="icon">🧭</div>Calculatrice 3D</div>
+    <div class="tool" onclick="location.href='graphique.html'">
+      <div class="icon">📈</div>Calculatrice graphique
+    </div>
+    <div class="tool" onclick="location.href='scientifique.html'">
+      <div class="icon">🧪</div>Calculatrice scientifique
+    </div>
+    <div class="tool" onclick="location.href='matrices.html'">
+      <div class="icon">📊</div>Calculatrice matrices
+    </div>
+    <div class="tool" onclick="location.href='4fonctions.html'">
+      <div class="icon">🔢</div>Calculatrice 4 fonctions
+    </div>
+    <div class="tool" onclick="location.href='evaluation.html'">
+      <div class="icon">📝</div>Pratique pour l'évaluation
+    </div>
+    <div class="tool" onclick="location.href='geometrie.html'">
+      <div class="icon">📐</div>Outil géométrie
+    </div>
+    <div class="tool" onclick="location.href='3d.html'">
+      <div class="icon">🧭</div>Calculatrice 3D
+    </div>
   </div>
+
+  <footer>
+    Créateur : <strong>Yahya Lebbar</strong>
+  </footer>
 </body>
 </html>
+
