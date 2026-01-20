@@ -1,46 +1,79 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Desmos Pro</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
-</head>
+import tkinter as tk
+from math import sin, cos, tan, log, sqrt, pi, e, factorial
 
-<body>
+# Créer la fenêtre principale
+root = tk.Tk()
+root.title("Calculatrice Scientifique")
+root.geometry("400x600")
+root.resizable(False, False)
 
-<div class="app">
-<h2>📈 Desmos Pro</h2>
+# Variable pour stocker l'entrée
+entry_text = tk.StringVar()
+entry = tk.Entry(root, textvariable=entry_text, font=('Arial', 20), bd=5, relief='ridge', justify='right')
+entry.pack(fill='both', ipadx=8, ipady=15, pady=10, padx=10)
 
-<input id="eq1" placeholder="y = x^2">
-<input id="eq2" placeholder="y = sin(x)">
-<input id="eq3" placeholder="y = √(x)">
+# Fonction pour ajouter du texte à l'entrée
+def press(key):
+    entry_text.set(entry_text.get() + str(key))
 
-<div class="buttons">
-<button onclick="toggleMode()">RAD</button>
-<button onclick="resetView()">RESET</button>
-<button onclick="drawAll()">DRAW</button>
-</div>
+# Fonction pour effacer
+def clear():
+    entry_text.set("")
 
-<div class="keyboard">
-<button onclick="add('sin(')">sin</button>
-<button onclick="add('cos(')">cos</button>
-<button onclick="add('tan(')">tan</button>
-<button onclick="add('√(')">√</button>
-<button onclick="add('^2')">x²</button>
-<button onclick="add('^3')">x³</button>
-<button onclick="add('pi')">π</button>
-<button onclick="add('(')">(</button>
-<button onclick="add(')')">)</button>
-<button onclick="add('+')">+</button>
-<button onclick="add('-')">−</button>
-<button onclick="add('*')">×</button>
-<button onclick="add('/')">÷</button>
-</div>
+# Fonction pour calculer le résultat
+def calculate():
+    try:
+        expr = entry_text.get()
+        # Remplacer les symboles spéciaux pour eval
+        expr = expr.replace('√', 'sqrt').replace('π', str(pi)).replace('e', str(e))
+        result = eval(expr)
+        entry_text.set(result)
+    except Exception as e:
+        entry_text.set("Erreur")
 
-<canvas id="graph" width="500" height="350"></canvas>
-</div>
+# Fonction pour les fonctions scientifiques
+def scientific(func):
+    try:
+        value = float(entry_text.get())
+        if func == 'sin':
+            entry_text.set(sin(value))
+        elif func == 'cos':
+            entry_text.set(cos(value))
+        elif func == 'tan':
+            entry_text.set(tan(value))
+        elif func == 'log':
+            entry_text.set(log(value))
+        elif func == '√':
+            entry_text.set(sqrt(value))
+        elif func == '!':
+            entry_text.set(factorial(int(value)))
+    except Exception as e:
+        entry_text.set("Erreur")
 
-<script src="script.js"></script>
-</body>
-</html>
+# Créer les boutons
+buttons = [
+    ['7', '8', '9', '/', 'C'],
+    ['4', '5', '6', '*', '√'],
+    ['1', '2', '3', '-', 'sin'],
+    ['0', '.', '=', '+', 'cos'],
+    ['(', ')', 'π', 'e', 'tan'],
+    ['log', '!']
+]
+
+# Ajouter les boutons à l'interface
+for r, row in enumerate(buttons):
+    frame = tk.Frame(root)
+    frame.pack(expand=True, fill='both')
+    for c, btn in enumerate(row):
+        if btn == '=':
+            b = tk.Button(frame, text=btn, font=('Arial', 18), command=calculate)
+        elif btn == 'C':
+            b = tk.Button(frame, text=btn, font=('Arial', 18), command=clear)
+        elif btn in ['sin', 'cos', 'tan', 'log', '√', '!']:
+            b = tk.Button(frame, text=btn, font=('Arial', 18), command=lambda f=btn: scientific(f))
+        else:
+            b = tk.Button(frame, text=btn, font=('Arial', 18), command=lambda k=btn: press(k))
+        b.pack(side='left', expand=True, fill='both')
+
+# Lancer la boucle principale
+root.mainloop()
