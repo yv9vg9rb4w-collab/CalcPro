@@ -68,8 +68,10 @@
       ctx.font = "12px Arial";
       for (let i = -9; i <= 9; i++) {
         if (i !== 0) {
-          ctx.fillText(i, originX + i * scale - 5, originY + 15); // X
-          ctx.fillText(-i, originX + 5, originY - i * scale + 5); // Y
+          // Axe X
+          ctx.fillText(i, originX + i * scale - 5, originY + 15);
+          // Axe Y
+          ctx.fillText(i, originX + 5, originY - i * scale + 5);
         }
       }
 
@@ -92,7 +94,7 @@
       }
       ctx.stroke();
 
-      // Résultat pour x choisi (sans "y =")
+      // Résultat pour x choisi
       if (!isNaN(xval)) {
         try {
           const yval = parseExpr(expr, xval);
