@@ -2,14 +2,55 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Calculatrice graphique</title>
+  <title>Calculatrice graphique Lebbar</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    canvas { background: #fff; border: 1px solid #ccc; }
+    body { background: #121212; color: white; font-family: Arial; text-align: center; }
+    input { padding: 10px; font-size: 16px; width: 300px; }
+    button { padding: 10px; font-size: 16px; margin-left: 10px; }
+  </style>
 </head>
 <body>
-  <h1>📈 Calculatrice graphique</h1>
-  <div class="container">
-    <p>Ici tu pourras mettre ton propre code de calculatrice graphique ou une démo.</p>
-    <p><a href="index.html">⬅ Retour à l’accueil</a></p>
-  </div>
+  <h1>📈 Calculatrice graphique Lebbar</h1>
+  <input type="text" id="equation" placeholder="Ex: x*x">
+  <button onclick="draw()">Tracer</button>
+  <br><br>
+  <canvas id="graph" width="600" height="400"></canvas>
+  <script>
+    function draw() {
+      const canvas = document.getElementById('graph');
+      const ctx = canvas.getContext('2d');
+      const expr = document.getElementById('equation').value;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Axes
+      ctx.strokeStyle = "#888";
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height/2);
+      ctx.lineTo(canvas.width, canvas.height/2);
+      ctx.moveTo(canvas.width/2, 0);
+      ctx.lineTo(canvas.width/2, canvas.height);
+      ctx.stroke();
+
+      // Courbe
+      ctx.strokeStyle = "#00ffcc";
+      ctx.beginPath();
+      for (let x = -300; x < 300; x++) {
+        let px = canvas.width/2 + x;
+        let y;
+        try {
+          y = eval(expr.replace(/x/g, `(${x/30})`));
+        } catch {
+          y = 0;
+        }
+        let py = canvas.height/2 - y * 30;
+        if (x === -300) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+  </script>
+  <p><a href="index.html" style="color:#00ffcc;">⬅ Retour à l’accueil</a></p>
 </body>
 </html>
