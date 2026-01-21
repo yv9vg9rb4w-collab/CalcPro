@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Scientific Calculator</title>
+<title>Lebbar Scientific Calculator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -12,12 +12,12 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    background:radial-gradient(circle at top,#1e3c72,#0f2027);
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
     font-family:Arial, sans-serif;
 }
 .calc{
     width:360px;
-    background:#0a0a0a;
+    background:#0b0b0b;
     border-radius:22px;
     padding:15px;
     box-shadow:0 30px 60px rgba(0,0,0,.7);
@@ -54,9 +54,7 @@ button{
     background:#1e1e1e;
     color:white;
 }
-button:active{
-    transform:scale(0.94);
-}
+button:active{transform:scale(0.94);}
 .op{background:#ff9800;}
 .eq{background:#00c853;}
 .fn{background:#3949ab;}
@@ -67,7 +65,7 @@ button:active{
 <body>
 
 <div class="calc">
-    <div class="brand">CalcPro • SCIENTIFIC</div>
+    <div class="brand">LEBBAR • SCIENTIFIC</div>
     <div class="screen" id="screen">0</div>
 
     <div class="keys">
@@ -96,8 +94,7 @@ button:active{
         <button class="eq" onclick="calc()">=</button>
         <button class="op" onclick="add('+')">+</button>
 
-        
-        <button class="fn" onclick="add('Math.sqrt(')">√</button>
+        <button class="fn" onclick="add('√(')">√</button>
         <button class="fn" onclick="add('^')">xʸ</button>
         <button class="fn" onclick="add('sin(')">sin</button>
         <button class="fn" onclick="add('cos(')">cos</button>
@@ -105,51 +102,54 @@ button:active{
         <button class="fn" onclick="add('tan(')">tan</button>
         <button class="fn" onclick="add('log(')">log</button>
         <button class="fn" onclick="add('ln(')">ln</button>
-        <button class="fn" onclick="add(Math.PI)">π</button>
-
+        <button class="fn" onclick="add('π')">π</button>
     </div>
 </div>
 
 <script>
-let screen=document.getElementById("screen");
-let expr="";
+let screen = document.getElementById("screen");
+let expr = "";
 
+/* AFFICHAGE */
 function add(v){
-    if(screen.innerText==="0") expr="";
-    expr+=v;
-    screen.innerText=expr;
+    if(screen.innerText === "0") expr = "";
+    expr += v;
+    screen.innerText = expr;
 }
 
 function clearAll(){
-    expr="";
-    screen.innerText="0";
+    expr = "";
+    screen.innerText = "0";
 }
 
 function del(){
-    expr=expr.slice(0,-1);
-    screen.innerText=expr||"0";
+    expr = expr.slice(0,-1);
+    screen.innerText = expr || "0";
 }
 
+/* CALCUL */
 function calc(){
     try{
-        let e=expr;
+        let e = expr;
 
-        e=e.replace(/÷/g,"/");
-        e=e.replace(/×/g,"*");
-        e=e.replace(/\^/g,"**");
-        e=e.replace(/sin/g,"Math.sin");
-        e=e.replace(/cos/g,"Math.cos");
-        e=e.replace(/tan/g,"Math.tan");
-        e=e.replace(/log/g,"Math.log10");
-        e=e.replace(/ln/g,"Math.log");
-        
+        // symboles → JavaScript
+        e = e.replace(/÷/g,"/");
+        e = e.replace(/×/g,"*");
+        e = e.replace(/√/g,"Math.sqrt");
+        e = e.replace(/π/g,"Math.PI");
+        e = e.replace(/\^/g,"**");
+        e = e.replace(/sin/g,"Math.sin");
+        e = e.replace(/cos/g,"Math.cos");
+        e = e.replace(/tan/g,"Math.tan");
+        e = e.replace(/log/g,"Math.log10");
+        e = e.replace(/ln/g,"Math.log");
 
-        let result=Function("return "+e)();
-        screen.innerText=result;
-        expr=result.toString();
+        let result = Function("return " + e)();
+        screen.innerText = result;
+        expr = result.toString();
     }catch{
-        screen.innerText="Erreur";
-        expr="";
+        screen.innerText = "Erreur";
+        expr = "";
     }
 }
 </script>
