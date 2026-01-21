@@ -1,15 +1,169 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Calculatrice matrices</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Lebbar Matrix Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    margin:0;
+    background:#020617;
+    color:white;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.box{
+    width:95%;
+    max-width:700px;
+    background:#020617;
+    border-radius:18px;
+    padding:15px;
+    box-shadow:0 25px 50px rgba(0,0,0,.7);
+}
+.title{
+    text-align:center;
+    font-weight:bold;
+    color:#38bdf8;
+    margin-bottom:10px;
+}
+.area{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+textarea{
+    width:100%;
+    height:120px;
+    background:#020617;
+    color:#22c55e;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:10px;
+    font-size:16px;
+    resize:none;
+}
+.buttons{
+    margin:10px 0;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+}
+button{
+    height:45px;
+    border:none;
+    border-radius:12px;
+    background:#1e293b;
+    color:white;
+    font-size:15px;
+}
+button:active{transform:scale(0.95);}
+.result{
+    background:#000;
+    color:#00ff88;
+    border-radius:12px;
+    padding:12px;
+    min-height:80px;
+    white-space:pre;
+}
+</style>
 </head>
+
 <body>
-  <h1>📊 Calculatrice matrices</h1>
-  <div class="container">
-    <p>Ici tu pourras ajouter des fonctions pour manipuler des matrices.</p>
-    <p><a href="index.html">⬅ Retour à l’accueil</a></p>
-  </div>
+
+<div class="box">
+<div class="title">🧮 LEBBAR • MATRIX CALCULATOR</div>
+
+<div class="area">
+<textarea id="A" placeholder="Matrice A"></textarea>
+<textarea id="B" placeholder="Matrice B"></textarea>
+</div>
+
+<div class="buttons">
+<button onclick="add()">A + B</button>
+<button onclick="sub()">A − B</button>
+<button onclick="mul()">A × B</button>
+<button onclick="det()">det(A)</button>
+<button onclick="inv()">A⁻¹</button>
+</div>
+
+<div class="result" id="result">Résultat ici</div>
+</div>
+
+<script>
+function parseMatrix(text){
+    return text.trim().split("\n").map(r=>r.trim().split(/\s+/).map(Number));
+}
+
+function display(m){
+    return m.map(r=>r.join(" ")).join("\n");
+}
+
+function add(){
+    let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
+}
+
+const AreaA=document.getElementById("A");
+const AreaB=document.getElementById("B");
+const R=document.getElementById("result");
+
+function add(){
+    try{
+        let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
+        let C=A.map((r,i)=>r.map((v,j)=>v+B[i][j]));
+        R.innerText=display(C);
+    }catch{R.innerText="Erreur";}
+}
+
+function sub(){
+    try{
+        let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
+        let C=A.map((r,i)=>r.map((v,j)=>v-B[i][j]));
+        R.innerText=display(C);
+    }catch{R.innerText="Erreur";}
+}
+
+function mul(){
+    try{
+        let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
+        let C=A.map(r=>B[0].map((_,j)=>r.reduce((s,v,i)=>s+v*B[i][j],0)));
+        R.innerText=display(C);
+    }catch{R.innerText="Erreur";}
+}
+
+function det(){
+    try{
+        let M=parseMatrix(AreaA.value);
+        if(M.length===2){
+            let d=M[0][0]*M[1][1]-M[0][1]*M[1][0];
+            R.innerText=d;
+        }else if(M.length===3){
+            let d=
+            M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])-
+            M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])+
+            M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
+            R.innerText=d;
+        }else R.innerText="2×2 ou 3×3 seulement";
+    }catch{R.innerText="Erreur";}
+}
+
+function inv(){
+    try{
+        let M=parseMatrix(AreaA.value);
+        if(M.length!==2){R.innerText="Inverse 2×2 seulement";return;}
+        let d=M[0][0]*M[1][1]-M[0][1]*M[1][0];
+        if(d===0){R.innerText="Non inversible";return;}
+        let I=[
+            [ M[1][1]/d, -M[0][1]/d ],
+            [ -M[1][0]/d, M[0][0]/d ]
+        ];
+        R.innerText=display(I);
+    }catch{R.innerText="Erreur";}
+}
+</script>
+
 </body>
 </html>
