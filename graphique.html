@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>CalcPro - Calculatrice graphique</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #121212;
@@ -41,23 +42,41 @@
       margin-top: 20px;
       box-shadow: 0 0 10px #00ffcc55;
     }
+    footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
   <h1>📈 Calculatrice graphique</h1>
   <div id="controls">
-    <input type="text" id="equation" placeholder="Exemple : sin(x) ou x*x">
+    <input type="text" id="equation" placeholder="Exemple : x^2, sin(x), sqrt(x)">
     <button onclick="drawGraph()">Tracer</button>
   </div>
-  <!-- ⚠️ Dimensions fixées directement -->
- <canvas id="graphCanvas" width="900" height="500"></canvas>
+  <canvas id="graphCanvas" width="900" height="500"></canvas>
 
+  <footer>
+    Créateur : <strong>Yahya Lebbar</strong>
+  </footer>
 
   <script>
+    // Vérification de l'équation (sécurité)
+    function isValidEquation(expr) {
+      const regex = /^[0-9x+\-*/^().\s]*$/i;
+      return regex.test(expr);
+    }
+
     function drawGraph() {
       const canvas = document.getElementById('graphCanvas');
       const ctx = canvas.getContext('2d');
       const expr = document.getElementById('equation').value;
+
+      if (!isValidEquation(expr)) {
+        alert("Équation invalide !");
+        return;
+      }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -84,25 +103,25 @@
         const x = (px - originX) / scaleX;
         let y;
         try {
-          
           let exprJS = expr
-  .replace(/sin\(/g, "Math.sin(")
-  .replace(/cos\(/g, "Math.cos(")
-  .replace(/tan\(/g, "Math.tan(")
-  .replace(/log\(/g, "Math.log10(")
-  .replace(/ln\(/g, "Math.log(")
-  .replace(/sqrt\(/g, "Math.sqrt(")
-  .replace(/pi/g, "Math.PI")
-  .replace(/e/g, "Math.E")
-  .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
+            .replace(/sin\(/g, "Math.sin(")
+            .replace(/cos\(/g, "Math.cos(")
+            .replace(/tan\(/g, "Math.tan(")
+            .replace(/log\(/g, "Math.log10(")
+            .replace(/ln\(/g, "Math.log(")
+            .replace(/sqrt\(/g, "Math.sqrt(")
+            .replace(/pi/g, "Math.PI")
+            .replace(/e/g, "Math.E")
+            .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
 
-
-          y = eval(exprJS);
+          // Remplacer x par sa valeur
+          y = eval(exprJS.replace(/x/g, `(${x})`));
         } catch {
           y = NaN;
         }
+
         const py = originY - y * scaleY;
-        if (px === 0) {
+        if (px === 0 || isNaN(y)) {
           ctx.moveTo(px, py);
         } else {
           ctx.lineTo(px, py);
