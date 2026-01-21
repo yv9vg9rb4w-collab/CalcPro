@@ -1,39 +1,178 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Outil Géométrie - CalcPro</title>
-  <style>
-    body { background-color: #121212; color: white; font-family: Arial, sans-serif; text-align: center; }
-    h1 { color: #00ffcc; }
-    canvas { border: 2px solid #00ffcc; background: #1e1e1e; margin-top: 20px; cursor: crosshair; box-shadow: 0 0 15px #00ffcc33; }
-    .nav { margin-bottom: 20px; }
-    button { background: #1e1e1e; color: #00ffcc; border: 1px solid #00ffcc; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
-    button:hover { background: #00ffcc; color: #121212; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Outil de Géométrie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 15px 0;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button.active {
+            background: #22c55e;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        canvas {
+            background: white;
+            border-radius: 12px;
+            touch-action: none;
+        }
+    </style>
 </head>
 <body>
-  <h1>Outil Géométrie</h1>
-  <div class="nav">
-    <button onclick="location.href='index.html'">⬅ Retour</button>
-    <button onclick="clearCanvas()">Effacer</button>
-  </div>
-  
-  <canvas id="geoCanvas" width="800" height="500"></canvas>
 
-  <script>
-    const canvas = document.getElementById('geoCanvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
+<h1>📐 Outil de Géométrie</h1>
 
-    ctx.strokeStyle = '#00ffcc';
-    ctx.lineWidth = 2;
+<div class="toolbar">
+    <button id="pointBtn" class="active">Point</button>
+    <button id="segmentBtn">Segment</button>
+    <button id="circleBtn">Cercle</button>
+    <button id="clearBtn">Effacer</button>
+</div>
 
-    canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-    canvas.onmousemove = (e) => { if(drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
-    canvas.onmouseup = () => drawing = false;
+<canvas id="canvas" width="360" height="500"></canvas>
 
-    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-  </script>
+<script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const pointBtn = document.getElementById("pointBtn");
+    const segmentBtn = document.getElementById("segmentBtn");
+    const circleBtn = document.getElementById("circleBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    let mode = "point";
+    let firstPoint = null;
+
+    function setActive(btn) {
+        [pointBtn, segmentBtn, circleBtn].forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+    }
+
+    pointBtn.onclick = () => {
+        mode = "point";
+        firstPoint = null;
+        setActive(pointBtn);
+    };
+
+    segmentBtn.onclick = () => {
+        mode = "segment";
+        firstPoint = null;
+        setActive(segmentBtn);
+    };
+
+    circleBtn.onclick = () => {
+        mode = "circle";
+        firstPoint = null;
+        setActive(circleBtn);
+    };
+
+    clearBtn.onclick = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        firstPoint = null;
+    };
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        return { x, y };
+    }
+
+    function drawPoint(x, y) {
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+    }
+
+    function drawSegment(p1, p2) {
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    function drawCircle(center, edge) {
+        const r = Math.hypot(edge.x - center.x, edge.y - center.y);
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    function handleClick(e) {
+        const pos = getPos(e);
+
+        if (mode === "point") {
+            drawPoint(pos.x, pos.y);
+        }
+
+        if (mode === "segment") {
+            if (!firstPoint) {
+                firstPoint = pos;
+                drawPoint(pos.x, pos.y);
+            } else {
+                drawSegment(firstPoint, pos);
+                drawPoint(pos.x, pos.y);
+                firstPoint = null;
+            }
+        }
+
+        if (mode === "circle") {
+            if (!firstPoint) {
+                firstPoint = pos;
+                drawPoint(pos.x, pos.y);
+            } else {
+                drawCircle(firstPoint, pos);
+                firstPoint = null;
+            }
+        }
+    }
+
+    canvas.addEventListener("click", handleClick);
+    canvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        handleClick(e);
+    });
+</script>
+
 </body>
 </html>
