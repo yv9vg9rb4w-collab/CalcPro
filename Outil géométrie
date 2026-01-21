@@ -1,133 +1,56 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Outil Géométrie Lebbar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      color: #00ffcc;
-    }
-    #tool {
-      display: inline-block;
-      background: #222;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #00ffcc55;
-      text-align: left;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input {
-      width: 100px;
-      padding: 5px;
-      margin-left: 10px;
-      border-radius: 6px;
-      border: none;
-      text-align: right;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: none;
-      background: #00ffcc;
-      color: #000;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background: #00ccaa;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #0f0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Mon Outil Géométrie</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; }
+        canvas { border: 2px solid #333; background: white; cursor: crosshair; margin-top: 20px; }
+        .controls { margin-top: 10px; gap: 10px; display: flex; }
+        button { padding: 8px 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+    </style>
 </head>
 <body>
-  <h1>📐 Outil Géométrie Lebbar</h1>
-  <div id="tool">
-    <h2>Aire et périmètre</h2>
-    <label>Côté du carré : <input type="number" id="carre"></label>
-    <button onclick="carre()">Calculer carré</button>
 
-    <label>Rayon du cercle : <input type="number" id="cercle"></label>
-    <button onclick="cercle()">Calculer cercle</button>
+    <h1>GéoOutil Pro</h1>
+    
+    <div class="controls">
+        <button onclick="clearCanvas()">Effacer tout</button>
+        <span>Clique et glisse pour tracer une ligne</span>
+    </div>
 
-    <h2>Volumes</h2>
-    <label>Côté du cube : <input type="number" id="cube"></label>
-    <button onclick="cube()">Calculer cube</button>
+    <canvas id="geoCanvas" width="800" height="500"></canvas>
 
-    <label>Rayon de la sphère : <input type="number" id="sphere"></label>
-    <button onclick="sphere()">Calculer sphère</button>
+    <script>
+        const canvas = document.getElementById('geoCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        let startX, startY;
 
-    <label>Rayon du cylindre : <input type="number" id="cylindreR"> Hauteur : <input type="number" id="cylindreH"></label>
-    <button onclick="cylindre()">Calculer cylindre</button>
+        // Pour éviter le flou sur les écrans haute résolution
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#333";
 
-    <h2>Triangle rectangle</h2>
-    <label>Côté a : <input type="number" id="triA"> Côté b : <input type="number" id="triB"></label>
-    <button onclick="pythagore()">Calculer hypoténuse</button>
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            startX = e.offsetX;
+            startY = e.offsetY;
+        });
 
-    <div id="result"></div>
-  </div>
+        canvas.addEventListener('mouseup', (e) => {
+            if (!drawing) return;
+            // Dessine la ligne finale
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            drawing = false;
+        });
 
-  <script>
-    function carre() {
-      let a = parseFloat(document.getElementById("carre").value);
-      let perimetre = 4 * a;
-      let aire = a * a;
-      document.getElementById("result").innerText = 
-        `Carré → Périmètre = ${perimetre}, Aire = ${aire}`;
-    }
-
-    function cercle() {
-      let r = parseFloat(document.getElementById("cercle").value);
-      let circonf = 2 * Math.PI * r;
-      let aire = Math.PI * r * r;
-      document.getElementById("result").innerText = 
-        `Cercle → Circonférence = ${circonf.toFixed(2)}, Aire = ${aire.toFixed(2)}`;
-    }
-
-    function cube() {
-      let a = parseFloat(document.getElementById("cube").value);
-      let volume = Math.pow(a, 3);
-      document.getElementById("result").innerText = 
-        `Cube → Volume = ${volume}`;
-    }
-
-    function sphere() {
-      let r = parseFloat(document.getElementById("sphere").value);
-      let volume = (4/3) * Math.PI * Math.pow(r, 3);
-      document.getElementById("result").innerText = 
-        `Sphère → Volume = ${volume.toFixed(2)}`;
-    }
-
-    function cylindre() {
-      let r = parseFloat(document.getElementById("cylindreR").value);
-      let h = parseFloat(document.getElementById("cylindreH").value);
-      let volume = Math.PI * r * r * h;
-      document.getElementById("result").innerText = 
-        `Cylindre → Volume = ${volume.toFixed(2)}`;
-    }
-
-    function pythagore() {
-      let a = parseFloat(document.getElementById("triA").value);
-      let b = parseFloat(document.getElementById("triB").value);
-      let c = Math.sqrt(a*a + b*b);
-      document.getElementById("result").innerText = 
-        `Triangle rectangle → Hypoténuse = ${c.toFixed(2)}`;
-    }
-  </script>
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
 </body>
 </html>
