@@ -2,87 +2,96 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Calculatrice scientifique</title>
+  <title>Calculatrice Lebbar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background-color: #121212;
-      color: white;
-      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
       text-align: center;
-      margin: 0;
       padding: 20px;
     }
     h1 {
       color: #00ffcc;
-    }
-    #calc {
-      display: inline-block;
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #00ffcc55;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 18px;
       margin-bottom: 10px;
-      border-radius: 6px;
+    }
+    #calculator {
+      display: inline-block;
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ffcc55;
+    }
+    #display {
+      width: 100%;
+      font-size: 20px;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
       border: none;
       text-align: right;
+      background: #000;
+      color: #0f0;
+    }
+    .row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
     }
     button {
       width: 70px;
       height: 50px;
       margin: 5px;
       font-size: 16px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
-      background-color: #00ffcc;
-      color: #121212;
+      background: #00ffcc;
+      color: #000;
       cursor: pointer;
+      transition: 0.2s;
     }
-    button:active {
-      background-color: #009999;
+    button:hover {
+      background: #00ccaa;
     }
   </style>
 </head>
 <body>
-  <h1>📐 Calculatrice scientifique</h1>
-  <div id="calc">
+  <h1>🧠 Calculatrice Lebbar</h1>
+  <div id="calculator">
     <input type="text" id="display" readonly>
-    <div>
+
+    <div class="row">
       <button onclick="insert('7')">7</button>
       <button onclick="insert('8')">8</button>
       <button onclick="insert('9')">9</button>
       <button onclick="insert('/')">÷</button>
     </div>
-    <div>
+    <div class="row">
       <button onclick="insert('4')">4</button>
       <button onclick="insert('5')">5</button>
       <button onclick="insert('6')">6</button>
       <button onclick="insert('*')">×</button>
     </div>
-    <div>
+    <div class="row">
       <button onclick="insert('1')">1</button>
       <button onclick="insert('2')">2</button>
       <button onclick="insert('3')">3</button>
       <button onclick="insert('-')">−</button>
     </div>
-    <div>
+    <div class="row">
       <button onclick="insert('0')">0</button>
       <button onclick="insert('.')">.</button>
       <button onclick="calculate()">=</button>
       <button onclick="insert('+')">+</button>
     </div>
-    <div>
+    <div class="row">
       <button onclick="insert('sin(')">sin</button>
       <button onclick="insert('cos(')">cos</button>
       <button onclick="insert('tan(')">tan</button>
       <button onclick="insert('sqrt(')">√</button>
     </div>
-    <div>
+    <div class="row">
       <button onclick="insert('log(')">log</button>
       <button onclick="insert('ln(')">ln</button>
       <button onclick="insert('^')">x^y</button>
@@ -91,6 +100,8 @@
   </div>
 
   <script>
+    let lastAnswer = "";
+
     function insert(val) {
       document.getElementById("display").value += val;
     }
@@ -102,13 +113,12 @@
     function calculate() {
       let expr = document.getElementById("display").value;
 
-      // Remplacements pour JS
       expr = expr
         .replace(/sin\(/g, "Math.sin(")
         .replace(/cos\(/g, "Math.cos(")
         .replace(/tan\(/g, "Math.tan(")
-        .replace(/log\(/g, "Math.log10(") // log base 10
-        .replace(/ln\(/g, "Math.log(")    // ln naturel
+        .replace(/log\(/g, "Math.log10(")
+        .replace(/ln\(/g, "Math.log(")
         .replace(/sqrt\(/g, "Math.sqrt(")
         .replace(/pi/g, "Math.PI")
         .replace(/e/g, "Math.E")
@@ -116,6 +126,7 @@
 
       try {
         let result = eval(expr);
+        lastAnswer = result;
         document.getElementById("display").value = result;
       } catch {
         document.getElementById("display").value = "Erreur";
