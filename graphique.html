@@ -110,17 +110,18 @@
           let y;
           try {
             let exprJS = expr
-              .replace(/sin\(/g, "Math.sin(")
-              .replace(/cos\(/g, "Math.cos(")
-              .replace(/tan\(/g, "Math.tan(")
-              .replace(/log\(/g, "Math.log10(")
-              .replace(/ln\(/g, "Math.log(")
-              .replace(/sqrt\(/g, "Math.sqrt(")
-              .replace(/pi/g, "Math.PI")
-              .replace(/e/g, "Math.E")
-              .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
+  .replace(/sin\(/g, "Math.sin(")
+  .replace(/cos\(/g, "Math.cos(")
+  .replace(/tan\(/g, "Math.tan(")
+  .replace(/log\(/g, "Math.log10(")
+  .replace(/ln\(/g, "Math.log(")
+  .replace(/sqrt\(/g, "Math.sqrt(")
+  .replace(/pi/g, "Math.PI")
+  .replace(/e/g, "Math.E")
+  .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
 
             y = eval(exprJS.replace(/x/g, `(${x})`));
+
           } catch {
             y = NaN;
           }
