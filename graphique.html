@@ -22,7 +22,7 @@
     input {
       padding: 10px;
       font-size: 16px;
-      width: 300px;
+      width: 400px;
       border-radius: 6px;
       border: none;
     }
@@ -52,7 +52,7 @@
 <body>
   <h1>📈 Calculatrice graphique</h1>
   <div id="controls">
-    <input type="text" id="equation" placeholder="Exemple : x^2, sin(x), sqrt(x)">
+    <input type="text" id="equation" placeholder="Exemple : x^2, sin(x), cos(x)">
     <button onclick="drawGraph()">Tracer</button>
   </div>
   <canvas id="graphCanvas" width="900" height="500"></canvas>
@@ -62,21 +62,23 @@
   </footer>
 
   <script>
-    // Vérification de l'équation (sécurité)
     function isValidEquation(expr) {
-      const regex = /^[0-9x+\-*/^().\s]*$/i;
+      const regex = /^[0-9x+\-*/^().,\s]*$/i;
       return regex.test(expr);
     }
 
     function drawGraph() {
       const canvas = document.getElementById('graphCanvas');
       const ctx = canvas.getContext('2d');
-      const expr = document.getElementById('equation').value;
+      const exprInput = document.getElementById('equation').value;
 
-      if (!isValidEquation(expr)) {
+      if (!isValidEquation(exprInput)) {
         alert("Équation invalide !");
         return;
       }
+
+      // Séparer les équations par virgule
+      const equations = exprInput.split(",").map(e => e.trim());
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -96,38 +98,42 @@
       ctx.lineTo(originX, height);
       ctx.stroke();
 
-      // Fonction
-      ctx.strokeStyle = "#00ffcc";
-      ctx.beginPath();
-      for (let px = 0; px < width; px++) {
-        const x = (px - originX) / scaleX;
-        let y;
-        try {
-          let exprJS = expr
-            .replace(/sin\(/g, "Math.sin(")
-            .replace(/cos\(/g, "Math.cos(")
-            .replace(/tan\(/g, "Math.tan(")
-            .replace(/log\(/g, "Math.log10(")
-            .replace(/ln\(/g, "Math.log(")
-            .replace(/sqrt\(/g, "Math.sqrt(")
-            .replace(/pi/g, "Math.PI")
-            .replace(/e/g, "Math.E")
-            .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
+      // Palette de couleurs
+      const colors = ["#00ffcc", "#ff0066", "#ffaa00", "#66ff00", "#0099ff", "#ff00ff"];
 
-          // Remplacer x par sa valeur
-          y = eval(exprJS.replace(/x/g, `(${x})`));
-        } catch {
-          y = NaN;
-        }
+      // Tracer chaque équation
+      equations.forEach((expr, idx) => {
+        ctx.strokeStyle = colors[idx % colors.length];
+        ctx.beginPath();
+        for (let px = 0; px < width; px++) {
+          const x = (px - originX) / scaleX;
+          let y;
+          try {
+            let exprJS = expr
+              .replace(/sin\(/g, "Math.sin(")
+              .replace(/cos\(/g, "Math.cos(")
+              .replace(/tan\(/g, "Math.tan(")
+              .replace(/log\(/g, "Math.log10(")
+              .replace(/ln\(/g, "Math.log(")
+              .replace(/sqrt\(/g, "Math.sqrt(")
+              .replace(/pi/g, "Math.PI")
+              .replace(/e/g, "Math.E")
+              .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
 
-        const py = originY - y * scaleY;
-        if (px === 0 || isNaN(y)) {
-          ctx.moveTo(px, py);
-        } else {
-          ctx.lineTo(px, py);
+            y = eval(exprJS.replace(/x/g, `(${x})`));
+          } catch {
+            y = NaN;
+          }
+
+          const py = originY - y * scaleY;
+          if (px === 0 || isNaN(y)) {
+            ctx.moveTo(px, py);
+          } else {
+            ctx.lineTo(px, py);
+          }
         }
-      }
-      ctx.stroke();
+        ctx.stroke();
+      });
     }
   </script>
 </body>
