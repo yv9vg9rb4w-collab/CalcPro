@@ -62,22 +62,10 @@
   </footer>
 
   <script>
-    // Vérification de l'équation (sécurité)
-    function isValidEquation(expr) {
-      // Autoriser chiffres, x, opérateurs, fonctions mathématiques et constantes
-      const regex = /^[0-9x+\-*/^().,\s]*$|sin|cos|tan|log|ln|sqrt|pi|e/i;
-      return regex.test(expr);
-    }
-
     function drawGraph() {
       const canvas = document.getElementById('graphCanvas');
       const ctx = canvas.getContext('2d');
       const exprInput = document.getElementById('equation').value;
-
-      if (!isValidEquation(exprInput)) {
-        alert("Équation invalide !");
-        return;
-      }
 
       // Séparer les équations par virgule
       const equations = exprInput.split(",").map(e => e.trim());
