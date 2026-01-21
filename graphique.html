@@ -1,149 +1,124 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>CalcPro - Calculatrice graphique</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background-color: #121212;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      color: #00ffcc;
-    }
-    #controls {
-      margin: 20px 0;
-    }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      width: 400px;
-      border-radius: 6px;
-      border: none;
-    }
-    button {
-      padding: 10px 20px;
-      margin-left: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      background-color: #00ffcc;
-      color: #121212;
-      cursor: pointer;
-    }
-    canvas {
-      background: #1e1e1e;
-      border-radius: 10px;
-      margin-top: 20px;
-      box-shadow: 0 0 10px #00ffcc55;
-    }
-  </style>
-</head>
-<body>
-  <h1>📈 Calculatrice graphique</h1>
-  <div id="controls">
-    <input type="text" id="equation" placeholder="Exemple : x^2, sin(x), cos(x), tan(x), log(x), ln(x)">
-    <button onclick="drawGraph()">Tracer</button>
-  </div>
-  <canvas id="graphCanvas" width="900" height="500"></canvas>
+<meta charset="UTF-8">
+<title>Lebbar Graphique</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script>
-   function isValidEquation(expr) {
-  // Supprimer les espaces
-  expr = expr.replace(/\s+/g, "");
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  // Autoriser uniquement ces mots
-  const allowed = ["sin", "cos", "tan", "log", "ln", "sqrt", "pi", "e", "x"];
-
-  // Vérifier chaque mot
-  const tokens = expr.split(/[^a-zA-Z]+/).filter(Boolean);
-  return tokens.every(t => allowed.includes(t) || !isNaN(t));
+<style>
+body{
+    margin:0;
+    background:#0f172a;
+    color:white;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
 }
+.box{
+    width:95%;
+    max-width:600px;
+    background:#020617;
+    border-radius:18px;
+    padding:15px;
+    box-shadow:0 20px 40px rgba(0,0,0,.6);
+}
+.title{
+    text-align:center;
+    font-weight:bold;
+    color:#38bdf8;
+    margin-bottom:10px;
+}
+input{
+    width:100%;
+    padding:12px;
+    font-size:18px;
+    border:none;
+    border-radius:12px;
+    outline:none;
+    background:#020617;
+    color:#22c55e;
+    border:1px solid #334155;
+}
+canvas{
+    margin-top:15px;
+    background:#020617;
+    border-radius:14px;
+}
+</style>
+</head>
 
-   ctx.clearRect(0, 0, canvas.width, canvas.height);
+<body>
 
-      const width = canvas.width;
-      const height = canvas.height;
-      const scaleX = 40; // 40px = 1 unité
-      const scaleY = 40;
-      const originX = width / 2;
-      const originY = height / 2;
+<div class="box">
+<div class="title">📈 LEBBAR • GRAPH CALCULATOR</div>
 
-      // Axes
-      ctx.strokeStyle = "#888";
-      ctx.beginPath();
-      ctx.moveTo(0, originY);
-      ctx.lineTo(width, originY);
-      ctx.moveTo(originX, 0);
-      ctx.lineTo(originX, height);
-      ctx.stroke();
+<input id="fx" placeholder="Ex : x^2 , sin(x) , √(x)" oninput="draw()">
 
-      // Graduations X
-      ctx.fillStyle = "#aaa";
-      ctx.font = "12px Arial";
-      for (let i = -Math.floor(width/(2*scaleX)); i <= Math.floor(width/(2*scaleX)); i++) {
-        const px = originX + i * scaleX;
-        ctx.beginPath();
-        ctx.moveTo(px, originY - 5);
-        ctx.lineTo(px, originY + 5);
-        ctx.stroke();
-        ctx.fillText(i.toString(), px - 5, originY + 20);
-      }
+<canvas id="graph"></canvas>
+</div>
 
-      // Graduations Y
-      for (let j = -Math.floor(height/(2*scaleY)); j <= Math.floor(height/(2*scaleY)); j++) {
-        const py = originY - j * scaleY;
-        ctx.beginPath();
-        ctx.moveTo(originX - 5, py);
-        ctx.lineTo(originX + 5, py);
-        ctx.stroke();
-        if (j !== 0) {
-          ctx.fillText(j.toString(), originX + 10, py + 5);
-        }
-      }
+<script>
+const ctx = document.getElementById('graph');
+let chart;
 
-      // Couleurs
-      const colors = ["#00ffcc", "#ff0066", "#ffaa00", "#66ff00", "#0099ff", "#ff00ff"];
+function draw(){
+    let f = document.getElementById("fx").value;
+    if(!f) return;
 
-      // Tracer chaque équation
-      equations.forEach((expr, idx) => {
-        ctx.strokeStyle = colors[idx % colors.length];
-        ctx.beginPath();
-        for (let px = 0; px < width; px++) {
-          const x = (px - originX) / scaleX;
-          let y;
-          try {
-            let exprJS = expr
-              .replace(/sin\(/g, "Math.sin(")
-              .replace(/cos\(/g, "Math.cos(")
-              .replace(/tan\(/g, "Math.tan(")
-              .replace(/log\(/g, "Math.log10(") // log base 10
-              .replace(/ln\(/g, "Math.log(")    // ln naturel
-              .replace(/sqrt\(/g, "Math.sqrt(")
-              .replace(/pi/g, "Math.PI")
-              .replace(/e/g, "Math.E")
-              .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
+    let xValues = [];
+    let yValues = [];
 
-            y = eval(exprJS.replace(/x/g, `(${x})`));
-          } catch {
-            y = NaN;
-          }
+    for(let x=-10; x<=10; x+=0.1){
+        let e = f
+            .replace(/\^/g,"**")
+            .replace(/√/g,"Math.sqrt")
+            .replace(/sin/g,"Math.sin")
+            .replace(/cos/g,"Math.cos")
+            .replace(/tan/g,"Math.tan")
+            .replace(/log/g,"Math.log10")
+            .replace(/ln/g,"Math.log")
+            .replace(/π/g,"Math.PI")
+            .replace(/x/g,`(${x})`);
 
-          const py = originY - y * scaleY;
-          if (px === 0 || isNaN(y)) {
-            ctx.moveTo(px, py);
-          } else {
-            ctx.lineTo(px, py);
-          }
-        }
-        ctx.stroke();
-      });
+        try{
+            let y = eval(e);
+            if(isFinite(y)){
+                xValues.push(x);
+                yValues.push(y);
+            }
+        }catch{}
     }
-  </script>
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(ctx,{
+        type:'line',
+        data:{
+            labels:xValues,
+            datasets:[{
+                label:"y = "+f,
+                data:yValues,
+                borderWidth:2,
+                tension:0.2
+            }]
+        },
+        options:{
+            responsive:true,
+            scales:{
+                x:{grid:{color:"#1e293b"}},
+                y:{grid:{color:"#1e293b"}}
+            },
+            plugins:{
+                legend:{labels:{color:"white"}}
+            }
+        }
+    });
+}
+</script>
+
 </body>
 </html>
