@@ -52,7 +52,7 @@
 <body>
   <h1>📈 Calculatrice graphique</h1>
   <div id="controls">
-    <input type="text" id="equation" placeholder="Exemple : x^2, sin(x), cos(x)">
+    <input type="text" id="equation" placeholder="Exemple : x^2, sin(x), cos(x), tan(x)">
     <button onclick="drawGraph()">Tracer</button>
   </div>
   <canvas id="graphCanvas" width="900" height="500"></canvas>
@@ -62,8 +62,10 @@
   </footer>
 
   <script>
+    // Vérification de l'équation (sécurité)
     function isValidEquation(expr) {
-      const regex = /^[0-9x+\-*/^().,\s]*$/i;
+      // Autoriser chiffres, x, opérateurs, fonctions mathématiques et constantes
+      const regex = /^[0-9x+\-*/^().,\s]*$|sin|cos|tan|log|ln|sqrt|pi|e/i;
       return regex.test(expr);
     }
 
@@ -110,18 +112,18 @@
           let y;
           try {
             let exprJS = expr
-  .replace(/sin\(/g, "Math.sin(")
-  .replace(/cos\(/g, "Math.cos(")
-  .replace(/tan\(/g, "Math.tan(")
-  .replace(/log\(/g, "Math.log10(")
-  .replace(/ln\(/g, "Math.log(")
-  .replace(/sqrt\(/g, "Math.sqrt(")
-  .replace(/pi/g, "Math.PI")
-  .replace(/e/g, "Math.E")
-  .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
+              .replace(/sin\(/g, "Math.sin(")
+              .replace(/cos\(/g, "Math.cos(")
+              .replace(/tan\(/g, "Math.tan(")
+              .replace(/log\(/g, "Math.log10(")
+              .replace(/ln\(/g, "Math.log(")
+              .replace(/sqrt\(/g, "Math.sqrt(")
+              .replace(/pi/g, "Math.PI")
+              .replace(/e/g, "Math.E")
+              .replace(/(\w+)\s*\^\s*(\w+)/g, "Math.pow($1,$2)");
 
+            // Remplacer x par sa valeur numérique
             y = eval(exprJS.replace(/x/g, `(${x})`));
-
           } catch {
             y = NaN;
           }
