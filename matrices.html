@@ -28,7 +28,7 @@ body{
     text-align:center;
     font-weight:bold;
     color:#38bdf8;
-    margin-bottom:10px;
+    margin-bottom:12px;
 }
 .area{
     display:grid;
@@ -47,7 +47,7 @@ textarea{
     resize:none;
 }
 .buttons{
-    margin:10px 0;
+    margin:12px 0;
     display:grid;
     grid-template-columns:repeat(5,1fr);
     gap:8px;
@@ -78,7 +78,7 @@ button:active{transform:scale(0.95);}
 <div class="title">🧮 LEBBAR • MATRIX CALCULATOR</div>
 
 <div class="area">
-<textarea id="A" placeholder="Matrice A"></textarea>
+<textarea id="A" placeholder="Matrice A (ex : 1 2&#10;3 4)"></textarea>
 <textarea id="B" placeholder="Matrice B"></textarea>
 </div>
 
@@ -86,82 +86,109 @@ button:active{transform:scale(0.95);}
 <button onclick="add()">A + B</button>
 <button onclick="sub()">A − B</button>
 <button onclick="mul()">A × B</button>
-<button onclick="det()">det(A)</button>
-<button onclick="inv()">A⁻¹</button>
+<button onclick="detA()">det(A)</button>
+<button onclick="invA()">A⁻¹</button>
 </div>
 
 <div class="result" id="result">Résultat ici</div>
 </div>
 
 <script>
+const Aarea = document.getElementById("A");
+const Barea = document.getElementById("B");
+const R = document.getElementById("result");
+
 function parseMatrix(text){
-    return text.trim().split("\n").map(r=>r.trim().split(/\s+/).map(Number));
+    let rows = text.trim().split("\n");
+    let matrix = rows.map(r => r.trim().split(/\s+/).map(Number));
+
+    let cols = matrix[0].length;
+    for(let r of matrix){
+        if(r.length !== cols || r.some(isNaN)){
+            throw "Format incorrect";
+        }
+    }
+    return matrix;
 }
 
-function display(m){
-    return m.map(r=>r.join(" ")).join("\n");
+function display(M){
+    return M.map(r => r.map(v => Number(v.toFixed(4))).join(" ")).join("\n");
 }
-
-function add(){
-    let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
-}
-
-const AreaA=document.getElementById("A");
-const AreaB=document.getElementById("B");
-const R=document.getElementById("result");
 
 function add(){
     try{
-        let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
-        let C=A.map((r,i)=>r.map((v,j)=>v+B[i][j]));
-        R.innerText=display(C);
-    }catch{R.innerText="Erreur";}
+        let A = parseMatrix(Aarea.value);
+        let B = parseMatrix(Barea.value);
+        let C = A.map((r,i)=>r.map((v,j)=>v + B[i][j]));
+        R.innerText = display(C);
+    }catch(e){ R.innerText="Erreur A + B"; }
 }
 
 function sub(){
     try{
-        let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
-        let C=A.map((r,i)=>r.map((v,j)=>v-B[i][j]));
-        R.innerText=display(C);
-    }catch{R.innerText="Erreur";}
+        let A = parseMatrix(Aarea.value);
+        let B = parseMatrix(Barea.value);
+        let C = A.map((r,i)=>r.map((v,j)=>v - B[i][j]));
+        R.innerText = display(C);
+    }catch(e){ R.innerText="Erreur A − B"; }
 }
 
 function mul(){
     try{
-        let A=parseMatrix(AreaA.value), B=parseMatrix(AreaB.value);
-        let C=A.map(r=>B[0].map((_,j)=>r.reduce((s,v,i)=>s+v*B[i][j],0)));
-        R.innerText=display(C);
-    }catch{R.innerText="Erreur";}
+        let A = parseMatrix(Aarea.value);
+        let B = parseMatrix(Barea.value);
+        let C = A.map(r =>
+            B[0].map((_,j) =>
+                r.reduce((s,v,i)=> s + v * B[i][j], 0)
+            )
+        );
+        R.innerText = display(C);
+    }catch(e){ R.innerText="Erreur A × B"; }
 }
 
-function det(){
+function detA(){
     try{
-        let M=parseMatrix(AreaA.value);
-        if(M.length===2){
-            let d=M[0][0]*M[1][1]-M[0][1]*M[1][0];
-            R.innerText=d;
-        }else if(M.length===3){
-            let d=
-            M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])-
-            M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])+
-            M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
-            R.innerText=d;
-        }else R.innerText="2×2 ou 3×3 seulement";
-    }catch{R.innerText="Erreur";}
+        let M = parseMatrix(Aarea.value);
+
+        if(M.length === 2){
+            let d = M[0][0]*M[1][1] - M[0][1]*M[1][0];
+            R.innerText = d;
+        }
+        else if(M.length === 3){
+            let d =
+              M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])
+            - M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])
+            + M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
+            R.innerText = d;
+        }
+        else{
+            R.innerText = "det : seulement 2×2 ou 3×3";
+        }
+    }catch(e){ R.innerText="Erreur det(A)"; }
 }
 
-function inv(){
+function invA(){
     try{
-        let M=parseMatrix(AreaA.value);
-        if(M.length!==2){R.innerText="Inverse 2×2 seulement";return;}
-        let d=M[0][0]*M[1][1]-M[0][1]*M[1][0];
-        if(d===0){R.innerText="Non inversible";return;}
-        let I=[
+        let M = parseMatrix(Aarea.value);
+
+        if(M.length !== 2){
+            R.innerText="Inverse seulement 2×2";
+            return;
+        }
+
+        let d = M[0][0]*M[1][1] - M[0][1]*M[1][0];
+        if(d === 0){
+            R.innerText="Matrice non inversible";
+            return;
+        }
+
+        let I = [
             [ M[1][1]/d, -M[0][1]/d ],
             [ -M[1][0]/d, M[0][0]/d ]
         ];
-        R.innerText=display(I);
-    }catch{R.innerText="Erreur";}
+
+        R.innerText = display(I);
+    }catch(e){ R.innerText="Erreur A⁻¹"; }
 }
 </script>
 
