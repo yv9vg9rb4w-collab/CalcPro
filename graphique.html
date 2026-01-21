@@ -53,14 +53,19 @@
   <canvas id="graphCanvas" width="900" height="500"></canvas>
 
   <script>
-    function drawGraph() {
-      const canvas = document.getElementById('graphCanvas');
-      const ctx = canvas.getContext('2d');
-      const exprInput = document.getElementById('equation').value;
+   function isValidEquation(expr) {
+  // Supprimer les espaces
+  expr = expr.replace(/\s+/g, "");
 
-      const equations = exprInput.split(",").map(e => e.trim());
+  // Autoriser uniquement ces mots
+  const allowed = ["sin", "cos", "tan", "log", "ln", "sqrt", "pi", "e", "x"];
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Vérifier chaque mot
+  const tokens = expr.split(/[^a-zA-Z]+/).filter(Boolean);
+  return tokens.every(t => allowed.includes(t) || !isNaN(t));
+}
+
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const width = canvas.width;
       const height = canvas.height;
