@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Calculatrice 3D - CalcPro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { background:#121212; color:white; font-family:Arial,sans-serif; margin:0; overflow:hidden; display:flex; flex-direction:column; align-items:center; }
-    h1 { color:#00ffcc; margin:15px 0; text-align:center; }
-    #coords { color:#00ffcc; margin:10px; font-size:14px; }
-    .toolbar { display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; }
-    .toolbar button { padding:10px 16px; border:none; border-radius:8px; background:#2563eb; color:white; font-size:14px; cursor:pointer; transition:0.2s; }
-    .toolbar button:hover { transform:scale(1.05); }
-    footer { margin-top:5px; text-align:center; font-size:14px; color:#aaa; }
-    #container { width:100%; height:500px; border-radius:12px; }
-  </style>
+<meta charset="UTF-8">
+<title>Calculatrice 3D Scientifique - CalcPro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { background:#121212; color:white; font-family:Arial,sans-serif; margin:0; overflow:hidden; display:flex; flex-direction:column; align-items:center; }
+  h1 { color:#00ffcc; margin:15px 0; text-align:center; }
+  #coords { color:#00ffcc; margin:10px; font-size:14px; }
+  .toolbar { display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; }
+  .toolbar button { padding:10px 16px; border:none; border-radius:8px; background:#2563eb; color:white; font-size:14px; cursor:pointer; transition:0.2s; }
+  .toolbar button:hover { transform:scale(1.05); }
+  footer { margin-top:5px; text-align:center; font-size:14px; color:#aaa; }
+  #container { width:100%; height:500px; border-radius:12px; }
+</style>
 </head>
 <body>
 
-<h1>🧭 Calculatrice 3D - CalcPro</h1>
+<h1>🧭 Calculatrice 3D Scientifique - CalcPro</h1>
+
 <div class="toolbar">
   <button id="addPointBtn">Ajouter Point</button>
+  <button id="connectBtn">Connecter Points</button>
   <button id="clearBtn">Effacer</button>
 </div>
+
 <div id="coords">Coordonnées : x=0, y=0, z=0</div>
 <div id="container"></div>
 <footer>Développeur: <strong>Lebbar Yahya</strong></footer>
@@ -30,85 +33,130 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-  const container = document.getElementById('container');
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x1e1e1e);
+const container = document.getElementById('container');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1e1e1e);
 
-  const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
-  camera.position.set(10,10,10);
+const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
+camera.position.set(15,15,15);
 
-  const renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  container.appendChild(renderer.domElement);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(container.clientWidth, container.clientHeight);
+container.appendChild(renderer.domElement);
 
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 
-  // Axes et grille
-  scene.add(new THREE.AxesHelper(5));
-  scene.add(new THREE.GridHelper(20,20));
+// Axes et grille
+scene.add(new THREE.AxesHelper(10));
+scene.add(new THREE.GridHelper(20,20,0x444444,0x888888));
 
-  // Plan invisible pour cliquer (X,Z) avec y=0 (comme la grille)
-  const planeGeo = new THREE.PlaneGeometry(20,20);
-  const planeMat = new THREE.MeshBasicMaterial({visible:false});
-  const plane = new THREE.Mesh(planeGeo, planeMat);
-  plane.rotateX(-Math.PI/2); // Horizontal (XZ)
-  scene.add(plane);
+// Plan semi-transparent cliquable
+const planeGeo = new THREE.PlaneGeometry(20,20);
+const planeMat = new THREE.MeshBasicMaterial({color:0x5555ff, opacity:0.1, transparent:true});
+const plane = new THREE.Mesh(planeGeo, planeMat);
+plane.rotateX(-Math.PI/2);
+scene.add(plane);
 
-  const points = [];
-  const coords = document.getElementById("coords");
+let points = [];
+let segments = [];
 
-  let addPointMode = false;
-  document.getElementById("addPointBtn").onclick = ()=>{
-    addPointMode = !addPointMode;
-    document.getElementById("addPointBtn").style.background = addPointMode ? "#22c55e" : "#2563eb";
-  };
-  document.getElementById("clearBtn").onclick = ()=>{
-    points.forEach(p => scene.remove(p));
-    points.length = 0;
-  };
+const coords = document.getElementById("coords");
+let addPointMode = false;
+let connectMode = false;
+let lastPoint = null;
 
-  function addPoint(x,y,z){
-    const geo = new THREE.SphereGeometry(0.2,16,16);
-    const mat = new THREE.MeshBasicMaterial({color:0xffeb3b});
-    const sphere = new THREE.Mesh(geo, mat);
-    sphere.position.set(x,y,z);
-    scene.add(sphere);
-    points.push(sphere);
-  }
+document.getElementById("addPointBtn").onclick = ()=>{
+  addPointMode = !addPointMode;
+  connectMode = false;
+  lastPoint = null;
+  document.getElementById("addPointBtn").style.background = addPointMode?"#22c55e":"#2563eb";
+  document.getElementById("connectBtn").style.background = "#2563eb";
+};
 
-  // Click to add point on XZ plane
-  renderer.domElement.addEventListener('click', (event)=>{
-    if(!addPointMode) return;
+document.getElementById("connectBtn").onclick = ()=>{
+  connectMode = !connectMode;
+  addPointMode = false;
+  lastPoint = null;
+  document.getElementById("connectBtn").style.background = connectMode?"#22c55e":"#2563eb";
+  document.getElementById("addPointBtn").style.background = "#2563eb";
+};
 
-    const rect = renderer.domElement.getBoundingClientRect();
-    const mouse = new THREE.Vector2(
-      ((event.clientX - rect.left)/rect.width)*2 -1,
-      -((event.clientY - rect.top)/rect.height)*2 +1
-    );
+document.getElementById("clearBtn").onclick = ()=>{
+  points.forEach(p=>scene.remove(p));
+  segments.forEach(s=>scene.remove(s));
+  points = [];
+  segments = [];
+  lastPoint = null;
+};
 
-    const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse,camera);
-    const intersects = raycaster.intersectObject(plane);
-    if(intersects.length>0){
-      const p = intersects[0].point;
-      addPoint(p.x,0,p.z); // y=0 pour rester sur la grille
+// Fonction pour créer un point
+function addPoint(x,y,z){
+  const geo = new THREE.SphereGeometry(0.3,16,16);
+  const mat = new THREE.MeshBasicMaterial({color:0xffeb3b});
+  const sphere = new THREE.Mesh(geo, mat);
+  sphere.position.set(x,y,z);
+  scene.add(sphere);
+  points.push(sphere);
+}
+
+// Fonction pour créer un segment entre deux points
+function addSegment(p1,p2){
+  const mat = new THREE.LineBasicMaterial({color:0x03a9f4});
+  const pointsLine = [];
+  pointsLine.push(p1.position.clone());
+  pointsLine.push(p2.position.clone());
+  const geo = new THREE.BufferGeometry().setFromPoints(pointsLine);
+  const line = new THREE.Line(geo, mat);
+  scene.add(line);
+  segments.push(line);
+}
+
+// Click sur le plan
+renderer.domElement.addEventListener('click', (event)=>{
+  const rect = renderer.domElement.getBoundingClientRect();
+  const mouse = new THREE.Vector2(
+    ((event.clientX - rect.left)/rect.width)*2 -1,
+    -((event.clientY - rect.top)/rect.height)*2 +1
+  );
+
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(mouse,camera);
+  const intersects = raycaster.intersectObject(plane);
+  if(intersects.length>0){
+    const p = intersects[0].point;
+
+    if(addPointMode){
+      addPoint(p.x,0,p.z);
       coords.innerText = `Coordonnées : x=${p.x.toFixed(2)}, y=0, z=${p.z.toFixed(2)}`;
     }
-  });
 
-  function animate(){
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene,camera);
+    if(connectMode){
+      if(!lastPoint){
+        lastPoint = {x:p.x, y:0, z:p.z};
+        addPoint(p.x,0,p.z);
+      } else {
+        const newPoint = {x:p.x, y:0, z:p.z};
+        addPoint(newPoint.x,0,newPoint.z);
+        addSegment({position:new THREE.Vector3(lastPoint.x,lastPoint.y,lastPoint.z)}, {position:new THREE.Vector3(newPoint.x,newPoint.y,newPoint.z)});
+        lastPoint = newPoint;
+      }
+    }
   }
-  animate();
+});
 
-  window.addEventListener('resize', ()=>{
-    camera.aspect = container.clientWidth/container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-  });
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = container.clientWidth/container.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(container.clientWidth, container.clientHeight);
+});
 </script>
 
 </body>
