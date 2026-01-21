@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Calculatrice graphique Lebbar</title>
+  <title>Calculatrice graphique CalcPro</title>
   <style>
     body {
       background: #121212;
@@ -23,7 +23,7 @@
   </style>
 </head>
 <body>
-  <h1>📈 Calculatrice graphique Lebbar</h1>
+  <h1>📈 Calculatrice graphique CalcPro</h1>
 
   <input type="text" id="equation" placeholder="Ex: x^2 ou sin(x)">
   <input type="number" id="xvalue" placeholder="Valeur de x ?" step="any">
@@ -65,7 +65,7 @@
     // Nombres sur les axes
     ctx.fillStyle = "#000";
     ctx.font = "12px Arial";
-    for (let i = -9; i <= 9; i++) {
+    for (let i = -10; i <= 10; i++) {
       if (i !== 0) {
         ctx.fillText(i, originX + i * scale - 5, originY + 15); // X
         ctx.fillText(i, originX + 5, originY - i * scale + 5); // Y
