@@ -13,9 +13,9 @@ header{text-align:center;padding:20px;font-size:24px;color:#60a5fa;font-weight:b
 .container{max-width:700px;margin:auto;background:#1e1e2f;padding:20px;border-radius:15px;box-shadow:0 0 25px rgba(0,0,0,.6);}
 .matrix-box{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
 textarea{width:100%;height:120px;background:#0b0e1a;color:#60a5fa;border:none;border-radius:10px;padding:10px;font-size:15px;resize:none;}
-.buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px;}
-button{padding:12px;font-size:15px;border:none;border-radius:10px;cursor:pointer;background:#2563eb;color:white;font-weight:bold;}
-button:hover{opacity:0.9;}
+.buttons{display:grid;grid-template-columns:repeat(auto-fit, minmax(120px,1fr));gap:15px;margin-top:20px;}
+button{padding:15px;font-size:16px;border:none;border-radius:12px;cursor:pointer;background:#2563eb;color:white;font-weight:bold;transition:0.2s;}
+button:hover{background:#3b82f6;transform:scale(1.05);}
 .result{margin-top:15px;background:#0b0e1a;padding:15px;border-radius:10px;min-height:70px;white-space:pre-wrap;color:#60a5fa;font-size:16px;}
 footer{text-align:center;margin-top:20px;color:#aaa;font-size:13px;}
 table{border-collapse:collapse;}
@@ -32,12 +32,12 @@ td{border:1px solid #60a5fa;padding:6px;text-align:center;}
   </div>
 
   <div class="buttons">
-    <button onclick="add()">A + B</button>
-    <button onclick="sub()">A − B</button>
-    <button onclick="mul()">A × B</button>
-    <button onclick="det()">det(A)</button>
-    <button onclick="inv()">A⁻¹</button>
-    <button onclick="trans()">Aᵀ</button>
+    <button id="btnAdd">A + B</button>
+    <button id="btnSub">A − B</button>
+    <button id="btnMul">A × B</button>
+    <button id="btnDet">det(A)</button>
+    <button id="btnInv">A⁻¹</button>
+    <button id="btnTrans">Aᵀ</button>
   </div>
 
   <div class="result" id="result">Résultat…</div>
@@ -48,7 +48,7 @@ td{border:1px solid #60a5fa;padding:6px;text-align:center;}
 // parse matrix automatiquement (espaces, virgules, tab)
 function parseMatrix(text){
   const rows = text.trim().split(/\n/);
-  const matrix = rows.map(row => row.trim().split(/[\s,]+/).map(Number));
+  const matrix = rows.map(row=>row.trim().split(/[\s,]+/).map(Number));
   return math.matrix(matrix);
 }
 
@@ -66,17 +66,20 @@ function showMatrix(mat){
   return html;
 }
 
-function display(result){
-  document.getElementById("result").innerHTML=showMatrix(result);
-}
+function display(result){document.getElementById("result").innerHTML=showMatrix(result);}
 
-// opérations
-function add(){try{display(math.add(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Impossible d’additionner";}}
-function sub(){try{display(math.subtract(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Impossible de soustraire";}}
-function mul(){try{display(math.multiply(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Dimensions incompatibles";}}
-function det(){try{display(math.det(parseMatrix(A.value)));}catch{result.innerText="❌ Matrice non carrée ou erreur";}}
-function inv(){try{display(math.inv(parseMatrix(A.value)));}catch{result.innerText="❌ Matrice non inversible";}}
-function trans(){try{display(math.transpose(parseMatrix(A.value)));}}
+// RÉCUPÉRATION DES ÉLÉMENTS
+const A = document.getElementById("A");
+const B = document.getElementById("B");
+const result = document.getElementById("result");
+
+// AJOUT DES ÉVÉNEMENTS AUX BOUTONS
+document.getElementById("btnAdd").addEventListener("click",()=>{try{display(math.add(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Impossible d’additionner";}});
+document.getElementById("btnSub").addEventListener("click",()=>{try{display(math.subtract(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Impossible de soustraire";}});
+document.getElementById("btnMul").addEventListener("click",()=>{try{display(math.multiply(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Dimensions incompatibles";}});
+document.getElementById("btnDet").addEventListener("click",()=>{try{display(math.det(parseMatrix(A.value)));}catch{result.innerText="❌ Matrice non carrée ou erreur";}});
+document.getElementById("btnInv").addEventListener("click",()=>{try{display(math.inv(parseMatrix(A.value)));}catch{result.innerText="❌ Matrice non inversible";}});
+document.getElementById("btnTrans").addEventListener("click",()=>{try{display(math.transpose(parseMatrix(A.value)));}catch{result.innerText="❌ Erreur";}});
 </script>
 </body>
 </html>
