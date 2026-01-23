@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Calculatrice Scientifique iPhone</title>
+<title>Calculatrice Scientifique PRO MAX</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.9.1/math.min.js"></script>
 <style>
   body {
-    background-color: #1c1c1e;
+    background-color: #121212;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
     flex-direction: column;
@@ -18,97 +18,103 @@
   }
 
   h1 {
-    color: #0a84ff;
+    color: #00ffe0;
     margin-bottom: 15px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   #expr {
     width: 100%;
-    max-width: 400px;
-    padding: 15px;
-    font-size: 22px;
-    border-radius: 15px;
+    max-width: 450px;
+    padding: 18px;
+    font-size: 24px;
+    border-radius: 20px;
     border: none;
-    background: #2c2c2e;
-    color: #0a84ff;
+    background: #1e1e1e;
+    color: #00ffe0;
     text-align: right;
     margin-bottom: 15px;
   }
 
-  .buttons, .quick-buttons, .scientific-buttons {
+  .grid-buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    max-width: 400px;
+    max-width: 450px;
     width: 100%;
     margin-bottom: 15px;
   }
 
   button {
     padding: 18px 0;
-    font-size: 18px;
-    border-radius: 15px;
+    font-size: 20px;
+    border-radius: 20px;
     border: none;
-    background: #3a3a3c;
-    color: #fff;
+    background: #2c2c2e;
+    color: #00ffe0;
     font-weight: 600;
+    box-shadow: 0 0 8px #00ffe088;
     transition: 0.15s;
     cursor: pointer;
   }
 
   button:hover {
-    background: #5a5a5c;
+    box-shadow: 0 0 15px #00ffe0;
     transform: scale(1.05);
   }
 
   #result {
     width: 100%;
-    max-width: 400px;
-    background: #2c2c2e;
-    border-radius: 15px;
+    max-width: 450px;
+    background: #1e1e1e;
+    border-radius: 20px;
     padding: 15px;
     text-align: right;
-    font-size: 22px;
+    font-size: 24px;
     min-height: 50px;
     margin-bottom: 10px;
-    color: #0a84ff;
+    color: #00ffe0;
   }
 
   #history {
-    max-width: 400px;
+    max-width: 450px;
     width: 100%;
-    background: #2c2c2e;
-    border-radius: 12px;
+    background: #1a1a1a;
+    border-radius: 15px;
     padding: 10px;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
-    color: #8e8e93;
-    font-size: 14px;
+    color: #00ffe0aa;
+    font-size: 15px;
   }
 
   .history-item {
     margin-bottom: 6px;
+    cursor: pointer;
+  }
+
+  .history-item:hover {
+    color: #ffffff;
+    text-decoration: underline;
   }
 
   footer {
     margin-top: 20px;
     font-size: 14px;
-    color: #8e8e93;
+    color: #888;
     text-align: center;
   }
 </style>
 </head>
 <body>
 
-<h1>Calculatrice Scientifique</h1>
+<h1>Calculatrice Scientifique PRO MAX</h1>
 <input type="text" id="expr" placeholder="0">
 
-<!-- Résultat -->
 <div id="result">Résultat</div>
 
-<!-- Boutons rapides symboliques -->
-<div class="quick-buttons">
+<!-- Boutons numériques et opérateurs -->
+<div class="grid-buttons">
   <button onclick="ajouter('7')">7</button>
   <button onclick="ajouter('8')">8</button>
   <button onclick="ajouter('9')">9</button>
@@ -130,28 +136,30 @@
   <button onclick="ajouter('+')">+</button>
 </div>
 
-<!-- Fonctions scientifiques -->
-<div class="scientific-buttons">
+<!-- Fonctions scientifiques avancées -->
+<div class="grid-buttons">
   <button onclick="ajouterRacine()">√</button>
   <button onclick="ajouter('^2')">x²</button>
   <button onclick="ajouter('^3')">x³</button>
-  <button onclick="ajouter('(')">(</button>
+  <button onclick="ajouter('^')">x^y</button>
 
+  <button onclick="ajouter('(')">(</button>
   <button onclick="ajouter(')')">)</button>
   <button onclick="ajouter('sin(')">sin</button>
   <button onclick="ajouter('cos(')">cos</button>
-  <button onclick="ajouter('tan(')">tan</button>
 
+  <button onclick="ajouter('tan(')">tan</button>
   <button onclick="ajouter('asin(')">asin</button>
   <button onclick="ajouter('acos(')">acos</button>
   <button onclick="ajouter('atan(')">atan</button>
-  <button onclick="ajouter('log(')">log</button>
 
+  <button onclick="ajouter('log(')">log</button>
   <button onclick="ajouter('ln(')">ln</button>
   <button onclick="ajouter('exp(')">exp</button>
+  <button onclick="ajouter('abs(')">abs</button>
+
   <button onclick="ajouter('!')">!</button>
   <button onclick="ajouter('π')">π</button>
-
   <button onclick="ajouter('e')">e</button>
   <button onclick="calculer()">=</button>
 </div>
@@ -168,7 +176,6 @@ const exprInput = document.getElementById('expr');
 const resultDiv = document.getElementById('result');
 const historyDiv = document.getElementById('history');
 
-// Ajouter texte
 function ajouter(val) {
   const cursorPos = exprInput.selectionStart;
   const text = exprInput.value;
@@ -177,10 +184,52 @@ function ajouter(val) {
   exprInput.selectionEnd = cursorPos + val.length;
 }
 
-// Racine √()
 function ajouterRacine() {
   const cursorPos = exprInput.selectionStart;
   const text = exprInput.value;
   exprInput.value = text.slice(0, cursorPos) + '√()' + text.slice(cursorPos);
   exprInput.focus();
-  exprInput.sel
+  exprInput.selectionEnd = cursorPos + 2;
+}
+
+function ajouterMultiplication() {
+  ajouter('×');
+}
+
+function clearInput() {
+  exprInput.value = '';
+  resultDiv.innerHTML = 'Résultat';
+}
+
+// Historique cliquable
+function ajouterHistorique(expr, res) {
+  const div = document.createElement('div');
+  div.className = 'history-item';
+  div.textContent = expr + " → " + res;
+  div.onclick = () => exprInput.value = expr; // réutiliser
+  historyDiv.prepend(div);
+}
+
+// Préparer expression pour Math.js
+function parseExpression(expr) {
+  return expr
+    .replace(/√\(/g, 'sqrt(')
+    .replace(/×/g, '*')
+    .replace(/π/g, 'pi');
+}
+
+// Calculer
+function calculer() {
+  try {
+    const expr = parseExpression(exprInput.value);
+    const res = math.evaluate(expr).toString();
+    resultDiv.innerHTML = res;
+    ajouterHistorique(exprInput.value, res);
+  } catch(e) {
+    resultDiv.innerHTML = "Erreur : " + e.message;
+  }
+}
+</script>
+
+</body>
+</html>
