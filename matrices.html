@@ -27,8 +27,8 @@ td{border:1px solid #60a5fa;padding:6px;text-align:center;}
 <header>🧮 Matrices ULTRA</header>
 <div class="container">
   <div class="matrix-box">
-    <textarea id="A" placeholder="Matrice A&#10;Ex: 1 2 3&#10;4 5 6"></textarea>
-    <textarea id="B" placeholder="Matrice B&#10;Ex: 7,8,9&#10;10,11,12"></textarea>
+    <textarea id="A" placeholder="Matrice A&#10;Ex: 1 2&#10;3 4"></textarea>
+    <textarea id="B" placeholder="Matrice B&#10;Ex: 5 6&#10;7 8"></textarea>
   </div>
 
   <div class="buttons">
@@ -45,14 +45,22 @@ td{border:1px solid #60a5fa;padding:6px;text-align:center;}
 <footer>CalcPro © Lebbar Yahya</footer>
 
 <script>
-// parse matrix automatiquement (espaces, virgules, tab)
+// PARSE matrice (espaces, virgules, tabulations)
 function parseMatrix(text){
   const rows = text.trim().split(/\n/);
-  const matrix = rows.map(row=>row.trim().split(/[\s,]+/).map(Number));
+  const matrix = rows.map(row=>{
+    const nums = row.trim().split(/[\s,]+/).map(Number);
+    if(nums.some(isNaN)) throw "Format incorrect"; // validation
+    return nums;
+  });
+
+  // Vérifier que toutes les lignes ont le même nombre de colonnes
+  const nCols = matrix[0].length;
+  if(!matrix.every(r=>r.length === nCols)) throw "Toutes les lignes doivent avoir le même nombre de colonnes";
   return math.matrix(matrix);
 }
 
-// affiche le résultat en tableau HTML
+// AFFICHER matrice en tableau HTML
 function showMatrix(mat){
   if(typeof mat==="number") return mat;
   const arr = mat._data || mat;
@@ -73,13 +81,48 @@ const A = document.getElementById("A");
 const B = document.getElementById("B");
 const result = document.getElementById("result");
 
-// AJOUT DES ÉVÉNEMENTS AUX BOUTONS
-document.getElementById("btnAdd").addEventListener("click",()=>{try{display(math.add(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Impossible d’additionner";}});
-document.getElementById("btnSub").addEventListener("click",()=>{try{display(math.subtract(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Impossible de soustraire";}});
-document.getElementById("btnMul").addEventListener("click",()=>{try{display(math.multiply(parseMatrix(A.value),parseMatrix(B.value)));}catch{result.innerText="❌ Dimensions incompatibles";}});
-document.getElementById("btnDet").addEventListener("click",()=>{try{display(math.det(parseMatrix(A.value)));}catch{result.innerText="❌ Matrice non carrée ou erreur";}});
-document.getElementById("btnInv").addEventListener("click",()=>{try{display(math.inv(parseMatrix(A.value)));}catch{result.innerText="❌ Matrice non inversible";}});
-document.getElementById("btnTrans").addEventListener("click",()=>{try{display(math.transpose(parseMatrix(A.value)));}catch{result.innerText="❌ Erreur";}});
+// FONCTIONS DES BOUTONS
+document.getElementById("btnAdd").addEventListener("click",()=>{
+  try{
+    display(math.add(parseMatrix(A.value),parseMatrix(B.value)));
+  }catch(e){result.innerText="❌ "+e;}
+});
+
+document.getElementById("btnSub").addEventListener("click",()=>{
+  try{
+    display(math.subtract(parseMatrix(A.value),parseMatrix(B.value)));
+  }catch(e){result.innerText="❌ "+e;}
+});
+
+document.getElementById("btnMul").addEventListener("click",()=>{
+  try{
+    const MA = parseMatrix(A.value);
+    const MB = parseMatrix(B.value);
+    display(math.multiply(MA,MB));
+  }catch(e){result.innerText="❌ "+e;}
+});
+
+document.getElementById("btnDet").addEventListener("click",()=>{
+  try{
+    const MA = parseMatrix(A.value);
+    if(MA._size[0]!==MA._size[1]) throw "La matrice doit être carrée";
+    display(math.det(MA));
+  }catch(e){result.innerText="❌ "+e;}
+});
+
+document.getElementById("btnInv").addEventListener("click",()=>{
+  try{
+    const MA = parseMatrix(A.value);
+    if(MA._size[0]!==MA._size[1]) throw "La matrice doit être carrée";
+    display(math.inv(MA));
+  }catch(e){result.innerText="❌ "+e;}
+});
+
+document.getElementById("btnTrans").addEventListener("click",()=>{
+  try{
+    display(math.transpose(parseMatrix(A.value)));
+  }catch(e){result.innerText="❌ "+e;}
+});
 </script>
 </body>
 </html>
