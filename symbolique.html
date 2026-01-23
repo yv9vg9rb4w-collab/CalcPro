@@ -96,15 +96,38 @@
 
 <!-- Boutons fonctions rapides -->
 <div class="quick-buttons">
+  <button onclick="ajouterRacine()">√</button>
   <button onclick="ajouter('^2')">x²</button>
   <button onclick="ajouter('^3')">x³</button>
-  <button onclick="ajouter('sqrt()')">√</button>
-  <button onclick="ajouter('+')">+</button>
-  <button onclick="ajouter('-')">-</button>
-  <button onclick="ajouter('*')">*</button>
-  <button onclick="ajouter('/')">/</button>
+  <button onclick="ajouter(' + ')">+</button>
+  <button onclick="ajouter(' - ')">-</button>
+  <button onclick="ajouterMultiplication()">×</button>
+  <button onclick="ajouter(' / ')">/</button>
 </div>
 
+<script>
+function ajouter(val) {
+  const cursorPos = exprInput.selectionStart;
+  const text = exprInput.value;
+  exprInput.value = text.slice(0, cursorPos) + val + text.slice(cursorPos);
+  exprInput.focus();
+  exprInput.selectionEnd = cursorPos + val.length;
+}
+
+// Pour √()
+function ajouterRacine() {
+  const cursorPos = exprInput.selectionStart;
+  const text = exprInput.value;
+  exprInput.value = text.slice(0, cursorPos) + '√()' + text.slice(cursorPos);
+  exprInput.focus();
+  exprInput.selectionEnd = cursorPos + 2; // place le curseur entre les parenthèses
+}
+
+// Pour ×
+function ajouterMultiplication() {
+  ajouter(' × ');
+}
+</script>
 <!-- Boutons calcul symbolique -->
 <div class="buttons">
   <button onclick="simplifier()">Simplifier</button>
