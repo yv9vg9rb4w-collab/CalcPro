@@ -1,82 +1,21 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>CalcPro - A* 3D</title>
-    <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
-        #info { position: absolute; top: 15px; left: 15px; color: #00ffcc; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #00ffcc; z-index: 5; pointer-events: none; }
-        .back { position: absolute; bottom: 20px; left: 20px; background: #00ffcc; color: black; padding: 10px; text-decoration: none; border-radius: 5px; z-index: 5; }
-    </style>
+<meta charset="UTF-8">
+<title>3D Ultra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body{ margin:0; overflow:hidden; background:#121212; }
+  #scene3D{ width:100vw; height:100vh; }
+</style>
 </head>
 <body>
-    <div id="info">Algorithme A* 3D - Navigation Autonome</div>
-    <a href="index.html" class="back">⬅ Retour</a>
-
-    <script type="module">
-        import * as THREE from 'https://cdn.skypack.dev/three@0.136.0/build/three.module.js';
-        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js';
-
-        const size = 12;
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-        camera.position.set(15, 15, 15);
-
-        // --- GRILLE ET ALGO ---
-        const nodes = [];
-        const geometry = new THREE.BoxGeometry(0.7, 0.7, 0.7);
-        
-        for(let x=0; x<size; x++) {
-            nodes[x] = [];
-            for(let y=0; y<size; y++) {
-                nodes[x][y] = [];
-                for(let z=0; z<size; z++) {
-                    const isWall = Math.random() < 0.2 && (x+y+z > 2);
-                    const mat = new THREE.MeshBasicMaterial({ color: isWall ? 0x333333 : 0x00ffcc, transparent: true, opacity: isWall ? 0.8 : 0.05 });
-                    const cube = new THREE.Mesh(geometry, mat);
-                    cube.position.set(x, y, z);
-                    scene.add(cube);
-                    nodes[x][y][z] = { x, y, z, isWall, g: Infinity, f: Infinity, parent: null, mesh: cube };
-                }
-            }
-        }
-
-        function solve() {
-            let start = nodes[0][0][0], end = nodes[size-1][size-1][size-1];
-            let open = [start]; start.g = 0;
-            while(open.length > 0) {
-                open.sort((a,b) => a.f - b.f);
-                let curr = open.shift();
-                if(curr === end) {
-                    while(curr) { curr.mesh.material.opacity = 1; curr.mesh.material.color.set(0xffffff); curr = curr.parent; }
-                    return;
-                }
-                [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].forEach(d => {
-                    let nx=curr.x+d[0], ny=curr.y+d[1], nz=curr.z+d[2];
-                    if(nx>=0 && nx<size && ny>=0 && ny<size && nz>=0 && nz<size) {
-                        let nb = nodes[nx][ny][nz];
-                        if(!nb.isWall && curr.g+1 < nb.g) {
-                            nb.parent = curr; nb.g = curr.g+1;
-                            nb.f = nb.g + (Math.abs(nx-end.x)+Math.abs(ny-end.y)+Math.abs(nz-end.z));
-                            if(!open.includes(nb)) open.push(nb);
-                        }
-                    }
-                });
-            }
-        }
-        solve();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            scene.rotation.y += 0.002;
-            renderer.render(scene, camera);
-        }
-        animate();
-    </script>
+<div id="scene3D"></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+<script src="script.js"></script>
+<script>
+  create3DScene("scene3D");
+</script>
 </body>
 </html>
