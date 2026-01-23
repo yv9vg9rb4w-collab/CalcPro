@@ -2,88 +2,111 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>LebbarAI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LebbarAI - Menu Principal</title>
-
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-  /* Reset */
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
+  /* Reset et styles de base */
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f5f6fa;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    padding: 40px 20px;
+    background-color: #121212;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
   }
 
   h1 {
-    font-weight: 700;
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    color: #2f3640;
+    text-align: center;
+    color: #00ffcc;
+    margin-bottom: 20px;
   }
 
   p {
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-    color: #718093;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 25px;
-    width: 100%;
-    max-width: 900px;
-  }
-
-  .card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 30px 20px;
     text-align: center;
-    text-decoration: none;
-    color: #2f3640;
-    font-weight: 600;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: #aaa;
+    margin-bottom: 30px;
+  }
+
+  /* Grid des fiches */
+  .tool-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  /* Carte outil */
+  .tool {
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    padding: 25px 15px;
+    text-align: center;
+    box-shadow: 0 0 10px #00ffcc55;
+    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
   }
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  .tool:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00ffccaa;
   }
 
-  /* Responsive text */
-  @media(max-width: 480px){
-    h1 { font-size: 2rem; }
-    p { font-size: 1rem; }
+  .icon {
+    font-size: 45px;
+    margin-bottom: 12px;
+  }
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 14px;
+    color: #aaa;
   }
 </style>
 </head>
 <body>
 
-  <h1>Bienvenue dans LebbarAI</h1>
-  <p>Choisissez un outil pour commencer :</p>
+<h1>Bienvenue sur <strong>LebbarAI</strong></h1>
+<p>Choisissez un outil pour commencer :</p>
 
-  <div class="grid">
-    <a href="3d.html" class="card">3D</a>
-    <a href="geometrie.html" class="card">Géométrie</a>
-    <a href="graphique.html" class="card">Graphique</a>
-    <a href="matrices.html" class="card">Matrices</a>
-    <a href="pc.html" class="card">PC</a>
-    <a href="scientifique.html" class="card">Scientifique</a>
-    <a href="symbolique.html" class="card">Symbolique</a>
+<div class="tool-list">
+  <div class="tool" onclick="location.href='graphique.html'">
+    <div class="icon">📈</div>
+    Calculatrice graphique
   </div>
+
+  <div class="tool" onclick="location.href='scientifique.html'">
+    <div class="icon">🧪</div>
+    Calculatrice scientifique
+  </div>
+
+  <div class="tool" onclick="location.href='matrices.html'">
+    <div class="icon">📊</div>
+    Calculatrice matrices
+  </div>
+
+  <div class="tool" onclick="location.href='geometrie.html'">
+    <div class="icon">📐</div>
+    Outil géométrie
+  </div>
+
+  <div class="tool" onclick="location.href='3d.html'">
+    <div class="icon">🧭</div>
+    Calculatrice 3D
+  </div>
+
+  <div class="tool" onclick="location.href='pc.html'">
+    <div class="icon">⚡️</div>
+    Calculatrice P.C
+  </div>
+
+  <div class="tool" onclick="location.href='symbolique.html'">
+    <div class="icon">🧮</div>
+    Calculatrice symbolique
+  </div>
+</div>
+
+<footer>
+  Développeur: <strong>Lebbar Yahya</strong>
+</footer>
 
 </body>
 </html>
