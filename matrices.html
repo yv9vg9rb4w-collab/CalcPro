@@ -11,7 +11,7 @@
 <style>
 body{
   margin:0;
-  background:#0d0f1f;
+  background:#121212;
   font-family:Arial, Helvetica, sans-serif;
   color:white;
 }
@@ -20,13 +20,14 @@ header{
   text-align:center;
   padding:20px;
   font-size:24px;
-  color:#00ffcc;
+  color:#60a5fa;
+  font-weight:bold;
 }
 
 .container{
   max-width:700px;
   margin:auto;
-  background:#151933;
+  background:#1e1e2f;
   padding:20px;
   border-radius:15px;
   box-shadow:0 0 25px rgba(0,0,0,.6);
@@ -42,7 +43,7 @@ textarea{
   width:100%;
   height:120px;
   background:#0b0e1a;
-  color:white;
+  color:#60a5fa;
   border:none;
   border-radius:10px;
   padding:10px;
@@ -63,12 +64,13 @@ button{
   border:none;
   border-radius:10px;
   cursor:pointer;
-  background:#00ffcc;
+  background:#2563eb;
+  color:white;
   font-weight:bold;
 }
 
 button:hover{
-  background:#00d4aa;
+  opacity:0.9;
 }
 
 .result{
@@ -78,6 +80,8 @@ button:hover{
   border-radius:10px;
   min-height:70px;
   white-space:pre-wrap;
+  color:#60a5fa;
+  font-size:16px;
 }
 
 footer{
@@ -125,61 +129,73 @@ Ex:
 
 <script>
 function parseMatrix(text){
-  return text.trim().split("\n").map(row =>
-    row.trim().split(/\s+/).map(Number)
+  // transforme chaque ligne en array de nombres
+  return math.matrix(
+    text.trim().split("\n").map(row =>
+      row.trim().split(/\s+/).map(Number)
+    )
   );
 }
 
 function show(mat){
   document.getElementById("result").innerText =
-    math.format(mat, {precision: 4});
+    math.format(mat, {precision: 6});
 }
 
 function add(){
   try{
-    show(math.add(parseMatrix(A.value), parseMatrix(B.value)));
+    const A = parseMatrix(document.getElementById("A").value);
+    const B = parseMatrix(document.getElementById("B").value);
+    show(math.add(A,B));
   }catch{
-    result.innerText = "❌ Impossible d’additionner";
+    document.getElementById("result").innerText = "❌ Impossible d’additionner";
   }
 }
 
 function sub(){
   try{
-    show(math.subtract(parseMatrix(A.value), parseMatrix(B.value)));
+    const A = parseMatrix(document.getElementById("A").value);
+    const B = parseMatrix(document.getElementById("B").value);
+    show(math.subtract(A,B));
   }catch{
-    result.innerText = "❌ Impossible de soustraire";
+    document.getElementById("result").innerText = "❌ Impossible de soustraire";
   }
 }
 
 function mul(){
   try{
-    show(math.multiply(parseMatrix(A.value), parseMatrix(B.value)));
+    const A = parseMatrix(document.getElementById("A").value);
+    const B = parseMatrix(document.getElementById("B").value);
+    show(math.multiply(A,B));
   }catch{
-    result.innerText = "❌ Dimensions incompatibles";
+    document.getElementById("result").innerText = "❌ Dimensions incompatibles";
   }
 }
 
 function det(){
   try{
-    result.innerText = "det(A) = " + math.det(parseMatrix(A.value));
+    const A = parseMatrix(document.getElementById("A").value);
+    show(math.det(A));
   }catch{
-    result.innerText = "❌ Déterminant impossible";
+    document.getElementById("result").innerText = "❌ Matrice non carrée ou erreur";
   }
 }
 
 function inv(){
   try{
-    show(math.inv(parseMatrix(A.value)));
+    const A = parseMatrix(document.getElementById("A").value);
+    show(math.inv(A));
   }catch{
-    result.innerText = "❌ Matrice non inversible";
+    document.getElementById("result").innerText = "❌ Matrice non inversible";
   }
 }
 
 function trans(){
   try{
-    show(math.transpose(parseMatrix(A.value)));
+    const A = parseMatrix(document.getElementById("A").value);
+    show(math.transpose(A));
   }catch{
-    result.innerText = "❌ Erreur";
+    document.getElementById("result").innerText = "❌ Erreur";
   }
 }
 </script>
