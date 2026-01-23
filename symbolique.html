@@ -5,7 +5,7 @@
 <title>CalcPro – Calcul Symbolique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Math.js (calcul symbolique) -->
+<!-- Math.js -->
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 
 <style>
@@ -24,7 +24,7 @@ header{
 }
 
 .container{
-  max-width:500px;
+  max-width:520px;
   margin:auto;
   background:#151933;
   padding:20px;
@@ -39,7 +39,7 @@ input{
   border-radius:10px;
   border:none;
   outline:none;
-  margin-bottom:15px;
+  margin-bottom:12px;
 }
 
 .buttons{
@@ -49,7 +49,7 @@ input{
 }
 
 button{
-  padding:12px;
+  padding:14px;
   font-size:15px;
   border:none;
   border-radius:10px;
@@ -67,7 +67,8 @@ button:hover{
   background:#0b0e1a;
   padding:15px;
   border-radius:10px;
-  min-height:60px;
+  min-height:70px;
+  font-size:16px;
   word-wrap:break-word;
 }
 
@@ -90,6 +91,8 @@ footer{
 
   <div class="buttons">
     <button onclick="simplifier()">Simplifier</button>
+    <button onclick="factoriser()">Factoriser</button>
+    <button onclick="developper()">Développer</button>
     <button onclick="deriver()">Dériver</button>
     <button onclick="integrer()">Intégrer</button>
     <button onclick="evaluer()">Évaluer x=2</button>
@@ -102,28 +105,49 @@ footer{
 <footer>CalcPro © Lebbar Yahya</footer>
 
 <script>
+function getExpr(){
+  return document.getElementById("expr").value;
+}
+
+function show(txt){
+  document.getElementById("result").innerText = txt;
+}
+
 function simplifier(){
   try{
-    const res = math.simplify(getExpr());
-    show(res.toString());
+    show(math.simplify(getExpr()).toString());
   }catch{
     show("❌ Erreur de syntaxe");
   }
 }
 
+function factoriser(){
+  try{
+    show(math.factor(getExpr()).toString());
+  }catch{
+    show("❌ Impossible de factoriser");
+  }
+}
+
+function developper(){
+  try{
+    show(math.expand(getExpr()).toString());
+  }catch{
+    show("❌ Impossible de développer");
+  }
+}
+
 function deriver(){
   try{
-    const res = math.derivative(getExpr(),"x");
-    show(res.toString());
+    show(math.derivative(getExpr(),"x").toString());
   }catch{
-    show("❌ Impossible de dériver");
+    show("❌ Erreur de dérivation");
   }
 }
 
 function integrer(){
   try{
-    const res = math.integral(getExpr(),"x");
-    show(res.toString()+" + C");
+    show(math.integral(getExpr(),"x").toString() + " + C");
   }catch{
     show("❌ Intégration non supportée");
   }
@@ -131,19 +155,10 @@ function integrer(){
 
 function evaluer(){
   try{
-    const res = math.evaluate(getExpr(),{x:2});
-    show(res);
+    show(math.evaluate(getExpr(),{x:2}));
   }catch{
     show("❌ Erreur d’évaluation");
   }
-}
-
-function getExpr(){
-  return document.getElementById("expr").value;
-}
-
-function show(txt){
-  document.getElementById("result").innerText = txt;
 }
 </script>
 
