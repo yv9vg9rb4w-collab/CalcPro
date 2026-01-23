@@ -3,129 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CalcPro - Pro Max Engine</title>
+    <title>CalcPro - Biometric Scan</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Orbitron', sans-serif; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
         canvas { display: block; }
         
-        /* HUD Style Pro Max */
-        #hud-pro {
+        /* Interface de Scan Pro */
+        #overlay {
             position: absolute; top: 20px; left: 20px;
-            color: #00ffcc; border-left: 2px solid #00ffcc;
-            padding: 10px 20px; background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px); pointer-events: none;
+            color: #00ffcc; border-left: 3px solid #00ffcc;
+            padding: 10px 20px; background: rgba(0, 40, 40, 0.2);
+            backdrop-filter: blur(10px); pointer-events: none;
+            text-transform: uppercase; letter-spacing: 2px;
         }
-        .scanner-line {
-            width: 100%; height: 1px; background: #00ffcc;
-            position: absolute; top: 0; opacity: 0.3;
-            animation: scan 3s linear infinite;
+        .loading-bar {
+            width: 150px; height: 4px; background: #003333;
+            margin-top: 10px; position: relative;
         }
-        @keyframes scan { from { top: 0%; } to { top: 100%; } }
+        .progress {
+            width: 70%; height: 100%; background: #00ffcc;
+            animation: load 2s infinite;
+        }
+        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
 
-        .btn-exit {
-            position: absolute; bottom: 30px; right: 30px;
-            padding: 12px 25px; border: 1px solid #ff007f;
-            color: #ff007f; text-decoration: none;
-            text-transform: uppercase; font-size: 10px; letter-spacing: 2px;
-            border-radius: 50px; transition: 0.3s;
+        .btn-back {
+            position: absolute; bottom: 30px; left: 30px;
+            padding: 15px 30px; border: 1px solid #00ffcc;
+            color: #00ffcc; text-decoration: none; font-weight: bold;
+            border-radius: 5px; background: rgba(0, 255, 204, 0.1);
         }
-        .btn-exit:hover { background: #ff007f; color: #000; box-shadow: 0 0 20px #ff007f; }
     </style>
 </head>
 <body>
-    <div class="scanner-line"></div>
-    <div id="hud-pro">
-        <div style="letter-spacing: 3px; font-weight: bold;">PRO_MAX_ENGINE v9.0</div>
-        <div id="log" style="font-size: 9px; color: #008877; margin-top: 5px;">SYSTEM_STABLE</div>
+
+    <div id="overlay">
+        <div style="font-size: 0.8em; color: #888;">Biometric.Scan_Active</div>
+        <div style="font-size: 1.2em; font-weight: bold;">Target: Locked</div>
+        <div class="loading-bar"><div class="progress"></div></div>
     </div>
 
-    <a href="index.html" class="btn-exit">Terminer Session</a>
-    <canvas id="canvas"></canvas>
+    <a href="index.html" class="btn-back">EXIT_SYSTEM</a>
+    <canvas id="c"></canvas>
 
     <script>
-        const canvas = document.getElementById('canvas');
+        const canvas = document.getElementById('c');
         const ctx = canvas.getContext('2d');
-        let w, h, points = [], angle = 0;
+        let w, h, angle = 0;
 
-        function init() {
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
-            points = [];
-            // Génération de la structure de l'algorithme (Nœuds développés)
-            for(let i=0; i<30; i++) {
-                points.push({
-                    x: (Math.random() - 0.5) * 300,
-                    y: (Math.random() - 0.5) * 300,
-                    z: (Math.random() - 0.5) * 300,
-                    targetX: (Math.random() - 0.5) * 300,
-                    targetY: (Math.random() - 0.5) * 300,
-                    targetZ: (Math.random() - 0.5) * 300
-                });
-            }
+        // Modèle simplifié de crâne (Points 3D simplifiés pour performance mobile)
+        const skullPoints = [];
+        // Création d'une forme ovoïde complexe
+        for(let i=0; i<200; i++) {
+            let u = Math.random() * Math.PI * 2;
+            let v = Math.random() * Math.PI;
+            let r = 150 + Math.sin(v*3)*20; // Déformation pour faire "tête"
+            skullPoints.push({
+                x: r * Math.sin(v) * Math.cos(u),
+                y: r * Math.sin(v) * Math.sin(u) * 1.2 - 50,
+                z: r * Math.cos(v)
+            });
         }
 
-        function project(x, y, z) {
-            const perspective = 500 / (z + 600);
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+
+        function project(p) {
+            // Double rotation (Y et X)
+            let x1 = p.x * Math.cos(angle) - p.z * Math.sin(angle);
+            let z1 = p.x * Math.sin(angle) + p.z * Math.cos(angle);
+            let y1 = p.y * Math.cos(0.3) - z1 * Math.sin(0.3);
+            let z2 = p.y * Math.sin(0.3) + z1 * Math.cos(0.3);
+
+            const scale = 500 / (z2 + 800);
             return {
-                x: x * perspective + w / 2,
-                y: y * perspective + h / 2,
-                s: perspective
+                x: x1 * scale + w / 2,
+                y: y1 * scale + h / 2,
+                o: (z2 + 200) / 400 // Opacité basée sur la profondeur
             };
         }
 
         function draw() {
-            // Effet de rémanence Pro
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillStyle = "black";
             ctx.fillRect(0, 0, w, h);
             
-            angle += 0.01;
-            const cos = Math.cos(angle);
-            const sin = Math.sin(angle);
+            angle += 0.015;
 
-            // Dessin des connexions (Factorisation des données)
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0, 255, 204, 0.2)';
-            ctx.lineWidth = 0.5;
-
-            points.forEach((p, i) => {
-                // Rotation 3D
-                let x = p.x * cos - p.z * sin;
-                let z = p.x * sin + p.z * cos;
-                let y = p.y * Math.cos(angle*0.5) - z * Math.sin(angle*0.5);
+            // Dessin des points de données (Le crâne)
+            skullPoints.forEach((p, i) => {
+                const proj = project(p);
                 
-                let proj = project(x, y, z);
+                // On ne dessine que si c'est devant
+                if (proj.o > 0) {
+                    ctx.fillStyle = i % 10 === 0 ? "#ff007f" : "#00ffcc";
+                    ctx.globalAlpha = proj.o;
+                    
+                    // Dessin d'un petit carré de pixel pro
+                    ctx.fillRect(proj.x, proj.y, 2, 2);
 
-                // Animation de "Développement" (les points bougent)
-                p.x += (p.targetX - p.x) * 0.01;
-                p.y += (p.targetY - p.y) * 0.01;
-                if(Math.abs(p.x - p.targetX) < 1) {
-                    p.targetX = (Math.random() - 0.5) * 350;
-                    p.targetY = (Math.random() - 0.5) * 350;
+                    // Lignes de connexion aléatoires (Effet scanner)
+                    if (i % 15 === 0 && skullPoints[i+1]) {
+                        const p2 = project(skullPoints[i+1]);
+                        ctx.strokeStyle = "rgba(0, 255, 204, 0.1)";
+                        ctx.beginPath();
+                        ctx.moveTo(proj.x, proj.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
                 }
-
-                // Dessin des liens neuronaux
-                points.slice(i+1, i+4).forEach(p2 => {
-                    let proj2 = project(p2.x * cos - p2.z * sin, p2.y, p2.x * sin + p2.z * cos);
-                    ctx.moveTo(proj.x, proj.y);
-                    ctx.lineTo(proj2.x, proj2.y);
-                });
-
-                // Points lumineux
-                ctx.fillStyle = i % 5 === 0 ? '#ff007f' : '#00ffcc';
-                ctx.fillRect(proj.x-1, proj.y-1, 2, 2);
             });
-            ctx.stroke();
 
-            // HUD Log Update
-            if(Math.random() > 0.95) {
-                document.getElementById('log').innerText = "FACTOR_ID: " + Math.random().toString(16).slice(2,8).toUpperCase();
-            }
+            // Effet de scan horizontal
+            ctx.strokeStyle = "rgba(0, 255, 204, 0.05)";
+            let scanY = (Math.sin(Date.now()*0.002) * h/2) + h/2;
+            ctx.beginPath();
+            ctx.moveTo(0, scanY);
+            ctx.lineTo(w, scanY);
+            ctx.stroke();
 
             requestAnimationFrame(draw);
         }
 
-        window.addEventListener('resize', init);
-        init();
+        window.addEventListener('resize', resize);
+        resize();
         draw();
     </script>
 </body>
