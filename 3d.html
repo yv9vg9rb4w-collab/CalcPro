@@ -2,150 +2,173 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>A* Pathfinding Pro 3D</title>
+    <title>A* Ultra Pro - Autonomous Navigation</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
-        #overlay { position: absolute; bottom: 20px; left: 20px; color: #0f0; background: rgba(0,20,0,0.8); padding: 15px; border: 1px solid #0f0; text-transform: uppercase; letter-spacing: 2px; pointer-events: none; }
-        .stat { color: #fff; font-weight: bold; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Inter', sans-serif; }
+        #ui { position: absolute; top: 30px; left: 30px; color: #00f2ff; border-left: 2px solid #00f2ff; padding-left: 15px; pointer-events: none; }
+        .label { font-size: 10px; opacity: 0.6; text-transform: uppercase; }
+        .value { font-size: 18px; font-weight: bold; margin-bottom: 10px; text-shadow: 0 0 10px #00f2ff; }
     </style>
 </head>
 <body>
-    <div id="overlay">
-        System: <span class="stat">A-STAR_v2.0</span><br>
-        Status: <span class="stat" id="status">Calcul en cours...</span><br>
-        Grid: <span class="stat">20x20x20 (8,000 Nodes)</span>
+    <div id="ui">
+        <div class="label">System Status</div>
+        <div class="value">Neural Pathfinding Active</div>
+        <div class="label">Coordinates</div>
+        <div id="coords" class="value">X:0 Y:0 Z:0</div>
+        <div class="label">Algorithm</div>
+        <div class="value">Heuristic-Manhattan</div>
     </div>
 
     <script type="importmap">
-        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
     </script>
 
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        // --- SETUP PRO ---
-        const size = 20;
+        // --- CORE SETTINGS ---
+        const SIZE = 15;
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.toneMapping = THREE.ReinhardToneMapping;
         document.body.appendChild(renderer.domElement);
 
+        // --- POST-PROCESSING (L'effet "Pro") ---
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        composer.addPass(bloomPass);
+
         const controls = new OrbitControls(camera, renderer.domElement);
-        camera.position.set(30, 30, 30);
+        camera.position.set(20, 20, 25);
 
-        // --- DONNÉES & ALGORITHME ---
-        const grid = [];
-        const start = {x:0, y:0, z:0};
-        const end = {x:size-1, y:size-1, z:size-1};
+        // --- GRID DATA ---
+        const nodes = [];
+        const wallColor = new THREE.Color(0x050505);
+        const instancedWalls = new THREE.InstancedMesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), new THREE.MeshPhongMaterial({color: 0x222222}), SIZE**3);
+        scene.add(instancedWalls);
 
-        function createGrid() {
-            for(let x=0; x<size; x++) {
-                grid[x] = [];
-                for(let y=0; y<size; y++) {
-                    grid[x][y] = [];
-                    for(let z=0; z<size; z++) {
-                        grid[x][y][z] = {
-                            x, y, z,
-                            isWall: Math.random() < 0.3 && !(x===0 && y===0 && z===0) && !(x===size-1 && y===size-1 && z===size-1),
-                            g: Infinity, h: 0, f: Infinity, parent: null
-                        };
+        let wallCount = 0;
+        const dummy = new THREE.Object3D();
+
+        for(let x=0; x<SIZE; x++) {
+            nodes[x] = [];
+            for(let y=0; y<SIZE; y++) {
+                nodes[x][y] = [];
+                for(let z=0; z<SIZE; z++) {
+                    const isWall = Math.random() < 0.25 && (x+y+z > 2) && (x+y+z < (SIZE-1)*3 - 2);
+                    nodes[x][y][z] = { x, y, z, isWall, g: Infinity, h: 0, f: Infinity, parent: null };
+                    
+                    if(isWall) {
+                        dummy.position.set(x, y, z);
+                        dummy.updateMatrix();
+                        instancedWalls.setMatrixAt(wallCount++, dummy.matrix);
                     }
                 }
             }
         }
 
-        function aStar() {
-            let openSet = [grid[start.x][start.y][start.z]];
-            openSet[0].g = 0;
-            
+        // --- PATHFINDING ---
+        function solve() {
+            let start = nodes[0][0][0];
+            let end = nodes[SIZE-1][SIZE-1][SIZE-1];
+            let openSet = [start];
+            start.g = 0;
+
             while(openSet.length > 0) {
-                let current = openSet.reduce((prev, curr) => prev.f < curr.f ? prev : curr);
-                
-                if(current.x === end.x && current.y === end.y && current.z === end.z) return current;
+                openSet.sort((a, b) => a.f - b.f);
+                let current = openSet.shift();
 
-                openSet = openSet.filter(n => n !== current);
-                
-                const neighbors = [];
-                [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].forEach(d => {
+                if(current === end) {
+                    let path = [];
+                    while(current) { path.push(current); current = current.parent; }
+                    return path.reverse();
+                }
+
+                const dirs = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+                for(let d of dirs) {
                     let nx = current.x+d[0], ny = current.y+d[1], nz = current.z+d[2];
-                    if(nx>=0 && nx<size && ny>=0 && ny<size && nz>=0 && nz<size) neighbors.push(grid[nx][ny][nz]);
-                });
-
-                for(let neighbor of neighbors) {
-                    if(neighbor.isWall) continue;
-                    let tentativeG = current.g + 1;
-                    if(tentativeG < neighbor.g) {
-                        neighbor.parent = current;
-                        neighbor.g = tentativeG;
-                        neighbor.h = Math.abs(neighbor.x-end.x) + Math.abs(neighbor.y-end.y) + Math.abs(neighbor.z-end.z);
-                        neighbor.f = neighbor.g + neighbor.h;
-                        if(!openSet.includes(neighbor)) openSet.push(neighbor);
+                    if(nx>=0 && nx<SIZE && ny>=0 && ny<SIZE && nz>=0 && nz<SIZE) {
+                        let neighbor = nodes[nx][ny][nz];
+                        if(neighbor.isWall) continue;
+                        let gScore = current.g + 1;
+                        if(gScore < neighbor.g) {
+                            neighbor.parent = current;
+                            neighbor.g = gScore;
+                            neighbor.h = Math.abs(nx-end.x) + Math.abs(ny-end.y) + Math.abs(nz-end.z);
+                            neighbor.f = neighbor.g + neighbor.h;
+                            if(!openSet.includes(neighbor)) openSet.push(neighbor);
+                        }
                     }
                 }
             }
             return null;
         }
 
-        // --- RENDU INSTANCIÉ (OPTIMISÉ) ---
-        createGrid();
-        const pathEnd = aStar();
-        document.getElementById('status').innerText = pathEnd ? "Chemin trouvé" : "Échec - Relancez";
+        const path = solve();
 
-        // Murs (Gris sombre)
-        const wallGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-        const wallMat = new THREE.MeshPhongMaterial({ color: 0x222222 });
-        const wallMesh = new THREE.InstancedMesh(wallGeo, wallMat, size**3);
-        
-        // Chemin (Néon bleu)
-        const pathMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
-        const pathMesh = new THREE.InstancedMesh(wallGeo, pathMat, size*3);
-
-        let wallIdx = 0;
-        const dummy = new THREE.Object3D();
-
-        for(let x=0; x<size; x++) {
-            for(let y=0; y<size; y++) {
-                for(let z=0; z<size; z++) {
-                    if(grid[x][y][z].isWall) {
-                        dummy.position.set(x, y, z);
-                        dummy.updateMatrix();
-                        wallMesh.setMatrixAt(wallIdx++, dummy.matrix);
-                    }
-                }
-            }
-        }
-        scene.add(wallMesh);
-
-        if(pathEnd) {
-            let curr = pathEnd;
-            let pIdx = 0;
-            while(curr) {
-                dummy.position.set(curr.x, curr.y, curr.z);
-                dummy.updateMatrix();
-                pathMesh.setMatrixAt(pIdx++, dummy.matrix);
-                curr = curr.parent;
-            }
-            pathMesh.count = pIdx;
-            scene.add(pathMesh);
+        // --- VISUAL PATH (Ligne lumineuse) ---
+        if(path) {
+            const points = path.map(p => new THREE.Vector3(p.x, p.y, p.z));
+            const curve = new THREE.CatmullRomCurve3(points);
+            const tubeGeo = new THREE.TubeGeometry(curve, path.length * 2, 0.1, 8, false);
+            const tubeMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff });
+            const tube = new THREE.Mesh(tubeGeo, tubeMat);
+            scene.add(tube);
         }
 
-        // --- EFFETS ---
-        const pLight = new THREE.PointLight(0x00ffff, 500, 100);
-        pLight.position.set(size/2, size/2, size/2);
-        scene.add(pLight);
-        scene.add(new THREE.AmbientLight(0x404040));
+        // --- DRONE AGENT ---
+        const drone = new THREE.Group();
+        const core = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), new THREE.MeshBasicMaterial({color: 0xffffff}));
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.02, 16, 100), new THREE.MeshBasicMaterial({color: 0x00f2ff}));
+        drone.add(core, ring);
+        scene.add(drone);
 
+        const light = new THREE.PointLight(0x00f2ff, 10, 10);
+        drone.add(light);
+
+        // --- ANIMATION LOOP ---
+        let progress = 0;
         function animate() {
             requestAnimationFrame(animate);
-            const time = Date.now() * 0.001;
-            pathMesh.position.y = Math.sin(time) * 0.2; // Petit flottement du chemin
-            scene.rotation.y += 0.002;
-            renderer.render(scene, camera);
+            
+            if(path) {
+                progress += 0.002;
+                if(progress > 1) progress = 0;
+                
+                const pos = path[Math.floor(progress * (path.length-1))];
+                drone.position.lerp(new THREE.Vector3(pos.x, pos.y, pos.z), 0.1);
+                ring.rotation.y += 0.1;
+                ring.rotation.x += 0.05;
+                
+                document.getElementById('coords').innerText = `X:${pos.x} Y:${pos.y} Z:${pos.z}`;
+            }
+
+            scene.rotation.y += 0.001;
+            composer.render();
         }
+
+        scene.add(new THREE.AmbientLight(0x111111));
         animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
