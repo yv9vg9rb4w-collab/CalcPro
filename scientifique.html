@@ -2,194 +2,201 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro – Calculatrice Scientifique</title>
+<title>Calculatrice Scientifique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Math.js -->
-<script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.9.1/math.min.js"></script>
 <style>
-body{
-  margin:0;
-  background:#121212;
-  font-family:Arial, Helvetica, sans-serif;
-  color:white;
-}
+  body {
+    background-color: #121212;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
 
-header{
-  text-align:center;
-  padding:20px;
-  font-size:24px;
-  color:#60a5fa; /* bleu clair */
-  font-weight:bold;
-}
+  h1 {
+    text-align: center;
+    color: #00ffcc;
+    margin-bottom: 15px;
+  }
 
-.container{
-  max-width:420px;
-  margin:auto;
-  background:#1e1e2f; /* sombre bleu foncé */
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,.6);
-}
+  #expr {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    background: #1e1e1e;
+    color: #00ffcc;
+    margin-bottom: 15px;
+    text-align: center;
+  }
 
-#screen{
-  width:100%;
-  padding:15px;
-  font-size:22px;
-  border:none;
-  border-radius:12px;
-  margin-bottom:15px;
-  text-align:right;
-  background:#0b0e1a;
-  color:#60a5fa; /* bleu clair */
-}
+  .buttons, .quick-buttons, .scientific-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
 
-.buttons{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
+  button {
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #121212;
+    background: linear-gradient(45deg, #00ffcc, #00ccff);
+    transition: 0.2s;
+  }
 
-button{
-  padding:14px;
-  font-size:16px;
-  border:none;
-  border-radius:12px;
-  background:#1f2937; /* bleu foncé / gris foncé */
-  color:#60a5fa; /* texte bleu clair */
-  font-weight:bold;
-  cursor:pointer;
-}
+  button:hover {
+    transform: scale(1.05);
+  }
 
-button.func{
-  background:#2563eb; /* bleu pro */
-  color:white;
-}
+  #result {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 12px;
+    min-height: 50px;
+    font-size: 18px;
+    color: #00ffcc;
+    word-wrap: break-word;
+  }
 
-button.equal{
-  background:#3b82f6; /* bleu plus clair pour = */
-  color:white;
-}
+  #history {
+    margin-top: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #1a1a2a;
+    padding: 10px;
+    border-radius: 10px;
+  }
 
-button:hover{
-  opacity:0.9;
-}
+  .history-item {
+    margin-bottom: 8px;
+    color: #00ffccaa;
+    font-size: 14px;
+  }
 
-footer{
-  text-align:center;
-  margin-top:15px;
-  font-size:13px;
-  color:#aaa;
-}
+  footer {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 14px;
+    color: #aaa;
+  }
 </style>
 </head>
-
 <body>
 
-<header>🧪 Calculatrice Scientifique</header>
+<h1>Calculatrice Scientifique</h1>
+<input type="text" id="expr" placeholder="Entrez votre expression">
 
-<div class="container">
-
-  <input id="screen" readonly placeholder="0">
-
-  <div class="buttons">
-    <button onclick="clearAll()">C</button>
-    <button onclick="append('(')">(</button>
-    <button onclick="append(')')">)</button>
-    <button onclick="appendOp('/')">÷</button>
-
-    <button onclick="append('7')">7</button>
-    <button onclick="append('8')">8</button>
-    <button onclick="append('9')">9</button>
-    <button onclick="appendOp('*')">×</button>
-
-    <button onclick="append('4')">4</button>
-    <button onclick="append('5')">5</button>
-    <button onclick="append('6')">6</button>
-    <button onclick="appendOp('-')">−</button>
-
-    <button onclick="append('1')">1</button>
-    <button onclick="append('2')">2</button>
-    <button onclick="append('3')">3</button>
-    <button onclick="appendOp('+')">+</button>
-
-    <button onclick="append('0')">0</button>
-    <button onclick="append('.')">.</button>
-    <button onclick="calculate()" class="equal">=</button>
-    <button onclick="addSqrt()" class="func">√</button>
-
-    <button onclick="appendPower(2)" class="func">x²</button>
-    <button onclick="appendPower(3)" class="func">x³</button>
-    <button onclick="addPi()" class="func">π</button>
-    <button onclick="addE()" class="func">e</button>
-
-    <button onclick="appendFunc('sin')" class="func">sin</button>
-    <button onclick="appendFunc('cos')" class="func">cos</button>
-    <button onclick="appendFunc('tan')" class="func">tan</button>
-    <button onclick="appendFunc('log')" class="func">log</button>
-
-    <button onclick="appendFunc('ln')" class="func">ln</button>
-    <button onclick="toggleAngle()" class="func" id="angle">DEG</button>
-  </div>
-
+<!-- Boutons rapides symboliques -->
+<div class="quick-buttons">
+  <button onclick="ajouterRacine()">√</button>
+  <button onclick="ajouter('^2')">x²</button>
+  <button onclick="ajouter('^3')">x³</button>
+  <button onclick="ajouter('+')">+</button>
+  <button onclick="ajouter('-')">-</button>
+  <button onclick="ajouterMultiplication()">×</button>
+  <button onclick="ajouter('/')">/</button>
+  <button onclick="ajouter('(')">(</button>
+  <button onclick="ajouter(')')">)</button>
 </div>
 
-<footer>CalcPro © Lebbar Yahya</footer>
+<!-- Fonctions scientifiques -->
+<div class="scientific-buttons">
+  <button onclick="ajouter('sin(')">sin</button>
+  <button onclick="ajouter('cos(')">cos</button>
+  <button onclick="ajouter('tan(')">tan</button>
+  <button onclick="ajouter('asin(')">asin</button>
+  <button onclick="ajouter('acos(')">acos</button>
+  <button onclick="ajouter('atan(')">atan</button>
+  <button onclick="ajouter('log(')">log</button>
+  <button onclick="ajouter('ln(')">ln</button>
+  <button onclick="ajouter('exp(')">exp</button>
+  <button onclick="ajouter('!')">!</button>
+  <button onclick="ajouter('π')">π</button>
+  <button onclick="ajouter('e')">e</button>
+</div>
+
+<!-- Boutons de calcul -->
+<div class="buttons">
+  <button onclick="calculer()">Calculer</button>
+  <button onclick="clearInput()">C</button>
+</div>
+
+<div id="result">Résultat ici...</div>
+
+<h3>Historique :</h3>
+<div id="history"></div>
+
+<footer>
+  Développeur: <strong>Lebbar Yahya</strong>
+</footer>
 
 <script>
-let screen = document.getElementById("screen");
-let deg = true;
+const exprInput = document.getElementById('expr');
+const resultDiv = document.getElementById('result');
+const historyDiv = document.getElementById('history');
 
-function append(val){
-  screen.value += val;
+// Ajouter texte à l'input
+function ajouter(val) {
+  const cursorPos = exprInput.selectionStart;
+  const text = exprInput.value;
+  exprInput.value = text.slice(0, cursorPos) + val + text.slice(cursorPos);
+  exprInput.focus();
+  exprInput.selectionEnd = cursorPos + val.length;
 }
 
-function appendOp(op){
-  screen.value += op;
+// Racine symbolique √()
+function ajouterRacine() {
+  const cursorPos = exprInput.selectionStart;
+  const text = exprInput.value;
+  exprInput.value = text.slice(0, cursorPos) + '√()' + text.slice(cursorPos);
+  exprInput.focus();
+  exprInput.selectionEnd = cursorPos + 2;
 }
 
-function clearAll(){
-  screen.value = "";
+// Multiplication symbolique ×
+function ajouterMultiplication() {
+  ajouter('×');
 }
 
-function addSqrt(){
-  screen.value += "√(";
+// Nettoyer l'input
+function clearInput() {
+  exprInput.value = '';
+  resultDiv.innerHTML = '';
 }
 
-function addPi(){
-  screen.value += "π";
+// Historique
+function ajouterHistorique(expr, res) {
+  const div = document.createElement('div');
+  div.className = 'history-item';
+  div.textContent = expr + " → " + res;
+  historyDiv.prepend(div);
 }
 
-function addE(){
-  screen.value += "e";
+// Remplacer symboles avant calcul pour Math.js
+function parseExpression(expr) {
+  return expr
+    .replace(/√\(/g, 'sqrt(')
+    .replace(/×/g, '*')
+    .replace(/π/g, 'pi');
 }
 
-function appendFunc(f){
-  screen.value += f + "(";
-}
-
-function appendPower(p){
-  screen.value += "^" + p;
-}
-
-function toggleAngle(){
-  deg = !deg;
-  math.config({angles: deg ? "deg" : "rad"});
-  document.getElementById("angle").innerText = deg ? "DEG" : "RAD";
-}
-
-function calculate(){
-  try{
-    let expr = screen.value
-      .replace(/×/g,"*")
-      .replace(/÷/g,"/")
-      .replace(/√/g,"sqrt")
-      .replace(/π/g,"pi");
-
-    screen.value = math.evaluate(expr);
-  }catch{
-    screen.value = "Erreur";
+// Calculer
+function calculer() {
+  try {
+    const expr = parseExpression(exprInput.value);
+    const res = math.evaluate(expr).toString();
+    resultDiv.innerHTML = res;
+    ajouterHistorique(exprInput.value, res);
+  } catch(e) {
+    resultDiv.innerHTML = "Erreur : " + e.message;
   }
 }
 </script>
