@@ -2,193 +2,185 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Lebbar Matrix Calculator</title>
+<title>CalcPro – Calcul Matrices</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Math.js -->
+<script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 
 <style>
 body{
-    margin:0;
-    background:#020617;
-    color:white;
-    font-family:Arial, sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+  margin:0;
+  background:#0d0f1f;
+  font-family:Arial, Helvetica, sans-serif;
+  color:white;
 }
-.box{
-    width:95%;
-    max-width:700px;
-    background:#020617;
-    border-radius:18px;
-    padding:15px;
-    box-shadow:0 25px 50px rgba(0,0,0,.7);
+
+header{
+  text-align:center;
+  padding:20px;
+  font-size:24px;
+  color:#00ffcc;
 }
-.title{
-    text-align:center;
-    font-weight:bold;
-    color:#38bdf8;
-    margin-bottom:12px;
+
+.container{
+  max-width:700px;
+  margin:auto;
+  background:#151933;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 0 25px rgba(0,0,0,.6);
 }
-.area{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
+
+.matrix-box{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
 }
+
 textarea{
-    width:100%;
-    height:120px;
-    background:#020617;
-    color:#22c55e;
-    border:1px solid #334155;
-    border-radius:12px;
-    padding:10px;
-    font-size:16px;
-    resize:none;
+  width:100%;
+  height:120px;
+  background:#0b0e1a;
+  color:white;
+  border:none;
+  border-radius:10px;
+  padding:10px;
+  font-size:15px;
+  resize:none;
 }
+
 .buttons{
-    margin:12px 0;
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:8px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:15px;
 }
+
 button{
-    height:45px;
-    border:none;
-    border-radius:12px;
-    background:#1e293b;
-    color:white;
-    font-size:15px;
+  padding:12px;
+  font-size:15px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#00ffcc;
+  font-weight:bold;
 }
-button:active{transform:scale(0.95);}
+
+button:hover{
+  background:#00d4aa;
+}
+
 .result{
-    background:#000;
-    color:#00ff88;
-    border-radius:12px;
-    padding:12px;
-    min-height:80px;
-    white-space:pre;
+  margin-top:15px;
+  background:#0b0e1a;
+  padding:15px;
+  border-radius:10px;
+  min-height:70px;
+  white-space:pre-wrap;
+}
+
+footer{
+  text-align:center;
+  margin-top:20px;
+  color:#aaa;
+  font-size:13px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-<div class="title">🧮 LEBBAR • MATRIX CALCULATOR</div>
+<header>🧮 Calcul Matrices</header>
 
-<div class="area">
-<textarea id="A" placeholder="Matrice A (ex : 1 2&#10;3 4)"></textarea>
-<textarea id="B" placeholder="Matrice B"></textarea>
+<div class="container">
+
+  <div class="matrix-box">
+    <textarea id="A" placeholder="Matrice A
+Ex:
+1 2
+3 4"></textarea>
+
+    <textarea id="B" placeholder="Matrice B
+Ex:
+5 6
+7 8"></textarea>
+  </div>
+
+  <div class="buttons">
+    <button onclick="add()">A + B</button>
+    <button onclick="sub()">A − B</button>
+    <button onclick="mul()">A × B</button>
+
+    <button onclick="det()">det(A)</button>
+    <button onclick="inv()">A⁻¹</button>
+    <button onclick="trans()">Aᵀ</button>
+  </div>
+
+  <div class="result" id="result">Résultat…</div>
+
 </div>
 
-<div class="buttons">
-<button onclick="add()">A + B</button>
-<button onclick="sub()">A − B</button>
-<button onclick="mul()">A × B</button>
-<button onclick="detA()">det(A)</button>
-<button onclick="invA()">A⁻¹</button>
-</div>
-
-<div class="result" id="result">Résultat ici</div>
-</div>
+<footer>CalcPro © Lebbar Yahya</footer>
 
 <script>
-const Aarea = document.getElementById("A");
-const Barea = document.getElementById("B");
-const R = document.getElementById("result");
-
 function parseMatrix(text){
-    let rows = text.trim().split("\n");
-    let matrix = rows.map(r => r.trim().split(/\s+/).map(Number));
-
-    let cols = matrix[0].length;
-    for(let r of matrix){
-        if(r.length !== cols || r.some(isNaN)){
-            throw "Format incorrect";
-        }
-    }
-    return matrix;
+  return text.trim().split("\n").map(row =>
+    row.trim().split(/\s+/).map(Number)
+  );
 }
 
-function display(M){
-    return M.map(r => r.map(v => Number(v.toFixed(4))).join(" ")).join("\n");
+function show(mat){
+  document.getElementById("result").innerText =
+    math.format(mat, {precision: 4});
 }
 
 function add(){
-    try{
-        let A = parseMatrix(Aarea.value);
-        let B = parseMatrix(Barea.value);
-        let C = A.map((r,i)=>r.map((v,j)=>v + B[i][j]));
-        R.innerText = display(C);
-    }catch(e){ R.innerText="Erreur A + B"; }
+  try{
+    show(math.add(parseMatrix(A.value), parseMatrix(B.value)));
+  }catch{
+    result.innerText = "❌ Impossible d’additionner";
+  }
 }
 
 function sub(){
-    try{
-        let A = parseMatrix(Aarea.value);
-        let B = parseMatrix(Barea.value);
-        let C = A.map((r,i)=>r.map((v,j)=>v - B[i][j]));
-        R.innerText = display(C);
-    }catch(e){ R.innerText="Erreur A − B"; }
+  try{
+    show(math.subtract(parseMatrix(A.value), parseMatrix(B.value)));
+  }catch{
+    result.innerText = "❌ Impossible de soustraire";
+  }
 }
 
 function mul(){
-    try{
-        let A = parseMatrix(Aarea.value);
-        let B = parseMatrix(Barea.value);
-        let C = A.map(r =>
-            B[0].map((_,j) =>
-                r.reduce((s,v,i)=> s + v * B[i][j], 0)
-            )
-        );
-        R.innerText = display(C);
-    }catch(e){ R.innerText="Erreur A × B"; }
+  try{
+    show(math.multiply(parseMatrix(A.value), parseMatrix(B.value)));
+  }catch{
+    result.innerText = "❌ Dimensions incompatibles";
+  }
 }
 
-function detA(){
-    try{
-        let M = parseMatrix(Aarea.value);
-
-        if(M.length === 2){
-            let d = M[0][0]*M[1][1] - M[0][1]*M[1][0];
-            R.innerText = d;
-        }
-        else if(M.length === 3){
-            let d =
-              M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])
-            - M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])
-            + M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
-            R.innerText = d;
-        }
-        else{
-            R.innerText = "det : seulement 2×2 ou 3×3";
-        }
-    }catch(e){ R.innerText="Erreur det(A)"; }
+function det(){
+  try{
+    result.innerText = "det(A) = " + math.det(parseMatrix(A.value));
+  }catch{
+    result.innerText = "❌ Déterminant impossible";
+  }
 }
 
-function invA(){
-    try{
-        let M = parseMatrix(Aarea.value);
+function inv(){
+  try{
+    show(math.inv(parseMatrix(A.value)));
+  }catch{
+    result.innerText = "❌ Matrice non inversible";
+  }
+}
 
-        if(M.length !== 2){
-            R.innerText="Inverse seulement 2×2";
-            return;
-        }
-
-        let d = M[0][0]*M[1][1] - M[0][1]*M[1][0];
-        if(d === 0){
-            R.innerText="Matrice non inversible";
-            return;
-        }
-
-        let I = [
-            [ M[1][1]/d, -M[0][1]/d ],
-            [ -M[1][0]/d, M[0][0]/d ]
-        ];
-
-        R.innerText = display(I);
-    }catch(e){ R.innerText="Erreur A⁻¹"; }
+function trans(){
+  try{
+    show(math.transpose(parseMatrix(A.value)));
+  }catch{
+    result.innerText = "❌ Erreur";
+  }
 }
 </script>
 
