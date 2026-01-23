@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro – Calcul Physique</title>
+<title>CalcPro – Physique & Chimie</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -21,7 +21,7 @@ header{
 }
 
 .container{
-  max-width:500px;
+  max-width:520px;
   margin:auto;
   background:#151933;
   padding:20px;
@@ -59,7 +59,7 @@ button:hover{
   background:#0b0e1a;
   padding:15px;
   border-radius:10px;
-  min-height:50px;
+  min-height:60px;
   font-size:16px;
 }
 
@@ -74,11 +74,12 @@ footer{
 
 <body>
 
-<header>⚙️ Calcul Physique</header>
+<header>⚗️⚙️ Physique & Chimie</header>
 
 <div class="container">
 
-  <select id="type">
+<select id="type">
+  <optgroup label="Physique">
     <option value="v">Vitesse (v = d / t)</option>
     <option value="a">Accélération (a = Δv / t)</option>
     <option value="f">Force (F = m × g)</option>
@@ -88,14 +89,23 @@ footer{
     <option value="ohm">Loi d’Ohm (U = R × I)</option>
     <option value="pression">Pression (P = F / S)</option>
     <option value="densite">Densité (ρ = m / V)</option>
-  </select>
+  </optgroup>
 
-  <input id="x" placeholder="Valeur 1">
-  <input id="y" placeholder="Valeur 2">
+  <optgroup label="Chimie">
+    <option value="n">Quantité de matière (n = m / M)</option>
+    <option value="c">Concentration molaire (C = n / V)</option>
+    <option value="m">Masse (m = n × M)</option>
+    <option value="vol">Volume (V = n / C)</option>
+    <option value="dil">Dilution (C₁V₁ = C₂V₂)</option>
+  </optgroup>
+</select>
 
-  <button onclick="calculer()">Calculer</button>
+<input id="x" placeholder="Valeur 1">
+<input id="y" placeholder="Valeur 2">
 
-  <div class="result" id="result">Résultat…</div>
+<button onclick="calculer()">Calculer</button>
+
+<div class="result" id="result">Résultat…</div>
 
 </div>
 
@@ -103,47 +113,35 @@ footer{
 
 <script>
 function calculer(){
-  let type = document.getElementById("type").value;
+  let t = document.getElementById("type").value;
   let x = parseFloat(document.getElementById("x").value);
   let y = parseFloat(document.getElementById("y").value);
-  let res = "";
+  let r = "";
 
   if(isNaN(x) || isNaN(y)){
-    document.getElementById("result").innerText = "❌ Valeurs invalides";
+    result.innerText = "❌ Valeurs invalides";
     return;
   }
 
-  switch(type){
-    case "v":
-      res = "v = " + (x / y) + " m/s";
-      break;
-    case "a":
-      res = "a = " + (x / y) + " m/s²";
-      break;
-    case "f":
-      res = "F = " + (x * y) + " N";
-      break;
-    case "ec":
-      res = "Ec = " + (0.5 * x * y * y) + " J";
-      break;
-    case "ep":
-      res = "Ep = " + (x * y * 9.81) + " J";
-      break;
-    case "p":
-      res = "P = " + (x / y) + " W";
-      break;
-    case "ohm":
-      res = "U = " + (x * y) + " V";
-      break;
-    case "pression":
-      res = "P = " + (x / y) + " Pa";
-      break;
-    case "densite":
-      res = "ρ = " + (x / y) + " kg/m³";
-      break;
+  switch(t){
+    case "v": r = "v = " + (x/y) + " m/s"; break;
+    case "a": r = "a = " + (x/y) + " m/s²"; break;
+    case "f": r = "F = " + (x*y) + " N"; break;
+    case "ec": r = "Ec = " + (0.5*x*y*y) + " J"; break;
+    case "ep": r = "Ep = " + (x*y*9.81) + " J"; break;
+    case "p": r = "P = " + (x/y) + " W"; break;
+    case "ohm": r = "U = " + (x*y) + " V"; break;
+    case "pression": r = "P = " + (x/y) + " Pa"; break;
+    case "densite": r = "ρ = " + (x/y) + " kg/m³"; break;
+
+    case "n": r = "n = " + (x/y) + " mol"; break;
+    case "c": r = "C = " + (x/y) + " mol/L"; break;
+    case "m": r = "m = " + (x*y) + " g"; break;
+    case "vol": r = "V = " + (x/y) + " L"; break;
+    case "dil": r = "C₂ = " + (x/y); break;
   }
 
-  document.getElementById("result").innerText = res;
+  result.innerText = r;
 }
 </script>
 
