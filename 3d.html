@@ -1,151 +1,117 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Calculatrice 3D XYZ – CalcPro</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Calculatrice 3D XYZ</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+    }
 
-<style>
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  background:#020617;
-  font-family:Arial, sans-serif;
-  color:white;
-}
-h1{
-  text-align:center;
-  color:#00ffcc;
-  margin:10px;
-}
-#ui{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-input,button{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  font-size:14px;
-}
-button{
-  background:#2563eb;
-  color:white;
-  cursor:pointer;
-}
-#info{
-  text-align:center;
-  margin:8px;
-  color:#00ffcc;
-}
-#scene{
-  width:100vw;
-  height:70vh;
-}
-</style>
+    #ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.8);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    input, button {
+      margin: 3px 0;
+      width: 80px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
 
-<h1>🧭 Calculatrice 3D XYZ – CalcPro</h1>
-
 <div id="ui">
-  <input id="x" type="number" placeholder="X">
-  <input id="y" type="number" placeholder="Y">
-  <input id="z" type="number" placeholder="Z">
-  <button id="add">Ajouter point</button>
+  <div>X <input id="x" type="number" value="2"></div>
+  <div>Y <input id="y" type="number" value="3"></div>
+  <div>Z <input id="z" type="number" value="4"></div>
+  <button onclick="addPoint()">Ajouter point</button>
 </div>
 
-<div id="info">x=0 | y=0 | z=0</div>
-<div id="scene"></div>
+<!-- THREE.JS -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/controls/OrbitControls.js"></script>
 
-<script type="module">
-import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
-import { OrbitControls } from "https://unpkg.com/three@0.152.2/examples/jsm/controls/OrbitControls.js";
+<script>
+  // SCÈNE
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
 
-// SCENE
-const container = document.getElementById("scene");
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x020617);
+  // CAMÉRA
+  const camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(6, 6, 6);
 
-// CAMERA (CENTRÉE)
-const camera = new THREE.PerspectiveCamera(
-  75,
-  container.clientWidth / container.clientHeight,
-  0.1,
-  1000
-);
-camera.position.set(6,6,6);
-camera.lookAt(0,0,0);
+  // RENDERER
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-// RENDERER
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(container.clientWidth, container.clientHeight);
-container.appendChild(renderer.domElement);
+  // CONTRÔLES SOURIS
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
 
-// CONTROLS
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+  // LUMIÈRE
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 10, 7);
+  scene.add(light);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-// LUMIÈRE
-scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  // AXES XYZ
+  const axes = new THREE.AxesHelper(5);
+  scene.add(axes);
 
-// AXES XYZ (GROS ET VISIBLES)
-const axes = new THREE.AxesHelper(5);
-scene.add(axes);
+  // GRILLE
+  const grid = new THREE.GridHelper(10, 10);
+  scene.add(grid);
 
-// GRILLE XZ
-scene.add(new THREE.GridHelper(10,10,0x00ffcc,0x003333));
+  // FONCTION AJOUTER POINT
+  function addPoint() {
+    const x = parseFloat(document.getElementById("x").value);
+    const y = parseFloat(document.getElementById("y").value);
+    const z = parseFloat(document.getElementById("z").value);
 
-// AJOUT DE POINT
-const info = document.getElementById("info");
+    const geometry = new THREE.SphereGeometry(0.15, 16, 16);
+    const material = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+    const sphere = new THREE.Mesh(geometry, material);
 
-document.getElementById("add").onclick = ()=>{
+    sphere.position.set(x, y, z);
+    scene.add(sphere);
 
-  console.log("BOUTON CLIQUÉ");
+    console.log("Point ajouté :", x, y, z);
+  }
 
-  // CUBE GÉANT DEVANT LA CAMÉRA
-  const geometry = new THREE.BoxGeometry(2,2,2);
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  const cube = new THREE.Mesh(geometry, material);
+  // ANIMATION
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
 
-  cube.position.set(0, 0, 0);
-  scene.add(cube);
-
-  // FORCE LE RENDU
-  renderer.render(scene, camera);
-};
-
-  const x = parseFloat(document.getElementById("x").value)||0;
-  const y = parseFloat(document.getElementById("y").value)||0;
-  const z = parseFloat(document.getElementById("z").value)||0;
-
-  const geo = new THREE.SphereGeometry(0.2,16,16);
-  const mat = new THREE.MeshBasicMaterial({color:0xff0000});
-  const point = new THREE.Mesh(geo, mat);
-  point.position.set(x,y,z);
-  scene.add(point);
-
-  info.innerText = `x=${x} | y=${y} | z=${z}`;
-};
-
-// ANIMATION
-function animate(){
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene,camera);
-}
-animate();
-
-// RESIZE
-window.addEventListener("resize",()=>{
-  camera.aspect = container.clientWidth / container.clientHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(container.clientWidth, container.clientHeight);
-});
+  // RESIZE
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 </script>
 
 </body>
