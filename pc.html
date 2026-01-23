@@ -2,8 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro – Physique & Chimie</title>
+<title>CalcPro – Calcul Symbolique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Math.js -->
+<script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 
 <style>
 body{
@@ -29,25 +32,30 @@ header{
   box-shadow:0 0 25px rgba(0,0,0,.6);
 }
 
-select,input{
+input{
   width:100%;
-  padding:12px;
-  font-size:16px;
+  padding:14px;
+  font-size:18px;
   border-radius:10px;
   border:none;
   outline:none;
   margin-bottom:12px;
 }
 
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
 button{
-  width:100%;
   padding:14px;
-  font-size:16px;
+  font-size:15px;
   border:none;
   border-radius:10px;
+  cursor:pointer;
   background:#00ffcc;
   font-weight:bold;
-  cursor:pointer;
 }
 
 button:hover{
@@ -59,8 +67,9 @@ button:hover{
   background:#0b0e1a;
   padding:15px;
   border-radius:10px;
-  min-height:60px;
+  min-height:70px;
   font-size:16px;
+  word-wrap:break-word;
 }
 
 footer{
@@ -74,74 +83,82 @@ footer{
 
 <body>
 
-<header>⚗️⚙️ Physique & Chimie</header>
+<header>🧮 Calcul Symbolique</header>
 
 <div class="container">
 
-<select id="type">
-  <optgroup label="Physique">
-    <option value="v">Vitesse (v = d / t)</option>
-    <option value="a">Accélération (a = Δv / t)</option>
-    <option value="f">Force (F = m × g)</option>
-    <option value="ec">Énergie cinétique (Ec = ½mv²)</option>
-    <option value="ep">Énergie potentielle (Ep = mgh)</option>
-    <option value="p">Puissance (P = W / t)</option>
-    <option value="ohm">Loi d’Ohm (U = R × I)</option>
-    <option value="pression">Pression (P = F / S)</option>
-    <option value="densite">Densité (ρ = m / V)</option>
-  </optgroup>
+  <input id="expr" placeholder="Ex : x^2 + 2*x + 1">
 
-  <optgroup label="Chimie">
-    <option value="n">Quantité de matière (n = m / M)</option>
-    <option value="c">Concentration molaire (C = n / V)</option>
-    <option value="m">Masse (m = n × M)</option>
-    <option value="vol">Volume (V = n / C)</option>
-    <option value="dil">Dilution (C₁V₁ = C₂V₂)</option>
-  </optgroup>
-</select>
+  <div class="buttons">
+    <button onclick="simplifier()">Simplifier</button>
+    <button onclick="factoriser()">Factoriser</button>
+    <button onclick="developper()">Développer</button>
+    <button onclick="deriver()">Dériver</button>
+    <button onclick="integrer()">Intégrer</button>
+    <button onclick="evaluer()">Évaluer x=2</button>
+  </div>
 
-<input id="x" placeholder="Valeur 1">
-<input id="y" placeholder="Valeur 2">
-
-<button onclick="calculer()">Calculer</button>
-
-<div class="result" id="result">Résultat…</div>
+  <div class="result" id="result">Résultat…</div>
 
 </div>
 
 <footer>CalcPro © Lebbar Yahya</footer>
 
 <script>
-function calculer(){
-  let t = document.getElementById("type").value;
-  let x = parseFloat(document.getElementById("x").value);
-  let y = parseFloat(document.getElementById("y").value);
-  let r = "";
+function getExpr(){
+  return document.getElementById("expr").value;
+}
 
-  if(isNaN(x) || isNaN(y)){
-    result.innerText = "❌ Valeurs invalides";
-    return;
+function show(txt){
+  document.getElementById("result").innerText = txt;
+}
+
+function simplifier(){
+  try{
+    show(math.simplify(getExpr()).toString());
+  }catch{
+    show("❌ Erreur de syntaxe");
   }
+}
 
-  switch(t){
-    case "v": r = "v = " + (x/y) + " m/s"; break;
-    case "a": r = "a = " + (x/y) + " m/s²"; break;
-    case "f": r = "F = " + (x*y) + " N"; break;
-    case "ec": r = "Ec = " + (0.5*x*y*y) + " J"; break;
-    case "ep": r = "Ep = " + (x*y*9.81) + " J"; break;
-    case "p": r = "P = " + (x/y) + " W"; break;
-    case "ohm": r = "U = " + (x*y) + " V"; break;
-    case "pression": r = "P = " + (x/y) + " Pa"; break;
-    case "densite": r = "ρ = " + (x/y) + " kg/m³"; break;
-
-    case "n": r = "n = " + (x/y) + " mol"; break;
-    case "c": r = "C = " + (x/y) + " mol/L"; break;
-    case "m": r = "m = " + (x*y) + " g"; break;
-    case "vol": r = "V = " + (x/y) + " L"; break;
-    case "dil": r = "C₂ = " + (x/y); break;
+function factoriser(){
+  try{
+    show(math.factor(getExpr()).toString());
+  }catch{
+    show("❌ Impossible de factoriser");
   }
+}
 
-  result.innerText = r;
+function developper(){
+  try{
+    show(math.expand(getExpr()).toString());
+  }catch{
+    show("❌ Impossible de développer");
+  }
+}
+
+function deriver(){
+  try{
+    show(math.derivative(getExpr(),"x").toString());
+  }catch{
+    show("❌ Erreur de dérivation");
+  }
+}
+
+function integrer(){
+  try{
+    show(math.integral(getExpr(),"x").toString() + " + C");
+  }catch{
+    show("❌ Intégration non supportée");
+  }
+}
+
+function evaluer(){
+  try{
+    show(math.evaluate(getExpr(),{x:2}));
+  }catch{
+    show("❌ Erreur d’évaluation");
+  }
 }
 </script>
 
