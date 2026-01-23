@@ -1,118 +1,45 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Calculatrice 3D XYZ</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
-    }
-
-    #ui {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(0,0,0,0.8);
-      padding: 10px;
-      border-radius: 8px;
-      z-index: 10;
-    }
-
-    input, button {
-      margin: 3px 0;
-      width: 80px;
-    }
-
-    button {
-      cursor: pointer;
-    }
-  </style>
+  <title>Calcul 3D de A à Z</title>
+  <style>body { margin: 0; }</style>
 </head>
 <body>
-
-<div id="ui">
-  <div>X <input id="x" type="number" value="2"></div>
-  <div>Y <input id="y" type="number" value="3"></div>
-  <div>Z <input id="z" type="number" value="4"></div>
-  <button onclick="addPoint()">Ajouter point</button>
-</div>
-
-<!-- THREE.JS -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/controls/OrbitControls.js"></script>
-
-<script>
-  // SCÈNE
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x111111);
-
-  // CAMÉRA
-  const camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  );
-  camera.position.set(6, 6, 6);
-
-  // RENDERER
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  // CONTRÔLES SOURIS
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-
-  // LUMIÈRE
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(5, 10, 7);
-  scene.add(light);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-  // AXES XYZ
-  const axes = new THREE.AxesHelper(5);
-  scene.add(axes);
-
-  // GRILLE
-  const grid = new THREE.GridHelper(10, 10);
-  scene.add(grid);
-
-  // FONCTION AJOUTER POINT
-  function addPoint() {
-    const x = parseFloat(document.getElementById("x").value);
-    const y = parseFloat(document.getElementById("y").value);
-    const z = parseFloat(document.getElementById("z").value);
-
-    const geometry = new THREE.SphereGeometry(0.15, 16, 16);
-    const material = new THREE.MeshStandardMaterial({ color: 0xffff00 });
-    const sphere = new THREE.Mesh(geometry, material);
-
-    sphere.position.set(x, y, z);
-    scene.add(sphere);
-
-    console.log("Point ajouté :", x, y, z);
-  }
-
-  // ANIMATION
-  function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  // RESIZE
-  window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-</script>
+    document.body.appendChild(renderer.domElement);
 
+    // Cube
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    // Lumière
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+
+    // Caméra
+    camera.position.z = 5;
+
+    // Contrôles
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    // Animation
+    function animate() {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
 </body>
 </html>
