@@ -1,71 +1,136 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>CalcPro – Calcul Symbolique</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
-
-<style>
-body{margin:0;background:#121212;color:white;font-family:Arial,sans-serif;}
-header{text-align:center;padding:20px;color:#60a5fa;font-size:24px;font-weight:bold;}
-.container{max-width:700px;margin:auto;background:#1e1e2f;padding:20px;border-radius:15px;box-shadow:0 0 25px rgba(0,0,0,.6);}
-input{width:100%;padding:12px;margin:10px 0;background:#0b0e1a;color:#60a5fa;border:none;border-radius:8px;font-size:16px;}
-.buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
-button{padding:12px;font-size:15px;border:none;border-radius:12px;background:#2563eb;color:white;cursor:pointer;font-weight:bold;transition:0.2s;}
-button:hover{background:#3b82f6;transform:scale(1.05);}
-.result{margin-top:15px;background:#0b0e1a;padding:15px;border-radius:10px;color:#60a5fa;min-height:60px;font-size:16px;white-space:pre-wrap;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calcul Symbolique Supérieur</title>
+  <!-- Math.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.9.1/math.min.js"></script>
+  <!-- Plotly for graph -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffcc;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 6px;
+      border: none;
+    }
+    input {
+      width: 300px;
+    }
+    button {
+      background: #00ffcc;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #result {
+      margin-top: 20px;
+      background: #333;
+      padding: 15px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      word-wrap: break-word;
+    }
+    #graph {
+      margin-top: 30px;
+      width: 90%;
+      max-width: 600px;
+      height: 400px;
+    }
+  </style>
 </head>
-
 <body>
-<header>🧮 Calcul Symbolique Pro</header>
-<div class="container">
-<input id="expr" type="text" placeholder="Exemple: x^2 + 2*x + 1">
+  <h1>Calcul Symbolique Supérieur</h1>
 
-<div class="buttons">
-<button id="btnFactor">Factoriser</button>
-<button id="btnExpand">Développer</button>
-<button id="btnSimplify">Simplifier</button>
-<button id="btnSolve">Résoudre x=0</button>
-</div>
+  <input type="text" id="expression" placeholder="Entrez une expression, ex: x^2 + 3*x">
+  <br>
+  <button onclick="simplifier()">Simplifier</button>
+  <button onclick="derivee()">Dériver</button>
+  <button onclick="integrale()">Intégrer</button>
+  <button onclick="resoudre()">Résoudre = 0</button>
+  <button onclick="tracer()">Tracer</button>
 
-<div class="result" id="result">Résultat…</div>
-</div>
+  <div id="result">Résultat ici...</div>
+  <div id="graph"></div>
 
-<script>
-const exprInput=document.getElementById("expr");
-const result=document.getElementById("result");
+  <script>
+    const resultDiv = document.getElementById('result');
 
-document.getElementById("btnFactor").addEventListener("click",()=>{
-  try{
-    const expr=exprInput.value;
-    result.innerHTML="Factorisé : "+math.factor(expr).toString();
-  }catch(e){result.innerText="❌ Erreur : "+e;}
-});
+    function simplifier() {
+      const expr = document.getElementById('expression').value;
+      try {
+        const simplified = math.simplify(expr).toString();
+        resultDiv.innerHTML = "Simplifié : " + simplified;
+      } catch (e) {
+        resultDiv.innerHTML = "Erreur : " + e.message;
+      }
+    }
 
-document.getElementById("btnExpand").addEventListener("click",()=>{
-  try{
-    const expr=exprInput.value;
-    result.innerHTML="Développé : "+math.expand(expr).toString();
-  }catch(e){result.innerText="❌ Erreur : "+e;}
-});
+    function derivee() {
+      const expr = document.getElementById('expression').value;
+      try {
+        const d = math.derivative(expr, 'x').toString();
+        resultDiv.innerHTML = "Dérivée : " + d;
+      } catch (e) {
+        resultDiv.innerHTML = "Erreur : " + e.message;
+      }
+    }
 
-document.getElementById("btnSimplify").addEventListener("click",()=>{
-  try{
-    const expr=exprInput.value;
-    result.innerHTML="Simplifié : "+math.simplify(expr).toString();
-  }catch(e){result.innerText="❌ Erreur : "+e;}
-});
+    function integrale() {
+      const expr = document.getElementById('expression').value;
+      try {
+        // Intégrale symbolique simple (math.js support limité)
+        const integral = math.integral(expr, 'x').toString();
+        resultDiv.innerHTML = "Intégrale : " + integral + " + C";
+      } catch (e) {
+        resultDiv.innerHTML = "Erreur : " + e.message;
+      }
+    }
 
-document.getElementById("btnSolve").addEventListener("click",()=>{
-  try{
-    const expr=exprInput.value;
-    const sol=math.solve(expr,'x');
-    result.innerHTML="Solutions x : "+sol;
-  }catch(e){result.innerText="❌ Erreur : "+e;}
-});
-</script>
+    function resoudre() {
+      const expr = document.getElementById('expression').value;
+      try {
+        const eq = math.parse(expr + '=0');
+        const solutions = math.solve(eq, 'x');
+        resultDiv.innerHTML = "Solutions : " + solutions.join(', ');
+      } catch (e) {
+        resultDiv.innerHTML = "Erreur : " + e.message;
+      }
+    }
+
+    function tracer() {
+      const expr = document.getElementById('expression').value;
+      try {
+        const f = math.compile(expr);
+        const xValues = math.range(-10, 10, 0.1).toArray();
+        const yValues = xValues.map(x => f.evaluate({x: x}));
+        Plotly.newPlot('graph', [{
+          x: xValues,
+          y: yValues,
+          type: 'scatter',
+          mode: 'lines',
+          line: {color: '#00ffcc'}
+        }], {margin: {t: 0}});
+        resultDiv.innerHTML = "Graphique tracé !";
+      } catch (e) {
+        resultDiv.innerHTML = "Erreur : " + e.message;
+      }
+    }
+  </script>
 </body>
 </html>
