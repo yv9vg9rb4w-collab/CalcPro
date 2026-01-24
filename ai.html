@@ -2,52 +2,25 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro AI</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body{margin:0;padding:20px;font-family:Arial;background:#121212;color:white;}
-h1{text-align:center;color:#00ffcc;}
-.container{max-width:800px;margin:auto;background:#1e1e1e;padding:20px;border-radius:16px;}
-textarea{width:100%;height:120px;background:#0c0c0c;color:white;border-radius:12px;padding:10px;border:none;font-size:16px;}
-button{margin-top:10px;padding:12px 20px;border:none;border-radius:20px;background:#00ffcc;color:#000;font-weight:bold;cursor:pointer;}
-button:hover{opacity:0.9;}
-.response{margin-top:20px;padding:15px;background:#101010;border-radius:12px;min-height:80px;}
-footer{text-align:center;margin-top:30px;color:#aaa;}
-</style>
+<title>IA CalcPro</title>
 </head>
 <body>
-
-<h1>🤖 CalcPro AI</h1>
-
-<div class="container">
-<textarea id="question" placeholder="Ex : 1+1, sqrt(9), 2^3, sin(30)"></textarea>
-<button onclick="repondre()">Demander à l’IA</button>
-<div class="response" id="response">La réponse apparaîtra ici…</div>
-</div>
-
-<footer>Développeur : <strong>Lebbar Yahya</strong></footer>
+<h1>🤖 Pose une question à l'IA</h1>
+<input type="text" id="question" placeholder="Tape ta question">
+<button onclick="ask()">Poser la question</button>
+<p id="answer"></p>
 
 <script>
-async function repondre(){
-  const q = document.getElementById("question").value.trim();
-  const r = document.getElementById("response");
-  if(!q){ r.innerHTML="❌ Écris une question."; return; }
-
-  r.innerHTML = "⏳ L’IA réfléchit...";
-
-  try{
-    const res = await fetch("http://localhost:3000/ask", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ question: q })
-    });
-    const data = await res.json();
-    r.innerHTML = "🤖 <strong>Réponse IA :</strong><br><br>" + (data.answer || "❌ Pas de réponse");
-  }catch(e){
-    r.innerHTML = "❌ Impossible de contacter l’IA.";
-  }
+async function ask() {
+  const question = document.getElementById('question').value;
+  const res = await fetch('http://localhost:3000/ask', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question })
+  });
+  const data = await res.json();
+  document.getElementById('answer').innerText = data.answer;
 }
 </script>
-
 </body>
 </html>
