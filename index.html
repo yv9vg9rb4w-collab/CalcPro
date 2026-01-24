@@ -122,6 +122,19 @@ footer{ margin-top:40px; text-align:center; font-size:14px; color:var(--muted); 
   <div id="response"></div>
 </section>
 
+<script>
+async function askAI() {
+  const prompt = document.getElementById("prompt").value;
+  const res = await fetch("/api/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
+  const data = await res.json();
+  document.getElementById("response").innerText = data.reply;
+}
+</script>
+
 <section class="contact">
   <h2>📚 Cours de soutien </h2>
   <p>
