@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Intégrale Numérique</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:50px;
+}
+input, button{
+    padding:10px;
+    margin:5px;
+    font-size:16px;
+}
+button{
+    background:#38bdf8;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+}
+button:hover{
+    background:#0ea5e9;
+}
+.result{
+    margin-top:20px;
+    padding:10px;
+    background:#020617;
+    display:inline-block;
+}
+</style>
+</head>
+<body>
+
+<h1>∫ Intégrale Numérique</h1>
+<p>Fonction f(x) (ex: x*x)</p>
+<input id="fx" placeholder="f(x)">
+<input id="a" placeholder="a">
+<input id="b" placeholder="b">
+<button onclick="calculerIntegral()">Calculer</button>
+
+<div class="result" id="res"></div>
+
+<script>
+function calculerIntegral(){
+    let f = new Function("x","return "+fx.value);
+    let aVal = parseFloat(a.value);
+    let bVal = parseFloat(b.value);
+    let n = 1000; // nombre de subdivisions
+    let h = (bVal - aVal) / n;
+    let somme = 0;
+    for(let i=0; i<n; i++){
+        let x1 = aVal + i*h;
+        let x2 = x1 + h;
+        somme += (f(x1) + f(x2))/2 * h;
+    }
+    res.innerText = "∫ f(x) dx ≈ " + somme;
+}
+</script>
+
+</body>
+</html>
