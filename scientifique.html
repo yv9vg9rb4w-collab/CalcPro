@@ -32,7 +32,7 @@ button:active{transform:translateY(2px);box-shadow:0 2px #000;}
 <button class="btn-func" onclick="addInput('e')">e</button>
 <button class="btn-func" onclick="addInput('√(')">√</button>
 <button class="btn-func" onclick="addInput('^')">x^y</button>
-<button class="btn-op" onclick="clearDisplay()">C</button>
+<button id="delBtn" class="btn-op" onclick="deleteOrClear()">AC</button>
 <button class="btn-number" onclick="addInput('7')">7</button>
 <button class="btn-number" onclick="addInput('8')">8</button>
 <button class="btn-number" onclick="addInput('9')">9</button>
@@ -50,8 +50,6 @@ button:active{transform:translateY(2px);box-shadow:0 2px #000;}
 <button class="btn-op" onclick="addInput(')')">)</button>
 <button class="btn-number" onclick="addInput('0')">0</button>
 <button class="btn-number" onclick="addInput('.')">.</button>
-<button class="btn-func" onclick="addInput('x')">x</button>
-<button id="delBtn" class="btn-op" onclick="deleteOrClear()">AC</button>
 <button class="btn-equal" onclick="calculate()">=</button>
 </div>
 </div>
