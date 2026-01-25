@@ -2,232 +2,164 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Calculatrice Scientifique PRO MAX</title>
+<title>CalcPro Scientific Calculator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.9.1/math.min.js"></script>
+
 <style>
-  body {
-    background-color: #121212;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0;
-    padding: 20px;
-    color: #fff;
-  }
-
-  h1 {
-    color: #00ffe0;
-    margin-bottom: 15px;
-    font-weight: 600;
-  }
-
-  #expr {
-    width: 100%;
-    max-width: 450px;
-    padding: 18px;
-    font-size: 24px;
-    border-radius: 20px;
-    border: none;
-    background: #1e1e1e;
-    color: #00ffe0;
-    text-align: right;
-    margin-bottom: 15px;
-  }
-
-  .grid-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    max-width: 450px;
-    width: 100%;
-    margin-bottom: 15px;
-  }
-
-  button {
-    padding: 18px 0;
-    font-size: 20px;
-    border-radius: 20px;
-    border: none;
-    background: #2c2c2e;
-    color: #00ffe0;
-    font-weight: 600;
-    box-shadow: 0 0 8px #00ffe088;
-    transition: 0.15s;
-    cursor: pointer;
-  }
-
-  button:hover {
-    box-shadow: 0 0 15px #00ffe0;
-    transform: scale(1.05);
-  }
-
-  #result {
-    width: 100%;
-    max-width: 450px;
-    background: #1e1e1e;
-    border-radius: 20px;
-    padding: 15px;
-    text-align: right;
-    font-size: 24px;
-    min-height: 50px;
-    margin-bottom: 10px;
-    color: #00ffe0;
-  }
-
-  #history {
-    max-width: 450px;
-    width: 100%;
-    background: #1a1a1a;
-    border-radius: 15px;
-    padding: 10px;
-    max-height: 250px;
-    overflow-y: auto;
-    color: #00ffe0aa;
-    font-size: 15px;
-  }
-
-  .history-item {
-    margin-bottom: 6px;
-    cursor: pointer;
-  }
-
-  .history-item:hover {
-    color: #ffffff;
-    text-decoration: underline;
-  }
-
-  footer {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #888;
-    text-align: center;
-  }
+body{
+    margin:0;
+    background:#0f172a;
+    font-family: Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+}
+.calculator{
+    background:#020617;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,.7);
+    width:320px;
+}
+.display{
+    background:#1e1e2f;
+    border-radius:12px;
+    padding:15px;
+    font-size:24px;
+    text-align:right;
+    margin-bottom:10px;
+    min-height:50px;
+    word-wrap: break-word;
+}
+.history{
+    background:#111;
+    max-height:100px;
+    overflow-y:auto;
+    padding:10px;
+    font-size:14px;
+    margin-bottom:10px;
+    border-radius:10px;
+}
+.button-grid{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap:10px;
+}
+button{
+    padding:15px;
+    font-size:18px;
+    border:none;
+    border-radius:12px;
+    background:#1e1e2f;
+    color:#22c55e;
+    cursor:pointer;
+    box-shadow:0 5px #111;
+    transition:0.1s;
+}
+button:active{
+    transform:translateY(2px);
+    box-shadow:0 2px #111;
+}
 </style>
 </head>
 <body>
 
-<h1>Calculatrice Scientifique PRO MAX</h1>
-<input type="text" id="expr" placeholder="0">
+<div class="calculator">
+    <div class="history" id="history"></div>
+    <div class="display" id="display">0</div>
+    <div class="button-grid">
+        <!-- First row: scientific functions -->
+        <button onclick="addInput('sin(')">sin</button>
+        <button onclick="addInput('cos(')">cos</button>
+        <button onclick="addInput('tg(')">tg</button>
+        <button onclick="addInput('ln(')">ln</button>
+        <button onclick="addInput('log(')">log</button>
 
-<div id="result">Résultat</div>
+        <!-- Second row -->
+        <button onclick="addInput('π')">π</button>
+        <button onclick="addInput('e')">e</button>
+        <button onclick="addInput('√(')">√</button>
+        <button onclick="addInput('^')">x^y</button>
+        <button onclick="clearDisplay()">C</button>
 
-<!-- Boutons numériques et opérateurs -->
-<div class="grid-buttons">
-  <button onclick="ajouter('7')">7</button>
-  <button onclick="ajouter('8')">8</button>
-  <button onclick="ajouter('9')">9</button>
-  <button onclick="ajouterMultiplication()">×</button>
+        <!-- Numbers 7-9 -->
+        <button onclick="addInput('7')">7</button>
+        <button onclick="addInput('8')">8</button>
+        <button onclick="addInput('9')">9</button>
+        <button onclick="addInput('(')">(</button>
+        <button onclick="addInput(')')">)</button>
 
-  <button onclick="ajouter('4')">4</button>
-  <button onclick="ajouter('5')">5</button>
-  <button onclick="ajouter('6')">6</button>
-  <button onclick="ajouter('/')">÷</button>
+        <!-- Numbers 4-6 -->
+        <button onclick="addInput('4')">4</button>
+        <button onclick="addInput('5')">5</button>
+        <button onclick="addInput('6')">6</button>
+        <button onclick="addInput('+')">+</button>
+        <button onclick="addInput('-')">-</button>
 
-  <button onclick="ajouter('1')">1</button>
-  <button onclick="ajouter('2')">2</button>
-  <button onclick="ajouter('3')">3</button>
-  <button onclick="ajouter('-')">-</button>
+        <!-- Numbers 1-3 -->
+        <button onclick="addInput('1')">1</button>
+        <button onclick="addInput('2')">2</button>
+        <button onclick="addInput('3')">3</button>
+        <button onclick="addInput('*')">×</button>
+        <button onclick="addInput('/')">÷</button>
 
-  <button onclick="ajouter('0')">0</button>
-  <button onclick="ajouter('.')">.</button>
-  <button onclick="clearInput()">C</button>
-  <button onclick="ajouter('+')">+</button>
+        <!-- Last row -->
+        <button onclick="addInput('0')">0</button>
+        <button onclick="addInput('.')">.</button>
+        <button onclick="addInput('x')">x</button>
+        <button onclick="deleteChar()">⌫</button>
+        <button onclick="calculate()">=</button>
+    </div>
 </div>
-
-<!-- Fonctions scientifiques avancées -->
-<div class="grid-buttons">
-  <button onclick="ajouterRacine()">√</button>
-  <button onclick="ajouter('^2')">x²</button>
-  <button onclick="ajouter('^3')">x³</button>
-  <button onclick="ajouter('^')">x^y</button>
-
-  <button onclick="ajouter('(')">(</button>
-  <button onclick="ajouter(')')">)</button>
-  <button onclick="ajouter('sin(')">sin</button>
-  <button onclick="ajouter('cos(')">cos</button>
-
-  <button onclick="ajouter('tan(')">tan</button>
-  <button onclick="ajouter('asin(')">asin</button>
-  <button onclick="ajouter('acos(')">acos</button>
-  <button onclick="ajouter('atan(')">atan</button>
-
-  <button onclick="ajouter('log(')">log</button>
-  <button onclick="ajouter('ln(')">ln</button>
-  <button onclick="ajouter('exp(')">exp</button>
-  <button onclick="ajouter('abs(')">abs</button>
-
-  <button onclick="ajouter('!')">!</button>
-  <button onclick="ajouter('π')">π</button>
-  <button onclick="ajouter('e')">e</button>
-  <button onclick="calculer()">=</button>
-</div>
-
-<h3>Historique :</h3>
-<div id="history"></div>
-
-<footer>
-<strong>CalcPro © Lebbar Yahya</strong>
-</footer>
 
 <script>
-const exprInput = document.getElementById('expr');
-const resultDiv = document.getElementById('result');
-const historyDiv = document.getElementById('history');
+let display = document.getElementById('display');
+let historyDiv = document.getElementById('history');
+let input = '';
 
-function ajouter(val) {
-  const cursorPos = exprInput.selectionStart;
-  const text = exprInput.value;
-  exprInput.value = text.slice(0, cursorPos) + val + text.slice(cursorPos);
-  exprInput.focus();
-  exprInput.selectionEnd = cursorPos + val.length;
+function addInput(value){
+    input += value;
+    display.innerText = input;
 }
 
-function ajouterRacine() {
-  const cursorPos = exprInput.selectionStart;
-  const text = exprInput.value;
-  exprInput.value = text.slice(0, cursorPos) + '√()' + text.slice(cursorPos);
-  exprInput.focus();
-  exprInput.selectionEnd = cursorPos + 2;
+function clearDisplay(){
+    input = '';
+    display.innerText = '0';
 }
 
-function ajouterMultiplication() {
-  ajouter('×');
+function deleteChar(){
+    input = input.slice(0,-1);
+    display.innerText = input || '0';
 }
 
-function clearInput() {
-  exprInput.value = '';
-  resultDiv.innerHTML = 'Résultat';
-}
+function calculate(){
+    if(!input) return;
 
-// Historique cliquable
-function ajouterHistorique(expr, res) {
-  const div = document.createElement('div');
-  div.className = 'history-item';
-  div.textContent = expr + " → " + res;
-  div.onclick = () => exprInput.value = expr; // réutiliser
-  historyDiv.prepend(div);
-}
+    let exp = input
+        .replace(/π/g, 'Math.PI')
+        .replace(/e/g, 'Math.E')
+        .replace(/√/g, 'Math.sqrt')
+        .replace(/tg\(/gi, 'Math.tan(')
+        .replace(/sin\(/gi, 'Math.sin(')
+        .replace(/cos\(/gi, 'Math.cos(')
+        .replace(/tan\(/gi, 'Math.tan(')
+        .replace(/ln\(/gi, 'Math.log(')
+        .replace(/log\(/gi, 'Math.log10(')
+        .replace(/x/gi,'0'); // option: X remplacé par 0 par défaut, peut modifier
 
-// Préparer expression pour Math.js
-function parseExpression(expr) {
-  return expr
-    .replace(/√\(/g, 'sqrt(')
-    .replace(/×/g, '*')
-    .replace(/π/g, 'pi');
-}
+    let result;
+    try{
+        result = eval(exp);
+        if(!isFinite(result)) result='Erreur';
+    }catch{
+        result='Erreur';
+    }
 
-// Calculer
-function calculer() {
-  try {
-    const expr = parseExpression(exprInput.value);
-    const res = math.evaluate(expr).toString();
-    resultDiv.innerHTML = res;
-    ajouterHistorique(exprInput.value, res);
-  } catch(e) {
-    resultDiv.innerHTML = "Erreur : " + e.message;
-  }
+    historyDiv.innerHTML += `<div>${input} = ${result}</div>`;
+    display.innerText = result;
+    input = '';
 }
 </script>
 
