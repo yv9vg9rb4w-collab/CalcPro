@@ -3,104 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CalcPro True 3D</title>
+    <title>CalcPro Ultra-Engine</title>
     <style>
-        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #111 0%, #000 100%); font-family: sans-serif; }
-        canvas { display: block; }
-        #ui {
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        #overlay {
             position: absolute; width: 100%; height: 100%;
             pointer-events: none; z-index: 10;
             display: flex; flex-direction: column; justify-content: space-between;
-            padding: 20px; box-sizing: border-box;
+            padding: 25px; box-sizing: border-box;
         }
-        .neon { color: #00ff88; text-shadow: 0 0 15px #00ff88; font-family: monospace; font-weight: bold; }
+        .neon-green { color: #00ff88; text-shadow: 0 0 10px #00ff88; font-weight: bold; }
+        .glitch { animation: flash 2s infinite; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        <div class="neon">MODE: TRUE_3D_SOLID<br>LIGHTING: ENABLED</div>
-        <div class="neon" style="text-align: center; font-size: 20px;">CalcPro © Lebbar Yahya</div>
+    <div id="overlay">
+        <div class="neon-green info">
+            STATUS: RUNNING...<br>
+            CORE: CALCPRO_V7_ULTIMATE<br>
+            RENDER: MATHEMATICAL_3D
+        </div>
+        <div class="neon-green glitch" style="text-align: center; font-size: 22px;">
+            CalcPro © Lebbar Yahya
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <canvas id="renderCanvas"></canvas>
 
     <script>
-        window.onload = function() {
-            // Configuration de la scène
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const canvas = document.getElementById('renderCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, points = [];
+        let angle = 0;
+
+        // Configuration de l'algorithme WOW
+        const count = 400; // Nombre de particules 3D
+        const radius = 150;
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            points = [];
             
-            // On force le moteur à utiliser le mode le plus compatible possible
-            const renderer = new THREE.WebGLRenderer({ 
-                antialias: true, 
-                alpha: true,
-                precision: "mediump" // Plus compatible pour les puces mobiles
-            });
-            
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            document.body.appendChild(renderer.domElement);
-
-            // --- LUMIÈRE (C'est ça qui fait le "True 3D") ---
-            const ambientLight = new THREE.AmbientLight(0x404040, 2); // Lumière globale
-            scene.add(ambientLight);
-
-            const pointLight = new THREE.PointLight(0x00ff88, 5, 50); // Lumière de projecteur
-            pointLight.position.set(10, 10, 10);
-            scene.add(pointLight);
-
-            // --- L'OBJET SOLIDE (MESH) ---
-            // Un TorusKnot avec des faces réelles
-            const geometry = new THREE.TorusKnotGeometry(7, 2.5, 100, 16);
-            
-            // Matériau "Phong" : il brille et réagit à la lumière
-            const material = new THREE.MeshPhongMaterial({
-                color: 0x00ff88,
-                shininess: 100,
-                specular: 0xffffff,
-                flatShading: false // Lissage des faces pour un look pro
-            });
-
-            const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
-
-            camera.position.z = 25;
-
-            // --- ANIMATION ---
-            function animate() {
-                requestAnimationFrame(animate);
-
-                // Rotation fluide
-                mesh.rotation.y += 0.01;
-                mesh.rotation.x += 0.005;
-
-                // Faire bouger la lumière pour voir les reflets
-                const time = Date.now() * 0.001;
-                pointLight.position.x = Math.sin(time) * 15;
-                pointLight.position.y = Math.cos(time) * 15;
-
-                renderer.render(scene, camera);
+            // Génération d'une sphère mathématique (Fibonacci Lattice)
+            for (let i = 0; i < count; i++) {
+                let y = 1 - (i / (count - 1)) * 2;
+                let r = Math.sqrt(1 - y * y);
+                let phi = 3.6959911 * i; // Angle d'or
+                points.push({
+                    x: Math.cos(phi) * r,
+                    y: y,
+                    z: Math.sin(phi) * r
+                });
             }
+        }
 
-            // Gestion du tactile pour l'interaction
-            let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            window.addEventListener(isMobile ? 'touchmove' : 'mousemove', (e) => {
-                const x = isMobile ? e.touches[0].clientX : e.clientX;
-                const y = isMobile ? e.touches[0].clientY : e.clientY;
+        function project(p) {
+            // Algorithme de projection 3D vers 2D
+            let x = p.x * Math.cos(angle) - p.z * Math.sin(angle);
+            let z = p.x * Math.sin(angle) + p.z * Math.cos(angle);
+            let y = p.y;
+
+            // Perspective
+            let scale = 400 / (400 + z * radius);
+            return {
+                x: x * radius * scale + width / 2,
+                y: y * radius * scale + height / 2,
+                size: scale * 3,
+                opacity: (scale - 0.5) * 2 // Cache les points de derrière
+            };
+        }
+
+        function draw() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, width, height);
+
+            angle += 0.01;
+
+            points.forEach(p => {
+                let proj = project(p);
                 
-                mesh.rotation.z = (x / window.innerWidth) * 2;
+                if (proj.opacity > 0) {
+                    // Algorithme de couleur dynamique
+                    let hue = (angle * 50 + p.y * 100) % 360;
+                    ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${proj.opacity})`;
+                    
+                    ctx.beginPath();
+                    ctx.arc(proj.x, proj.y, proj.size, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Ajout d'une lueur (Glow)
+                    if (proj.size > 2) {
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+                    }
+                }
             });
 
-            animate();
+            requestAnimationFrame(draw);
+        }
 
-            // Redimensionnement
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        };
+        window.addEventListener('resize', init);
+        
+        // Interaction tactile
+        window.addEventListener('touchmove', (e) => {
+            angle += 0.05;
+        });
+
+        init();
+        draw();
     </script>
 </body>
 </html>
