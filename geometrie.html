@@ -2,234 +2,135 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Outil Géométrie – CalcPro PRO</title>
+<title>CalcPro – Géométrie Avancée</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  background: #0f0f0f;
-  color: white;
-  font-family: Arial, sans-serif;
+body{
+  background:#0f0f0f;
+  color:white;
+  font-family:Arial;
+  margin:0;
 }
-
-header {
-  padding: 15px;
-  text-align: center;
-  font-size: 24px;
-  background: #111;
-  border-bottom: 1px solid #333;
+header{
+  background:#111;
+  text-align:center;
+  padding:15px;
+  font-size:22px;
+  border-bottom:1px solid #333;
 }
-
-.container {
-  display: flex;
-  height: calc(100vh - 90px);
+.container{
+  max-width:600px;
+  margin:auto;
+  padding:20px;
 }
-
-.tools {
-  width: 260px;
-  background: #151515;
-  padding: 10px;
-  border-right: 1px solid #333;
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  background:#181818;
+  color:white;
+  border:1px solid #333;
 }
-
-.tools button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 8px;
-  background: #222;
-  color: white;
-  border: none;
-  cursor: pointer;
+button{
+  width:100%;
+  padding:12px;
+  background:#00c853;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
 }
-
-.tools button:hover {
-  background: #00c853;
+.result{
+  margin-top:15px;
+  padding:12px;
+  background:#111;
+  border:1px solid #333;
+  font-size:14px;
+  line-height:1.6;
 }
-
-.info {
-  font-size: 13px;
-  background: #111;
-  padding: 8px;
-  margin-top: 10px;
-  border: 1px solid #333;
-}
-
-canvas {
-  flex: 1;
-  background: #0a0a0a;
-}
-
-footer {
-  text-align: center;
-  padding: 6px;
-  font-size: 12px;
-  background: #111;
-  color: #888;
+footer{
+  text-align:center;
+  font-size:12px;
+  padding:8px;
+  color:#777;
 }
 </style>
 </head>
 
 <body>
 
-<header>📐 Outil de Géométrie – CalcPro PRO</header>
+<header>📐 CalcPro – Géométrie Avancée</header>
 
 <div class="container">
-  <div class="tools">
-    <button onclick="setMode('point')">🔵 Point</button>
-    <button onclick="setMode('segment')">📏 Segment</button>
-    <button onclick="setMode('triangle')">🔺 Triangle</button>
-    <button onclick="clearAll()">🗑️ Effacer</button>
 
-    <div class="info" id="info">
-      Coordonnées :<br>
-      —
-    </div>
-  </div>
+<h3>📍 Points</h3>
+<input id="x1" placeholder="x₁">
+<input id="y1" placeholder="y₁">
+<input id="x2" placeholder="x₂">
+<input id="y2" placeholder="y₂">
+<input id="x3" placeholder="x₃ (optionnel)">
+<input id="y3" placeholder="y₃ (optionnel)">
 
-  <canvas id="canvas"></canvas>
+<h3>🔺 Polygone (format : x,y)</h3>
+<textarea id="poly" placeholder="Ex: 0,0  4,0  4,3  0,3"></textarea>
+
+<button onclick="calculer()">Calculer</button>
+
+<div class="result" id="res">Résultats…</div>
+
 </div>
 
 <footer>CalcPro © Lebbar Yahya</footer>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const info = document.getElementById("info");
+const d=(x1,y1,x2,y2)=>Math.hypot(x2-x1,y2-y1);
 
-canvas.width = window.innerWidth - 260;
-canvas.height = window.innerHeight - 90;
-
-let mode = "point";
-let objects = [];
-let temp = [];
-
-function setMode(m) {
-  mode = m;
-  temp = [];
+function angle(a,b,c){
+  return Math.acos((a*a+b*b-c*c)/(2*a*b))*180/Math.PI;
 }
 
-function drawGrid() {
-  ctx.strokeStyle = "#222";
-  for (let i = 0; i < canvas.width; i += 25) {
-    ctx.beginPath();
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i, canvas.height);
-    ctx.stroke();
+function calculer(){
+  const A={x:+x1.value,y:+y1.value};
+  const B={x:+x2.value,y:+y2.value};
+  const C={x:+x3.value,y:+y3.value};
+
+  let t="📏 SEGMENT AB<br>";
+  const AB=d(A.x,A.y,B.x,B.y);
+  t+=`AB = √[(x₂-x₁)²+(y₂-y₁)²] = ${AB.toFixed(3)}<br>`;
+  t+=`Milieu M = (${((A.x+B.x)/2).toFixed(2)}, ${((A.y+B.y)/2).toFixed(2)})<br>`;
+
+  t+=`<br>🧮 VECTEUR AB<br>`;
+  t+=`AB⃗ = (${(B.x-A.x)}, ${(B.y-A.y)})<br>`;
+  t+=`||AB⃗|| = ${AB.toFixed(3)}<br>`;
+
+  if(!isNaN(C.x)){
+    const BC=d(B.x,B.y,C.x,C.y);
+    const AC=d(A.x,A.y,C.x,C.y);
+    const P=AB+BC+AC;
+
+    t+=`<br>🔺 TRIANGLE ABC<br>`;
+    t+=`Périmètre = ${P.toFixed(3)}<br>`;
+    t+=`Aire = ${Math.abs(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y))/2}<br>`;
+    t+=`Angle ABC = ${angle(AB,BC,AC).toFixed(2)}°<br>`;
   }
-  for (let j = 0; j < canvas.height; j += 25) {
-    ctx.beginPath();
-    ctx.moveTo(0, j);
-    ctx.lineTo(canvas.width, j);
-    ctx.stroke();
-  }
 
-  ctx.strokeStyle = "#555";
-  ctx.beginPath();
-  ctx.moveTo(canvas.width/2, 0);
-  ctx.lineTo(canvas.width/2, canvas.height);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(0, canvas.height/2);
-  ctx.lineTo(canvas.width, canvas.height/2);
-  ctx.stroke();
-}
-
-function distance(a, b) {
-  return Math.hypot(b.x - a.x, b.y - a.y);
-}
-
-function angle(A, B, C) {
-  const AB = distance(A, B);
-  const BC = distance(B, C);
-  const AC = distance(A, C);
-  return Math.acos((AB*AB + BC*BC - AC*AC)/(2*AB*BC)) * 180 / Math.PI;
-}
-
-function triangleArea(A, B, C) {
-  return Math.abs(
-    (A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y))/2
-  );
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGrid();
-
-  for (let o of objects) {
-    if (o.type === "point") {
-      ctx.fillStyle = "#00e5ff";
-      ctx.beginPath();
-      ctx.arc(o.x, o.y, 5, 0, Math.PI*2);
-      ctx.fill();
+  const poly=poly.value.trim();
+  if(poly){
+    const pts=poly.split(/\s+/).map(p=>p.split(',').map(Number));
+    let area=0, per=0;
+    for(let i=0;i<pts.length;i++){
+      let [x1,y1]=pts[i];
+      let [x2,y2]=pts[(i+1)%pts.length];
+      area+=x1*y2-x2*y1;
+      per+=Math.hypot(x2-x1,y2-y1);
     }
-
-    if (o.type === "segment") {
-      ctx.strokeStyle = "#00c853";
-      ctx.beginPath();
-      ctx.moveTo(o.a.x, o.a.y);
-      ctx.lineTo(o.b.x, o.b.y);
-      ctx.stroke();
-    }
-
-    if (o.type === "triangle") {
-      ctx.strokeStyle = "#ff9100";
-      ctx.beginPath();
-      ctx.moveTo(o.A.x, o.A.y);
-      ctx.lineTo(o.B.x, o.B.y);
-      ctx.lineTo(o.C.x, o.C.y);
-      ctx.closePath();
-      ctx.stroke();
-    }
+    t+=`<br>🔷 POLYGONE<br>`;
+    t+=`Aire = ${(Math.abs(area)/2).toFixed(3)}<br>`;
+    t+=`Périmètre = ${per.toFixed(3)}<br>`;
   }
+
+  res.innerHTML=t;
 }
-
-canvas.addEventListener("click", e => {
-  const r = canvas.getBoundingClientRect();
-  const x = e.clientX - r.left;
-  const y = e.clientY - r.top;
-
-  info.innerHTML = `Coordonnées :<br>x = ${(x - canvas.width/2).toFixed(2)}<br>y = ${(canvas.height/2 - y).toFixed(2)}`;
-
-  if (mode === "point") {
-    objects.push({type:"point", x, y});
-  }
-
-  if (mode === "segment") {
-    temp.push({x,y});
-    if (temp.length === 2) {
-      const d = distance(temp[0], temp[1]);
-      info.innerHTML += `<br>Longueur = ${d.toFixed(2)}`;
-      objects.push({type:"segment", a:temp[0], b:temp[1]});
-      temp=[];
-    }
-  }
-
-  if (mode === "triangle") {
-    temp.push({x,y});
-    if (temp.length === 3) {
-      const A=temp[0], B=temp[1], C=temp[2];
-      const p = distance(A,B)+distance(B,C)+distance(A,C);
-      const area = triangleArea(A,B,C);
-      const ang = angle(A,B,C);
-      info.innerHTML += `<br>Périmètre = ${p.toFixed(2)}<br>Aire = ${area.toFixed(2)}<br>Angle = ${ang.toFixed(1)}°`;
-      objects.push({type:"triangle", A,B,C});
-      temp=[];
-    }
-  }
-
-  draw();
-});
-
-function clearAll() {
-  objects=[];
-  temp=[];
-  info.innerHTML="Coordonnées :<br>—";
-  draw();
-}
-
-draw();
 </script>
 
 </body>
