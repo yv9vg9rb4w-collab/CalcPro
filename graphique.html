@@ -62,7 +62,7 @@ canvas{
 <div class="box">
 <div class="title">📈 CalcPro • GRAPH CALCULATOR</div>
 
-<input id="fx" placeholder="Ex : x^3+2x^2-3x+1 , 1/x , racin(x), racinX" oninput="draw()">
+<input id="fx" placeholder="Ex : x^3+2x^2-3x+1 , 1/x , racin(x), tg(x)" oninput="draw()">
 <div class="result" id="res"></div>
 <canvas id="graph"></canvas>
 </div>
@@ -84,14 +84,15 @@ function draw(){
     for(let x=-10; x<=10; x+=0.1){
         let e = f
             .replace(/\^/g,"**")
-            .replace(/racin/gi,"Math.sqrt")  // <-- remplacer racin par Math.sqrt
-            .replace(/sin/g,"Math.sin")
-            .replace(/cos/g,"Math.cos")
-            .replace(/tan/g,"Math.tan")
-            .replace(/log/g,"Math.log10")
-            .replace(/ln/g,"Math.log")
-            .replace(/π/g,"Math.PI")
-            .replace(/x/gi, `(${x})`);  // X et x reconnus
+            .replace(/racin/gi,"Math.sqrt")  // racin(x)
+            .replace(/sin/gi,"Math.sin")
+            .replace(/cos/gi,"Math.cos")
+            .replace(/tg/gi,"Math.tan")     // tg(x)
+            .replace(/tan/gi,"Math.tan")
+            .replace(/log/gi,"Math.log10")
+            .replace(/ln/gi,"Math.log")
+            .replace(/π/gi,"Math.PI")
+            .replace(/x/gi, `(${x})`);      // X et x
 
         try{
             let y = eval(e);
@@ -131,9 +132,9 @@ function draw(){
         }
     });
 
-    // Analyse automatique pour parabole/cubique/hyperbole
+    // Analyse automatique
     try{
-        let fNorm = f.replace(/X/g,"x").replace(/racin/gi,""); // normalisation
+        let fNorm = f.replace(/X/gi,"x").replace(/racin/gi,""); // normalisation
         if(/x\*\*3|x\^3/.test(fNorm) || /x\*\*2|x\^2/.test(fNorm)){
             let a=1,b=0,c=0,d=0;
             const matchA = fNorm.match(/([+-]?\d*)x\^?3/);
@@ -149,6 +150,8 @@ function draw(){
             res.innerHTML = `Hyperbole → Asymptotes : x=0, y=0`;
         } else if(/Math\.sqrt/.test(f)){
             res.innerHTML = `Fonction racine → √x calculée`;
+        } else if(/Math\.tan/.test(f)){
+            res.innerHTML = `Fonction tangente → tg(x) calculée`;
         }
     }catch{}
 }
