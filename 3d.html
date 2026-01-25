@@ -3,29 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CalcPro Diamond Engine</title>
+    <title>CalcPro Radiant Gem</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
-        canvas { display: block; width: 100vw; height: 100vh; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        canvas { display: block; }
+
         #ui {
             position: absolute; width: 100%; height: 100%;
             pointer-events: none; z-index: 10;
             display: flex; flex-direction: column; justify-content: space-between;
             padding: 30px; box-sizing: border-box;
         }
-        .neon { color: #00ff88; text-shadow: 0 0 15px #00ff88; font-weight: bold; }
-        .footer { text-align: center; font-size: 22px; letter-spacing: 2px; }
+        .neon { 
+            color: #00ff88; 
+            text-shadow: 0 0 15px #00ff88, 0 0 25px rgba(0, 255, 136, 0.5); 
+            font-weight: bold; 
+            letter-spacing: 1px;
+        }
+        .header-text { font-size: 14px; line-height: 1.5; font-family: 'Courier New', monospace; }
+        .footer-text { text-align: center; font-size: clamp(18px, 5vw, 24px); margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div id="ui">
-        <div class="neon" style="font-size: 12px;">
-            SYSTEM: CALCPRO_V8<br>
-            STATUS: OPERATIONAL<br>
-            RENDER: SOLID_3D_CRYSTAL
+        <div class="neon header-text">
+            SYSTEM: CALCPRO_V9<br>
+            RENDER: DIAMOND_RADIANT<br>
+            EFFECT: NEON_GLOW
         </div>
-        <div class="neon footer">CalcPro © Lebbar Yahya</div>
+        <div class="neon footer-text">CalcPro © Lebbar Yahya</div>
     </div>
 
     <canvas id="c"></canvas>
@@ -35,23 +42,52 @@
         const ctx = canvas.getContext('2d');
         let w, h, nodes, faces;
         let angleX = 0, angleY = 0;
+        let stars = [];
 
-        // --- ALGORITHME DU DIAMANT (Octaèdre) ---
+        // --- GÉOMÉTRIE DU DIAMANT (Octaèdre sophistiqué) ---
         nodes = [
             [0, 1.5, 0], [1, 0, 1], [1, 0, -1], 
             [-1, 0, -1], [-1, 0, 1], [0, -1.5, 0]
         ];
 
+        // Faces avec des couleurs de base
         faces = [
-            [0, 1, 2, "#00ff88"], [0, 2, 3, "#00cc66"], 
-            [0, 3, 4, "#00ff88"], [0, 4, 1, "#00cc66"],
-            [5, 1, 2, "#009944"], [5, 2, 3, "#006633"], 
-            [5, 3, 4, "#009944"], [5, 4, 1, "#006633"]
+            [0, 1, 2, "hsl(120, 100%, 50%)"], [0, 2, 3, "hsl(150, 100%, 50%)"], 
+            [0, 3, 4, "hsl(180, 100%, 50%)"], [0, 4, 1, "hsl(210, 100%, 50%)"],
+            [5, 1, 2, "hsl(240, 100%, 50%)"], [5, 2, 3, "hsl(270, 100%, 50%)"], 
+            [5, 3, 4, "hsl(300, 100%, 50%)"], [5, 4, 1, "hsl(330, 100%, 50%)"]
         ];
+
+        // --- FOND STELLAIRE ANIMÉ ---
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    size: Math.random() * 2 + 0.5,
+                    opacity: Math.random() * 0.7 + 0.3,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.shadowBlur = 0; // Pas de flou pour les étoiles
+            stars.forEach(s => {
+                s.x -= s.speed;
+                if (s.x < 0) s.x = w;
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
 
         function resize() {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
+            createStars(); // Recréer les étoiles au redimensionnement
         }
 
         function rotate(node, ax, ay) {
@@ -69,8 +105,10 @@
             ctx.fillStyle = "black";
             ctx.fillRect(0, 0, w, h);
             
-            angleX += 0.013;
-            angleY += 0.017;
+            drawStars(); // Dessiner le fond
+
+            angleX += 0.01;
+            angleY += 0.015;
 
             // Projection Perspective
             let projected = nodes.map(n => {
@@ -78,19 +116,20 @@
                 let dist = 4; // Distance caméra
                 let scale = w / (dist + r[2]); 
                 return [
-                    r[0] * scale + w / 2,
-                    r[1] * scale + h / 2,
+                    r[0] * scale / 2.5 + w / 2, // Ajustement de la taille
+                    r[1] * scale / 2.5 + h / 2,
                     r[2] // Profondeur pour le tri
                 ];
             });
 
             // Tri des faces (Algorithme du Peintre)
-            const sorted = faces.map(f => {
+            const sorted = faces.map((f, index) => {
                 let z = (projected[f[0]][2] + projected[f[1]][2] + projected[f[2]][2]) / 3;
-                return { f, z };
+                return { f, z, index };
             }).sort((a, b) => b.z - a.z);
 
-            // Rendu des faces solides
+            // Rendu des faces solides avec couleurs dynamiques et lueur
+            const timeHue = (Date.now() * 0.0001) % 1; // Animation de la couleur globale
             sorted.forEach(obj => {
                 let f = obj.f;
                 ctx.beginPath();
@@ -99,30 +138,55 @@
                 ctx.lineTo(projected[f[2]][0], projected[f[2]][1]);
                 ctx.closePath();
 
-                // Style Crystal Pro
-                ctx.fillStyle = f[3];
-                ctx.globalAlpha = 0.7;
+                // Couleur basée sur le temps et la position
+                let faceHue = (timeHue * 360 + obj.index * 45) % 360;
+                let fillColor = `hsla(${faceHue}, 100%, 50%, 0.6)`;
+                let strokeColor = `hsla(${faceHue}, 100%, 70%, 1)`;
+
+                ctx.fillStyle = fillColor;
+                ctx.globalAlpha = 0.8;
                 ctx.fill();
                 
-                // Arêtes brillantes
-                ctx.strokeStyle = "#ffffff";
-                ctx.lineWidth = 1;
+                // Arêtes brillantes (effet néon)
+                ctx.shadowColor = strokeColor;
+                ctx.shadowBlur = 15;
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2;
                 ctx.globalAlpha = 1;
                 ctx.stroke();
 
-                // Effet de reflet interne
-                ctx.fillStyle = "rgba(255,255,255,0.1)";
+                // Effet de reflet interne blanc (simule la lumière)
+                ctx.shadowBlur = 0; // Désactiver le flou pour le reflet
+                ctx.fillStyle = "rgba(255,255,255,0.15)";
                 ctx.fill();
             });
 
             requestAnimationFrame(draw);
         }
 
-        // Contrôle Tactile
+        // Contrôle Tactile/Souris
+        let lastX, lastY;
+        const rotateObject = (clientX, clientY) => {
+            if (lastX !== undefined && lastY !== undefined) {
+                const dx = (clientX - lastX) * 0.01;
+                const dy = (clientY - lastY) * 0.01;
+                angleY += dx;
+                angleX += dy;
+            }
+            lastX = clientX;
+            lastY = clientY;
+        };
+
+        window.addEventListener('mousemove', (e) => {
+            rotateObject(e.clientX, e.clientY);
+        });
+        window.addEventListener('mousedown', () => { lastX = undefined; lastY = undefined; }); // Reset on click start
+
         window.addEventListener('touchmove', (e) => {
-            angleY += 0.05;
             e.preventDefault();
+            rotateObject(e.touches[0].clientX, e.touches[0].clientY);
         }, {passive: false});
+        window.addEventListener('touchstart', () => { lastX = undefined; lastY = undefined; }); // Reset on touch start
 
         window.addEventListener('resize', resize);
         resize();
