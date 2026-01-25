@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Dark Scientific Calculator</title>
+<title>CalcPro Dark Scientific Calculator Auto-ANS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -125,6 +125,10 @@ let lastResult = 0;
 let xValue = 5; // valeur par défaut pour X
 
 function addInput(value){
+    // Si début d'un nouveau calcul et la première touche est un opérateur, on ajoute ANS automatiquement
+    if(input === '' && ['+','-','×','/'].includes(value)){
+        input += lastResult;
+    }
     input += value;
     display.innerText = input;
 }
@@ -152,7 +156,9 @@ function calculate(){
         .replace(/tan\(/gi,'Math.tan(')
         .replace(/ln\(/gi,'Math.log(')
         .replace(/log\(/gi,'Math.log10(')
-    
+        .replace(/x/gi,xValue)
+        .replace(/×/g,'*'); // conversion × en *
+
     let result;
     try{
         result = eval(exp);
@@ -163,7 +169,7 @@ function calculate(){
 
     historyDiv.innerHTML += `<div>${input} = ${result}</div>`;
     display.innerText = result;
-    lastResult = result !== 'Erreur' ? result : lastResult; // mise à jour ANS
+    if(result !== 'Erreur') lastResult = result; // mise à jour automatique ANS
     input = '';
 }
 </script>
