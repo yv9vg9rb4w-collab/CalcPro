@@ -2,41 +2,40 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CalcPro Engine v2.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CalcPro Mobile Engine</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; touch-action: none; }
         canvas { display: block; }
 
-        /* Branding UI */
-        #brand-layer {
+        /* Signature responsive */
+        #brand {
             position: absolute;
-            bottom: 30px;
-            right: 30px;
+            bottom: env(safe-area-inset-bottom, 20px);
+            left: 20px;
             color: #00ff88;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
-            letter-spacing: 2px;
-            text-shadow: 0 0 15px #00ff88;
-            pointer-events: none;
+            text-shadow: 0 0 10px #00ff88;
             z-index: 100;
         }
 
-        .system-log {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: rgba(0, 255, 136, 0.7);
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            pointer-events: none;
+        /* Ajustement du menu pour mobile */
+        .lil-gui { 
+            --width: 150px;
+            --name-width: 40%;
+            z-index: 1000 !important;
+        }
+        
+        @media (max-width: 600px) {
+            .lil-gui { --width: 120px; font-size: 10px; }
+            #brand { font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="system-log">STATUS: MULTI_ALGO_READY<br>ENGINE: CALC_PRO_V2</div>
-    <div id="brand-layer">CalcPro © Lebbar Yahya</div>
+    <div id="brand">CalcPro © Lebbar Yahya</div>
 
     <script type="importmap">
         {
@@ -51,65 +50,64 @@
         import * as THREE from 'three';
         import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-        // --- INITIALISATION ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        camera.position.z = 15;
+        camera.position.z = window.innerWidth < 600 ? 20 : 15;
 
-        // --- PARAMÈTRES (L'objet que le GUI va modifier) ---
         const params = {
-            algorithm: 'TorusKnot',
-            color: '#00ff88',
-            particleSize: 0.05,
-            rotationSpeed: 1,
-            wireframe: false
+            Style: 'TorusKnot',
+            Vitesse: 1,
+            Taille: 0.05,
+            AutoColor: true
         };
 
-        let currentMesh;
+        let mesh;
         const material = new THREE.PointsMaterial({ 
-            size: params.particleSize, 
-            color: params.color,
+            size: params.Taille, 
             transparent: true,
             blending: THREE.AdditiveBlending 
         });
 
-        // --- FONCTION POUR CHANGER D'ALGORITHME ---
-        function updateGeometry() {
-            if (currentMesh) scene.remove(currentMesh);
-
-            let geo;
-            switch(params.algorithm) {
-                case 'Sphere': geo = new THREE.SphereGeometry(8, 64, 64); break;
-                case 'TorusKnot': geo = new THREE.TorusKnotGeometry(6, 2, 150, 20); break;
-                case 'Icosahedron': geo = new THREE.IcosahedronGeometry(8, 15); break;
-                case 'Torus': geo = new THREE.TorusGeometry(7, 3, 16, 100); break;
+        function build() {
+            if (mesh) {
+                mesh.geometry.dispose();
+                scene.remove(mesh);
             }
-
-            currentMesh = new THREE.Points(geo, material);
-            scene.add(currentMesh);
+            let geo;
+            if(params.Style === 'Sphere') geo = new THREE.SphereGeometry(8, 40, 40);
+            else if(params.Style === 'TorusKnot') geo = new THREE.TorusKnotGeometry(6, 2, 120, 20);
+            else if(params.Style === 'Spiral') geo = new THREE.TorusGeometry(7, 3, 12, 100);
+            
+            mesh = new THREE.Points(geo, material);
+            scene.add(mesh);
         }
 
-        // --- INTERFACE DE CONTRÔLE (GUI) ---
-        const gui = new GUI({ title: '💎 CalcPro Control Panel' });
-        gui.add(params, 'algorithm', ['Sphere', 'TorusKnot', 'Icosahedron', 'Torus']).onChange(updateGeometry);
-        gui.addColor(params, 'color').onChange(val => material.color.set(val));
-        gui.add(params, 'particleSize', 0.01, 0.2).onChange(val => material.size = val);
-        gui.add(params, 'rotationSpeed', 0, 5);
+        // GUI Setup
+        const gui = new GUI();
+        gui.add(params, 'Style', ['Sphere', 'TorusKnot', 'Spiral']).onChange(build);
+        gui.add(params, 'Vitesse', 0, 4);
+        gui.add(params, 'AutoColor');
 
-        // --- LANCEMENT INITIAL ---
-        updateGeometry();
+        build();
 
-        // --- ANIMATION ---
+        // Animation Loop
         function animate() {
             requestAnimationFrame(animate);
             
-            if (currentMesh) {
-                currentMesh.rotation.y += 0.005 * params.rotationSpeed;
-                currentMesh.rotation.x += 0.002 * params.rotationSpeed;
+            if (mesh) {
+                mesh.rotation.y += 0.005 * params.Vitesse;
+                mesh.rotation.x += 0.002 * params.Vitesse;
+            }
+
+            if (params.AutoColor) {
+                const h = (Date.now() * 0.0002) % 1;
+                material.color.setHSL(h, 0.8, 0.5);
             }
 
             renderer.render(scene, camera);
