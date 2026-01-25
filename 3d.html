@@ -3,139 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CalcPro Hybrid Engine</title>
+    <title>CalcPro Master Engine</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; touch-action: none; }
-        canvas { display: block; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial', sans-serif; }
+        canvas { display: block; touch-action: none; }
 
-        /* Branding UI */
-        #ui-layer {
+        /* Interface Stylisée */
+        #brand {
             position: absolute;
-            bottom: 20px;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-            box-sizing: border-box;
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        .brand-text {
+            bottom: 30px;
+            right: 30px;
             color: #00ff88;
+            font-size: 18px;
             font-weight: bold;
-            text-shadow: 0 0 10px #00ff88;
-            font-size: clamp(14px, 4vw, 18px);
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px #00ff88;
+            pointer-events: none;
+            z-index: 10;
         }
 
-        #hint {
+        #status {
             position: absolute;
             top: 20px;
-            width: 100%;
-            text-align: center;
-            color: rgba(0, 255, 136, 0.5);
-            font-size: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            left: 20px;
+            color: rgba(0, 255, 136, 0.6);
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="hint">PC: Souris | Mobile: Toucher l'écran</div>
-    <div id="ui-layer">
-        <div class="brand-text">ENGINE_V3.0</div>
-        <div class="brand-text">CalcPro © Lebbar Yahya</div>
-    </div>
+    <div id="status">ALGO: ACTIVE<br>CORE: CALCPRO_V4<br>TARGET: PC_MOBILE_HYBRID</div>
+    <div id="brand">CalcPro © Lebbar Yahya</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        let scene, camera, renderer, mesh, material;
+        let scene, camera, renderer, particles;
         let mouseX = 0, mouseY = 0;
-        let targetX = 0, targetY = 0;
-        let currentShape = 0;
-
-        // --- ALGORITHMES DES FORMES ---
-        const geometries = [
-            new THREE.TorusKnotGeometry(6, 1.8, 150, 20),
-            new THREE.IcosahedronGeometry(8, 10),
-            new THREE.TorusGeometry(7, 3, 16, 100),
-            new THREE.SphereGeometry(8, 48, 48)
-        ];
-
+        
+        // --- CONFIGURATION ---
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = window.innerWidth < 600 ? 25 : 18;
+            camera.position.z = 30;
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             document.body.appendChild(renderer.domElement);
 
-            // Matériau de points "Pro"
-            material = new THREE.PointsMaterial({
-                size: 0.08,
-                transparent: true,
-                blending: THREE.AdditiveBlending
-            });
-
-            mesh = new THREE.Points(geometries[0], material);
-            scene.add(mesh);
-
-            // --- ÉVÉNEMENTS ---
+            // Création de l'algorithme de particules entrelacées
+            const geometry = new THREE.TorusKnotGeometry(10, 3, 200, 32);
             
-            // PC : Mouvement de souris
-            window.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX - window.innerWidth / 2) / 100;
-                mouseY = (e.clientY - window.innerHeight / 2) / 100;
+            // Matériau "Glow" (Lueur)
+            const material = new THREE.PointsMaterial({
+                size: 0.1,
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending,
+                color: 0x00ff88
             });
 
-            // Mobile & PC : Clic/Toucher pour changer d'algorithme
-            const changeAction = () => {
-                currentShape = (currentShape + 1) % geometries.length;
-                mesh.geometry = geometries[currentShape];
-            };
-            window.addEventListener('mousedown', changeAction);
-            window.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                changeAction();
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            // Gestion PC (Souris)
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX - window.innerWidth / 2) * 0.002;
+                mouseY = (e.clientY - window.innerHeight / 2) * 0.002;
+            });
+
+            // Gestion Mobile (Toucher / Gyroscope simulé)
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    mouseX = (e.touches[0].clientX - window.innerWidth / 2) * 0.005;
+                    mouseY = (e.touches[0].clientY - window.innerHeight / 2) * 0.005;
+                }
             }, { passive: false });
 
-            window.addEventListener('resize', onWindowResize);
-
+            window.addEventListener('resize', onResize);
             animate();
         }
 
-        function onWindowResize() {
+        function onResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.position.z = window.innerWidth < 600 ? 25 : 18;
         }
 
+        // --- L'ALGORITHME D'ANIMATION ---
         function animate() {
             requestAnimationFrame(animate);
 
-            // Interpolation pour la fluidité (effet "Wow")
-            targetX += (mouseX - targetX) * 0.05;
-            targetY += (mouseY - targetY) * 0.05;
+            // Rotation de base
+            particles.rotation.y += 0.005;
+            
+            // Interaction fluide (Lag-free)
+            particles.rotation.x += (mouseY - particles.rotation.x) * 0.05;
+            particles.rotation.z += (mouseX - particles.rotation.z) * 0.05;
 
-            // Rotations combinées
-            mesh.rotation.y += 0.005;
-            mesh.rotation.x += 0.003;
-            mesh.position.x = targetX;
-            mesh.position.y = -targetY;
-
-            // Algorithme de couleur arc-en-ciel
-            const time = Date.now() * 0.0003;
-            material.color.setHSL(time % 1, 0.7, 0.6);
+            // Cycle de couleur dynamique (Arc-en-ciel Néon)
+            const time = Date.now() * 0.0005;
+            const hue = (time % 1);
+            particles.material.color.setHSL(hue, 0.8, 0.5);
 
             renderer.render(scene, camera);
         }
 
-        // Lancement de l'application
+        // Démarrage forcé
         init();
     </script>
 </body>
