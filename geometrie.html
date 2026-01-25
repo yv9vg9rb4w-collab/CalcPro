@@ -18,6 +18,18 @@ button:hover{background:#00e676}
 .exp{color:#ccc}
 .collapsible{background:#222;color:white;padding:12px;border:none;width:100%;text-align:left;font-size:16px;border-radius:6px;margin-top:10px;cursor:pointer;outline:none;}
 .content{padding:0 12px;display:none;overflow:hidden;border-left:3px solid #00c853;margin-bottom:10px;}
+/* Styles tableau trigonométrie */
+.code-window{background:#1e1e1e;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5);width:100%;max-width:700px;overflow-x:auto;border:1px solid #333;margin-top:10px;}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:#252526;color:#00ff88;padding:12px;text-align:left;border-bottom:2px solid #00ff88}
+td{padding:12px;border-bottom:1px solid #2d2d2d}
+.val-deg { color: #ffb86c; font-weight:bold; }
+.val-rad { color:#bd93f9; }
+.val-sin { color:#8be9fd; }
+.val-cos { color:#ff79c6; }
+.symbol { color:#ff5555; }
+tr:hover { background: rgba(255,255,255,0.05); }
+.brand{margin-top:20px;color:#00ff88;text-shadow:0 0 10px #00ff88;font-size:20px;text-align:center;}
 </style>
 </head>
 <body>
@@ -38,7 +50,7 @@ button:hover{background:#00e676}
 
 <button class="collapsible">📘 Leçon Trigonométrie</button>
 <div class="content">
-<h4>Triangle rectangle</h4>
+<h4>Triangle rectangle & Formules</h4>
 <ul>
 <li><span class="formule">sin θ = opposé / hypotenuse</span></li>
 <li><span class="formule">cos θ = adjacent / hypotenuse</span></li>
@@ -50,11 +62,56 @@ button:hover{background:#00e676}
 <span class="formule">c² = a² + b² − 2ab cos C</span>
 <h4>Conversion</h4>
 <span class="formule">rad = deg × π/180 | deg = rad × 180/π</span>
+
+<!-- Tableau trigonométrie -->
+<div class="code-window">
+    <table>
+        <thead>
+            <tr>
+                <th>[ Angle ]</th>
+                <th>[ Radians ]</th>
+                <th>[ Sinus ]</th>
+                <th>[ Cosinus ]</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="val-deg">0°</span></td>
+                <td><span class="val-rad">0</span></td>
+                <td><span class="val-sin">0</span></td>
+                <td><span class="val-cos">1</span></td>
+            </tr>
+            <tr>
+                <td><span class="val-deg">30°</span></td>
+                <td><span class="val-rad"><span class="symbol">π</span> / 6</span></td>
+                <td><span class="val-sin">1 / 2</span></td>
+                <td><span class="val-cos"><span class="symbol">√</span>3 / 2</span></td>
+            </tr>
+            <tr>
+                <td><span class="val-deg">45°</span></td>
+                <td><span class="val-rad"><span class="symbol">π</span> / 4</span></td>
+                <td><span class="val-sin"><span class="symbol">√</span>2 / 2</span></td>
+                <td><span class="val-cos"><span class="symbol">√</span>2 / 2</span></td>
+            </tr>
+            <tr>
+                <td><span class="val-deg">60°</span></td>
+                <td><span class="val-rad"><span class="symbol">π</span> / 3</span></td>
+                <td><span class="val-sin"><span class="symbol">√</span>3 / 2</span></td>
+                <td><span class="val-cos">1 / 2</span></td>
+            </tr>
+            <tr>
+                <td><span class="val-deg">90°</span></td>
+                <td><span class="val-rad"><span class="symbol">π</span> / 2</span></td>
+                <td><span class="val-sin">1</span></td>
+                <td><span class="val-cos">0</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 </div>
 
 </div>
-
-<footer>CalcPro © Lebbar Yahya</footer>
+<footer class="brand">CalcPro © Lebbar Yahya</footer>
 
 <script>
 const d=(x1,y1,x2,y2)=>Math.hypot(x2-x1,y2-y1);
@@ -78,9 +135,7 @@ if(A.x!==B.x){
 const a=(B.y-A.y)/(B.x-A.x);
 const b=A.y-a*A.x;
 t+=`<span class="formule">y = ax + b</span> → y = ${a.toFixed(3)}x + ${b.toFixed(3)}<br><br>`;
-}else{
-t+=`Droite verticale x = ${A.x.toFixed(2)}<br><br>`;
-}
+}else{t+=`Droite verticale x = ${A.x.toFixed(2)}<br><br>`;}
 
 /* CERCLE */
 const r=AB;
