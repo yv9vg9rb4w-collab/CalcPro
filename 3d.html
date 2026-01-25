@@ -3,119 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CalcPro Master Engine</title>
+    <title>CalcPro Final Engine</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial', sans-serif; }
-        canvas { display: block; touch-action: none; }
-
-        /* Interface Stylisée */
-        #brand {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            color: #00ff88;
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-shadow: 0 0 20px #00ff88;
-            pointer-events: none;
-            z-index: 10;
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        #ui {
+            position: absolute; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 20px; box-sizing: border-box;
         }
-
-        #status {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: rgba(0, 255, 136, 0.6);
-            font-family: monospace;
-            font-size: 12px;
-            line-height: 1.5;
-            pointer-events: none;
-        }
+        .text-neon { color: #00ff88; text-shadow: 0 0 10px #00ff88; font-weight: bold; }
+        .info { font-family: monospace; font-size: 10px; opacity: 0.7; }
     </style>
 </head>
 <body>
 
-    <div id="status">ALGO: ACTIVE<br>CORE: CALCPRO_V4<br>TARGET: PC_MOBILE_HYBRID</div>
-    <div id="brand">CalcPro © Lebbar Yahya</div>
+    <div id="ui">
+        <div class="info text-neon">ALGO: V5_STABLE<br>CORE: CALCPRO_V5<br>MODE: HYBRID_AUTO</div>
+        <div id="footer" class="text-neon" style="text-align: center; font-size: 18px;">CalcPro © Lebbar Yahya</div>
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
 
     <script>
-        let scene, camera, renderer, particles;
-        let mouseX = 0, mouseY = 0;
-        
-        // --- CONFIGURATION ---
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 30;
+        window.onload = function() {
+            try {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+                document.body.appendChild(renderer.domElement);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            document.body.appendChild(renderer.domElement);
+                // Forme 3D
+                const geometry = new THREE.TorusKnotGeometry(8, 2, 100, 16);
+                const material = new THREE.PointsMaterial({
+                    size: 0.15,
+                    color: 0x00ff88,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending
+                });
 
-            // Création de l'algorithme de particules entrelacées
-            const geometry = new THREE.TorusKnotGeometry(10, 3, 200, 32);
-            
-            // Matériau "Glow" (Lueur)
-            const material = new THREE.PointsMaterial({
-                size: 0.1,
-                transparent: true,
-                opacity: 0.9,
-                blending: THREE.AdditiveBlending,
-                color: 0x00ff88
-            });
+                const points = new THREE.Points(geometry, material);
+                scene.add(points);
 
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
+                camera.position.z = 25;
 
-            // Gestion PC (Souris)
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX - window.innerWidth / 2) * 0.002;
-                mouseY = (e.clientY - window.innerHeight / 2) * 0.002;
-            });
-
-            // Gestion Mobile (Toucher / Gyroscope simulé)
-            document.addEventListener('touchmove', (e) => {
-                if (e.touches.length > 0) {
-                    mouseX = (e.touches[0].clientX - window.innerWidth / 2) * 0.005;
-                    mouseY = (e.touches[0].clientY - window.innerHeight / 2) * 0.005;
+                // Animation
+                function animate() {
+                    requestAnimationFrame(animate);
+                    points.rotation.y += 0.01;
+                    points.rotation.x += 0.005;
+                    
+                    // Couleur changeante
+                    const time = Date.now() * 0.0005;
+                    material.color.setHSL(time % 1, 0.8, 0.5);
+                    
+                    renderer.render(scene, camera);
                 }
-            }, { passive: false });
 
-            window.addEventListener('resize', onResize);
-            animate();
-        }
+                animate();
 
-        function onResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+                // Gestion tactile
+                window.addEventListener('touchstart', () => {
+                    material.size = 0.3; // Grossit au toucher
+                    setTimeout(() => material.size = 0.15, 200);
+                });
 
-        // --- L'ALGORITHME D'ANIMATION ---
-        function animate() {
-            requestAnimationFrame(animate);
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
 
-            // Rotation de base
-            particles.rotation.y += 0.005;
-            
-            // Interaction fluide (Lag-free)
-            particles.rotation.x += (mouseY - particles.rotation.x) * 0.05;
-            particles.rotation.z += (mouseX - particles.rotation.z) * 0.05;
-
-            // Cycle de couleur dynamique (Arc-en-ciel Néon)
-            const time = Date.now() * 0.0005;
-            const hue = (time % 1);
-            particles.material.color.setHSL(hue, 0.8, 0.5);
-
-            renderer.render(scene, camera);
-        }
-
-        // Démarrage forcé
-        init();
+            } catch (e) {
+                document.getElementById('ui').innerHTML += '<div style="color:red">Erreur WebGL: ' + e.message + '</div>';
+            }
+        };
     </script>
 </body>
 </html>
