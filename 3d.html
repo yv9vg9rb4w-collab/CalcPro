@@ -3,127 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CalcPro 3D Engine</title>
+    <title>CalcPro Engine v2.0</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', Courier, monospace; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         canvas { display: block; }
 
-        /* Style Pro pour la signature et l'UI */
-        #ui-container {
+        /* Branding UI */
+        #brand-layer {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 30px;
-            box-sizing: border-box;
-            z-index: 10;
-        }
-
-        .header {
+            bottom: 30px;
+            right: 30px;
             color: #00ff88;
-            font-size: 14px;
-            letter-spacing: 4px;
-            text-shadow: 0 0 15px #00ff88;
-            border-left: 3px solid #00ff88;
-            padding-left: 15px;
-        }
-
-        .footer {
-            color: rgba(0, 255, 136, 0.6);
-            font-size: 18px;
-            text-align: right;
-            letter-spacing: 2px;
+            font-size: 20px;
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px #00ff88;
+            pointer-events: none;
+            z-index: 100;
         }
 
-        /* Effet de scanline pour le look hacker/pro */
-        body::before {
-            content: " ";
+        .system-log {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 3px 100%;
+            top: 20px;
+            left: 20px;
+            color: rgba(0, 255, 136, 0.7);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
             pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="ui-container">
-        <div class="header">SYSTEM_CORE: RUNNING<br>ALGO_TYPE: 3D_PARTICLE_KNOT</div>
-        <div class="footer">CalcPro © Lebbar Yahya</div>
-    </div>
+    <div class="system-log">STATUS: MULTI_ALGO_READY<br>ENGINE: CALC_PRO_V2</div>
+    <div id="brand-layer">CalcPro © Lebbar Yahya</div>
 
     <script type="importmap">
         {
             "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
             }
         }
     </script>
 
     <script type="module">
         import * as THREE from 'three';
+        import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-        // --- CONFIGURATION ---
+        // --- INITIALISATION ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        // --- ALGORITHME DE GÉOMÉTRIE AVANCÉE ---
-        // On utilise un TorusKnot pour un look complexe et pro
-        const geometry = new THREE.TorusKnotGeometry(10, 3, 200, 32);
-        
-        // Custom Shader Material simple pour l'effet de couleur
-        const material = new THREE.PointsMaterial({
-            size: 0.05,
-            color: 0x00ff88,
+        camera.position.z = 15;
+
+        // --- PARAMÈTRES (L'objet que le GUI va modifier) ---
+        const params = {
+            algorithm: 'TorusKnot',
+            color: '#00ff88',
+            particleSize: 0.05,
+            rotationSpeed: 1,
+            wireframe: false
+        };
+
+        let currentMesh;
+        const material = new THREE.PointsMaterial({ 
+            size: params.particleSize, 
+            color: params.color,
             transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending // Pour que les points brillent entre eux
+            blending: THREE.AdditiveBlending 
         });
 
-        const particleSystem = new THREE.Points(geometry, material);
-        scene.add(particleSystem);
+        // --- FONCTION POUR CHANGER D'ALGORITHME ---
+        function updateGeometry() {
+            if (currentMesh) scene.remove(currentMesh);
 
-        camera.position.z = 30;
+            let geo;
+            switch(params.algorithm) {
+                case 'Sphere': geo = new THREE.SphereGeometry(8, 64, 64); break;
+                case 'TorusKnot': geo = new THREE.TorusKnotGeometry(6, 2, 150, 20); break;
+                case 'Icosahedron': geo = new THREE.IcosahedronGeometry(8, 15); break;
+                case 'Torus': geo = new THREE.TorusGeometry(7, 3, 16, 100); break;
+            }
 
-        // --- GESTION DES MOUVEMENTS ---
-        let targetX = 0, targetY = 0;
-        let mouseX = 0, mouseY = 0;
+            currentMesh = new THREE.Points(geo, material);
+            scene.add(currentMesh);
+        }
 
-        window.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) * 0.05;
-            mouseY = (e.clientY - window.innerHeight / 2) * 0.05;
-        });
+        // --- INTERFACE DE CONTRÔLE (GUI) ---
+        const gui = new GUI({ title: '💎 CalcPro Control Panel' });
+        gui.add(params, 'algorithm', ['Sphere', 'TorusKnot', 'Icosahedron', 'Torus']).onChange(updateGeometry);
+        gui.addColor(params, 'color').onChange(val => material.color.set(val));
+        gui.add(params, 'particleSize', 0.01, 0.2).onChange(val => material.size = val);
+        gui.add(params, 'rotationSpeed', 0, 5);
 
-        // --- BOUCLE D'ANIMATION ---
-        function render() {
-            requestAnimationFrame(render);
+        // --- LANCEMENT INITIAL ---
+        updateGeometry();
 
-            // Interpolation fluide (Lerp) pour un mouvement "Smooth"
-            targetX += (mouseX - targetX) * 0.05;
-            targetY += (mouseY - targetY) * 0.05;
-
-            particleSystem.rotation.y += 0.005;
-            particleSystem.rotation.x += 0.002;
-
-            // L'objet réagit à la souris avec élégance
-            particleSystem.position.x = targetX * 0.2;
-            particleSystem.position.y = -targetY * 0.2;
-
-            // Changement dynamique de couleur basé sur la rotation
-            const hue = (Date.now() * 0.0001) % 1;
-            material.color.setHSL(hue, 0.8, 0.5);
+        // --- ANIMATION ---
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (currentMesh) {
+                currentMesh.rotation.y += 0.005 * params.rotationSpeed;
+                currentMesh.rotation.x += 0.002 * params.rotationSpeed;
+            }
 
             renderer.render(scene, camera);
         }
@@ -134,7 +121,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        render();
+        animate();
     </script>
 </body>
 </html>
