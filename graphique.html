@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Graphique</title>
+<title>CalcPro Graphique Avancé</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -62,7 +62,7 @@ canvas{
 <div class="box">
 <div class="title">📈 CalcPro • GRAPH CALCULATOR</div>
 
-<input id="fx" placeholder="Ex : x^2 , 1/x , √(X)" oninput="draw()">
+<input id="fx" placeholder="Ex : x^3+2x^2-3x+1 , 1/x , racin(x), racinX" oninput="draw()">
 <div class="result" id="res"></div>
 <canvas id="graph"></canvas>
 </div>
@@ -84,15 +84,14 @@ function draw(){
     for(let x=-10; x<=10; x+=0.1){
         let e = f
             .replace(/\^/g,"**")
-            .replace(/√/g,"Math.sqrt")
+            .replace(/racin/gi,"Math.sqrt")  // <-- remplacer racin par Math.sqrt
             .replace(/sin/g,"Math.sin")
             .replace(/cos/g,"Math.cos")
             .replace(/tan/g,"Math.tan")
             .replace(/log/g,"Math.log10")
             .replace(/ln/g,"Math.log")
             .replace(/π/g,"Math.PI")
-            // Remplacer X et x par la valeur
-            .replace(/x/gi, `(${x})`);
+            .replace(/x/gi, `(${x})`);  // X et x reconnus
 
         try{
             let y = eval(e);
@@ -132,22 +131,24 @@ function draw(){
         }
     });
 
-    // Calcul automatique des points clés
+    // Analyse automatique pour parabole/cubique/hyperbole
     try{
-        let fNorm = f.replace(/X/g,"x"); // Normaliser X -> x pour les calculs
-        if(fNorm.includes("x^2")){
-            let a=1,b=0,c=0;
-            const match = fNorm.match(/([+-]?\d*)x\^2/);
-            if(match && match[1]) a = Number(match[1]);
-            const matchB = fNorm.match(/([+-]?\d*)x(?!\^)/);
-            if(matchB && matchB[1]) b = Number(matchB[1]);
-            const matchC = fNorm.match(/([+-]?\d+)$/);
-            if(matchC) c = Number(matchC[1]);
-            const xs = -b/(2*a);
-            const ys = a*xs*xs+b*xs+c;
-            res.innerHTML = `Parabole → Sommet : (${xs.toFixed(2)}, ${ys.toFixed(2)})`;
+        let fNorm = f.replace(/X/g,"x").replace(/racin/gi,""); // normalisation
+        if(/x\*\*3|x\^3/.test(fNorm) || /x\*\*2|x\^2/.test(fNorm)){
+            let a=1,b=0,c=0,d=0;
+            const matchA = fNorm.match(/([+-]?\d*)x\^?3/);
+            if(matchA && matchA[1]) a=Number(matchA[1]);
+            const matchB = fNorm.match(/([+-]?\d*)x\^?2/);
+            if(matchB && matchB[1]) b=Number(matchB[1]);
+            const matchC = fNorm.match(/([+-]?\d*)x(?!\^)/);
+            if(matchC && matchC[1]) c=Number(matchC[1]);
+            const matchD = fNorm.match(/([+-]?\d+)$/);
+            if(matchD) d=Number(matchD[1]);
+            res.innerHTML = `Polynôme → Coefficients : a=${a}, b=${b}, c=${c}, d=${d}`;
         } else if(fNorm.includes("1/x")){
             res.innerHTML = `Hyperbole → Asymptotes : x=0, y=0`;
+        } else if(/Math\.sqrt/.test(f)){
+            res.innerHTML = `Fonction racine → √x calculée`;
         }
     }catch{}
 }
