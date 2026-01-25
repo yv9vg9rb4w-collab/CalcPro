@@ -2,36 +2,26 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro – Géométrie expliquée</title>
+<title>CalcPro – Géométrie + Trigonométrie</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{background:#0f0f0f;color:white;font-family:Arial;margin:0}
-header{background:#111;padding:15px;text-align:center;font-size:22px}
-.container{max-width:750px;margin:auto;padding:20px}
-h3{color:#00c853;margin-top:25px}
-input,textarea{
-  width:100%;padding:10px;margin:6px 0;
-  background:#181818;color:white;border:1px solid #333
-}
-button{
-  width:100%;padding:12px;margin-top:10px;
-  background:#00c853;border:none;font-size:16px
-}
-.result{
-  margin-top:15px;padding:15px;
-  background:#111;border:1px solid #333;
-  line-height:1.8;font-size:14px
-}
-.formule{color:#00e5ff}
+body{background:#0d0d0d;color:white;font-family:'Roboto',sans-serif;margin:0}
+header{background:#111;text-align:center;padding:20px;font-size:24px;font-weight:700;border-bottom:2px solid #00c853}
+.container{max-width:800px;margin:auto;padding:20px}
+h3{color:#00c853;margin-top:25px;cursor:pointer}
+input,textarea{width:100%;padding:12px;margin:8px 0;background:#181818;color:white;border:1px solid #333;border-radius:6px;font-size:16px}
+button{width:100%;padding:14px;margin-top:12px;background:#00c853;border:none;font-size:16px;font-weight:700;border-radius:6px;cursor:pointer;transition:0.3s}
+button:hover{background:#00e676}
+.result{margin-top:20px;padding:16px;background:#111;border:1px solid #333;line-height:1.8;border-radius:6px;font-size:14px}
+.formule{color:#00e5ff;font-weight:700}
 .exp{color:#ccc}
+.collapsible{background:#222;color:white;padding:12px;border:none;width:100%;text-align:left;font-size:16px;border-radius:6px;margin-top:10px;cursor:pointer;outline:none;}
+.content{padding:0 12px;display:none;overflow:hidden;border-left:3px solid #00c853;margin-bottom:10px;}
 </style>
 </head>
-
 <body>
-
-<header>📐 CalcPro – Géométrie AVEC EXPLICATIONS</header>
-
+<header>📐 CalcPro – Géométrie + Trigonométrie</header>
 <div class="container">
 
 <h3>Coordonnées des points</h3>
@@ -40,13 +30,31 @@ button{
 <input id="x3" placeholder="x₃ (optionnel)"><input id="y3" placeholder="y₃ (optionnel)">
 
 <h3>Polygone (x,y)</h3>
-<textarea id="poly" placeholder="Ex: 0,0  4,0  4,3  0,3"></textarea>
+<textarea id="poly" placeholder="Ex: 0,0 4,0 4,3 0,3"></textarea>
 
-<button onclick="calc()">Calculer</button>
+<button onclick="calc()">Calculer ✅</button>
 
 <div class="result" id="res">Résultats expliqués…</div>
 
+<button class="collapsible">📘 Leçon Trigonométrie</button>
+<div class="content">
+<h4>Triangle rectangle</h4>
+<ul>
+<li><span class="formule">sin θ = opposé / hypotenuse</span></li>
+<li><span class="formule">cos θ = adjacent / hypotenuse</span></li>
+<li><span class="formule">tan θ = opposé / adjacent</span></li>
+</ul>
+<h4>Loi des sinus</h4>
+<span class="formule">a / sin A = b / sin B = c / sin C</span>
+<h4>Loi des cosinus</h4>
+<span class="formule">c² = a² + b² − 2ab cos C</span>
+<h4>Conversion</h4>
+<span class="formule">rad = deg × π/180 | deg = rad × 180/π</span>
 </div>
+
+</div>
+
+<footer>CalcPro © Lebbar Yahya</footer>
 
 <script>
 const d=(x1,y1,x2,y2)=>Math.hypot(x2-x1,y2-y1);
@@ -60,31 +68,27 @@ let t="";
 /* SEGMENT */
 const AB=d(A.x,A.y,B.x,B.y);
 t+=`<b>📏 Distance AB</b><br>`;
-t+=`<span class="formule">Formule :</span> AB = √[(x₂−x₁)² + (y₂−y₁)²]<br>`;
-t+=`<span class="exp">Application :</span> AB = ${AB.toFixed(3)}<br>`;
-t+=`Milieu M = ((${A.x}+${B.x})/2 , (${A.y}+${B.y})/2)
-      = (${((A.x+B.x)/2).toFixed(2)} ; ${((A.y+B.y)/2).toFixed(2)})<br><br>`;
+t+=`<span class="formule">AB = √[(x₂−x₁)² + (y₂−y₁)²]</span><br>`;
+t+=`<span class="exp">AB = ${AB.toFixed(3)}</span><br>`;
+t+=`Milieu M = (${((A.x+B.x)/2).toFixed(2)} ; ${((A.y+B.y)/2).toFixed(2)})<br><br>`;
 
 /* DROITE */
-t+=`<b>📊 Droite (AB)</b><br>`;
+t+=`<b>📊 Droite AB</b><br>`;
 if(A.x!==B.x){
 const a=(B.y-A.y)/(B.x-A.x);
 const b=A.y-a*A.x;
-t+=`<span class="formule">a = (y₂−y₁)/(x₂−x₁)</span> = ${a.toFixed(3)}<br>`;
-t+=`<span class="formule">b = y₁ − a·x₁</span> = ${b.toFixed(3)}<br>`;
-t+=`Équation : y = ${a.toFixed(3)}x + ${b.toFixed(3)}<br><br>`;
+t+=`<span class="formule">y = ax + b</span> → y = ${a.toFixed(3)}x + ${b.toFixed(3)}<br><br>`;
 }else{
-t+=`x₁ = x₂ ⇒ droite verticale<br>`;
-t+=`Équation : x = ${A.x.toFixed(2)}<br><br>`;
+t+=`Droite verticale x = ${A.x.toFixed(2)}<br><br>`;
 }
 
 /* CERCLE */
 const r=AB;
 t+=`<b>⭕ Cercle (centre A)</b><br>`;
-t+=`Rayon r = AB = ${r.toFixed(3)}<br>`;
-t+=`Diamètre D = 2r = ${(2*r).toFixed(3)}<br>`;
-t+=`Aire = πr² = ${(Math.PI*r*r).toFixed(3)}<br>`;
-t+=`Périmètre = 2πr = ${(2*Math.PI*r).toFixed(3)}<br><br>`;
+t+=`Rayon r = ${r.toFixed(3)}<br>`;
+t+=`Diamètre D = ${(2*r).toFixed(3)}<br>`;
+t+=`Aire = ${(Math.PI*r*r).toFixed(3)}<br>`;
+t+=`Circonférence = ${(2*Math.PI*r).toFixed(3)}<br><br>`;
 
 /* TRIANGLE */
 if(!isNaN(C.x)){
@@ -93,8 +97,12 @@ const AC=d(A.x,A.y,C.x,C.y);
 const P=AB+BC+AC;
 const area=Math.abs(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y))/2;
 t+=`<b>🔺 Triangle ABC</b><br>`;
-t+=`Périmètre = AB + BC + AC = ${P.toFixed(3)}<br>`;
-t+=`Aire = |x₁(y₂−y₃)+x₂(y₃−y₁)+x₃(y₁−y₂)| / 2 = ${area.toFixed(3)}<br><br>`;
+t+=`Périmètre = ${P.toFixed(3)}<br>`;
+t+=`Aire = ${area.toFixed(3)}<br>`;
+const angleA=Math.acos((BC*BC + AC*AC - AB*AB)/(2*BC*AC))*180/Math.PI;
+const angleB=Math.acos((AC*AC + AB*AB - BC*BC)/(2*AC*AB))*180/Math.PI;
+const angleC=180-angleA-angleB;
+t+=`Angles : A=${angleA.toFixed(2)}° , B=${angleB.toFixed(2)}° , C=${angleC.toFixed(2)}°<br><br>`;
 }
 
 /* POLYGONE */
@@ -109,13 +117,23 @@ A2+=x1*y2-x2*y1;
 P2+=Math.hypot(x2-x1,y2-y1);
 }
 t+=`<b>🔷 Polygone</b><br>`;
-t+=`Aire = |Σ(xᵢyᵢ₊₁ − xᵢ₊₁yᵢ)| / 2 = ${(Math.abs(A2)/2).toFixed(3)}<br>`;
+t+=`Aire = ${(Math.abs(A2)/2).toFixed(3)}<br>`;
 t+=`Périmètre = ${P2.toFixed(3)}<br>`;
 }
 
-res.innerHTML=t;
+document.getElementById("res").innerHTML=t;
+}
+
+/* Collapsible trig leçon */
+var coll=document.getElementsByClassName("collapsible");
+for(let i=0;i<coll.length;i++){
+  coll[i].addEventListener("click",function(){
+    this.classList.toggle("active");
+    var content=this.nextElementSibling;
+    if(content.style.display==="block"){content.style.display="none";}
+    else{content.style.display="block";}
+  });
 }
 </script>
-
 </body>
 </html>
