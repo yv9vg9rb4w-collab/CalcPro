@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Dark Scientific Calculator Dynamic AC/⌫</title>
+<title>CalcPro Dark Scientific Calculator Auto-ANS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -85,6 +85,7 @@ button:active{
         <button class="btn-func" onclick="addInput('e')">e</button>
         <button class="btn-func" onclick="addInput('√(')">√</button>
         <button class="btn-func" onclick="addInput('^')">x^y</button>
+        <button class="btn-op" onclick="clearDisplay()">C</button>
 
         <!-- Numbers 7-9 -->
         <button class="btn-number" onclick="addInput('7')">7</button>
@@ -98,7 +99,7 @@ button:active{
         <button class="btn-number" onclick="addInput('5')">5</button>
         <button class="btn-number" onclick="addInput('6')">6</button>
         <button class="btn-op" onclick="addInput('×')">×</button>
-        <button class="btn-op" onclick="addInput('/')">÷</button>
+        <button class="btn-op" onclick="addInput('÷')">÷</button>
 
         <!-- Numbers 1-3 -->
         <button class="btn-number" onclick="addInput('1')">1</button>
@@ -110,6 +111,7 @@ button:active{
         <!-- Last row -->
         <button class="btn-number" onclick="addInput('0')">0</button>
         <button class="btn-number" onclick="addInput('.')">.</button>
+        <button class="btn-func" onclick="addInput('x')">x</button>
         <button id="delBtn" class="btn-op" onclick="deleteOrClear()">AC</button>
         <button class="btn-equal" onclick="calculate()">=</button>
     </div>
@@ -121,13 +123,13 @@ let historyDiv = document.getElementById('history');
 let delBtn = document.getElementById('delBtn');
 let input = '';
 let lastResult = 0;
-let xValue = 5; // valeur par défaut pour X
 
 function updateDelButton(){
     delBtn.innerText = input ? '⌫' : 'AC';
 }
 
 function addInput(value){
+    // ANS automatique si opérateur en début de calcul
     if(input === '' && ['+','-','×','/'].includes(value)){
         input += lastResult;
     }
@@ -159,9 +161,9 @@ function calculate(){
         .replace(/tan\(/gi,'Math.tan(')
         .replace(/ln\(/gi,'Math.log(')
         .replace(/log\(/gi,'Math.log10(')
-        .replace(/x/gi,xValue)
         .replace(/×/g,'*'); // conversion × en *
-
+        .replace(/÷/g,'/'); // conversion ÷ en /
+    
     let result;
     try{
         result = eval(exp);
@@ -172,12 +174,12 @@ function calculate(){
 
     historyDiv.innerHTML += `<div>${input} = ${result}</div>`;
     display.innerText = result;
-    if(result !== 'Erreur') lastResult = result;
+    if(result !== 'Erreur') lastResult = result; // ANS automatique
     input = '';
     updateDelButton();
 }
 
-// Initial button text
+// Initialisation bouton
 updateDelButton();
 </script>
 
