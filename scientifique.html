@@ -2,186 +2,72 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Dark Scientific Calculator Auto-ANS</title>
+<title>CalcPro Dark Scientific Calculator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{
-    margin:0;
-    background:#000;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    color:white;
-}
-.calculator{
-    background:#111;
-    border-radius:40px;
-    padding:20px;
-    width:380px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.8);
-}
-.display{
-    background:#222;
-    color:#22c55e;
-    font-size:32px;
-    border-radius:20px;
-    padding:15px;
-    text-align:right;
-    margin-bottom:15px;
-    min-height:60px;
-    overflow-x:auto;
-}
-.history{
-    max-height:100px;
-    overflow-y:auto;
-    font-size:14px;
-    margin-bottom:10px;
-    padding:5px;
-    background:#111;
-    border-radius:12px;
-}
-.button-grid{
-    display:grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap:10px;
-}
-button{
-    padding:18px;
-    font-size:18px;
-    border-radius:50%;
-    border:none;
-    cursor:pointer;
-    transition:0.1s;
-    box-shadow:0 5px #000;
-}
-button:active{
-    transform:translateY(2px);
-    box-shadow:0 2px #000;
-}
-/* Color styling */
-.btn-number { background:#222; color:#fff; } /* chiffres blancs */
+body{margin:0;background:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;color:white;}
+.calculator{background:#111;border-radius:40px;padding:20px;width:380px;box-shadow:0 10px 30px rgba(0,0,0,0.8);}
+.display{background:#222;color:#22c55e;font-size:32px;border-radius:20px;padding:15px;text-align:right;margin-bottom:15px;min-height:60px;overflow-x:auto;}
+.history{max-height:100px;overflow-y:auto;font-size:14px;margin-bottom:10px;padding:5px;background:#111;border-radius:12px;}
+.button-grid{display:grid;grid-template-columns: repeat(5, 1fr);gap:10px;}
+button{padding:18px;font-size:18px;border-radius:50%;border:none;cursor:pointer;transition:0.1s;box-shadow:0 5px #000;}
+button:active{transform:translateY(2px);box-shadow:0 2px #000;}
+.btn-number { background:#222; color:#fff; }
 .btn-op { background:#ff9500; color:#fff; }
 .btn-func { background:#333; color:#38bdf8; }
 .btn-equal { background:#34c759; color:#fff; }
 </style>
 </head>
 <body>
-
 <div class="calculator">
-    <div class="history" id="history"></div>
-    <div class="display" id="display">0</div>
-    <div class="button-grid">
-        <!-- Scientific functions -->
-        <button class="btn-func" onclick="addInput('sin(')">sin</button>
-        <button class="btn-func" onclick="addInput('cos(')">cos</button>
-        <button class="btn-func" onclick="addInput('tg(')">tg</button>
-        <button class="btn-func" onclick="addInput('ln(')">ln</button>
-        <button class="btn-func" onclick="addInput('log(')">log</button>
-
-        <!-- Constants / operations -->
-        <button class="btn-func" onclick="addInput('π')">π</button>
-        <button class="btn-func" onclick="addInput('e')">e</button>
-        <button class="btn-func" onclick="addInput('√(')">√</button>
-        <button class="btn-func" onclick="addInput('^')">x^y</button>
-        <button class="btn-op" onclick="clearDisplay()">C</button>
-
-        <!-- Numbers 7-9 -->
-        <button class="btn-number" onclick="addInput('7')">7</button>
-        <button class="btn-number" onclick="addInput('8')">8</button>
-        <button class="btn-number" onclick="addInput('9')">9</button>
-        <button class="btn-op" onclick="addInput('+')">+</button>
-        <button class="btn-op" onclick="addInput('-')">−</button>
-
-        <!-- Numbers 4-6 -->
-        <button class="btn-number" onclick="addInput('4')">4</button>
-        <button class="btn-number" onclick="addInput('5')">5</button>
-        <button class="btn-number" onclick="addInput('6')">6</button>
-        <button class="btn-op" onclick="addInput('×')">×</button>
-        <button class="btn-op" onclick="addInput('÷')">÷</button>
-
-        <!-- Numbers 1-3 -->
-        <button class="btn-number" onclick="addInput('1')">1</button>
-        <button class="btn-number" onclick="addInput('2')">2</button>
-        <button class="btn-number" onclick="addInput('3')">3</button>
-        <button class="btn-op" onclick="addInput('(')">(</button>
-        <button class="btn-op" onclick="addInput(')')">)</button>
-
-        <!-- Last row -->
-        <button class="btn-number" onclick="addInput('0')">0</button>
-        <button class="btn-number" onclick="addInput('.')">.</button>
-        <button class="btn-func" onclick="addInput('x')">x</button>
-        <button id="delBtn" class="btn-op" onclick="deleteOrClear()">AC</button>
-        <button class="btn-equal" onclick="calculate()">=</button>
-    </div>
+<div class="history" id="history"></div>
+<div class="display" id="display">0</div>
+<div class="button-grid">
+<button class="btn-func" onclick="addInput('sin(')">sin</button>
+<button class="btn-func" onclick="addInput('cos(')">cos</button>
+<button class="btn-func" onclick="addInput('tg(')">tg</button>
+<button class="btn-func" onclick="addInput('ln(')">ln</button>
+<button class="btn-func" onclick="addInput('log(')">log</button>
+<button class="btn-func" onclick="addInput('π')">π</button>
+<button class="btn-func" onclick="addInput('e')">e</button>
+<button class="btn-func" onclick="addInput('√(')">√</button>
+<button class="btn-func" onclick="addInput('^')">x^y</button>
+<button class="btn-op" onclick="clearDisplay()">C</button>
+<button class="btn-number" onclick="addInput('7')">7</button>
+<button class="btn-number" onclick="addInput('8')">8</button>
+<button class="btn-number" onclick="addInput('9')">9</button>
+<button class="btn-op" onclick="addInput('+')">+</button>
+<button class="btn-op" onclick="addInput('-')">−</button>
+<button class="btn-number" onclick="addInput('4')">4</button>
+<button class="btn-number" onclick="addInput('5')">5</button>
+<button class="btn-number" onclick="addInput('6')">6</button>
+<button class="btn-op" onclick="addInput('×')">×</button>
+<button class="btn-op" onclick="addInput('÷')">÷</button>
+<button class="btn-number" onclick="addInput('1')">1</button>
+<button class="btn-number" onclick="addInput('2')">2</button>
+<button class="btn-number" onclick="addInput('3')">3</button>
+<button class="btn-op" onclick="addInput('(')">(</button>
+<button class="btn-op" onclick="addInput(')')">)</button>
+<button class="btn-number" onclick="addInput('0')">0</button>
+<button class="btn-number" onclick="addInput('.')">.</button>
+<button class="btn-func" onclick="addInput('x')">x</button>
+<button id="delBtn" class="btn-op" onclick="deleteOrClear()">AC</button>
+<button class="btn-equal" onclick="calculate()">=</button>
+</div>
 </div>
 
 <script>
-let display = document.getElementById('display');
-let historyDiv = document.getElementById('history');
-let delBtn = document.getElementById('delBtn');
-let input = '';
-let lastResult = 0;
+let display=document.getElementById('display');
+let historyDiv=document.getElementById('history');
+let delBtn=document.getElementById('delBtn');
+let input='';
+let lastResult=0;
 
-function updateDelButton(){
-    delBtn.innerText = input ? '⌫' : 'AC';
-}
-
-function addInput(value){
-    // ANS automatique si opérateur en début de calcul
-    if(input === '' && ['+','-','×','/'].includes(value)){
-        input += lastResult;
-    }
-    input += value;
-    display.innerText = input || '0';
-    updateDelButton();
-}
-
-function deleteOrClear(){
-    if(input){
-        input = input.slice(0,-1);
-    } else {
-        lastResult = 0;
-    }
-    display.innerText = input || '0';
-    updateDelButton();
-}
-
-function calculate(){
-    if(!input) return;
-
-    let exp = input
-        .replace(/π/g,'Math.PI')
-        .replace(/e/g,'Math.E')
-        .replace(/√/g,'Math.sqrt')
-        .replace(/tg\(/gi,'Math.tan(')
-        .replace(/sin\(/gi,'Math.sin(')
-        .replace(/cos\(/gi,'Math.cos(')
-        .replace(/tan\(/gi,'Math.tan(')
-        .replace(/ln\(/gi,'Math.log(')
-        .replace(/log\(/gi,'Math.log10(')
-        .replace(/×/g,'*'); // conversion × en *
-        .replace(/÷/g,'/'); // conversion ÷ en /
-    
-    let result;
-    try{
-        result = eval(exp);
-        if(!isFinite(result)) result='Erreur';
-    }catch{
-        result='Erreur';
-    }
-
-    historyDiv.innerHTML += `<div>${input} = ${result}</div>`;
-    display.innerText = result;
-    if(result !== 'Erreur') lastResult = result; // ANS automatique
-    input = '';
-    updateDelButton();
-}
-
-// Initialisation bouton
+function updateDelButton(){delBtn.innerText=input?'⌫':'AC';}
+function addInput(value){if(input===''&&['+','-','×','/'].includes(value)){input+=lastResult;}input+=value;display.innerText=input||'0';updateDelButton();}
+function deleteOrClear(){if(input){input=input.slice(0,-1);}else{lastResult=0;}display.innerText=input||'0';updateDelButton();}
+function calculate(){if(!input)return;let exp=input.replace(/π/g,'Math.PI').replace(/e/g,'Math.E').replace(/√/g,'Math.sqrt').replace(/tg\(/gi,'Math.tan(').replace(/sin\(/gi,'Math.sin(').replace(/cos\(/gi,'Math.cos(').replace(/tan\(/gi,'Math.tan(').replace(/ln\(/gi,'Math.log(').replace(/log\(/gi,'Math.log10(').replace(/×/g,'*').replace(/÷/g,'/');let result;if(/[a-zA-Z]/.test(exp)){result='Expression avec x';}else{try{result=eval(exp);if(!isFinite(result))result='Erreur';}catch{result='Erreur';}}historyDiv.innerHTML+=`<div>${input} = ${result}</div>`;display.innerText=result;if(result!=='Erreur'&&result!=='Expression avec x')lastResult=result;input='';updateDelButton();}
 updateDelButton();
 </script>
-
 </body>
 </html>
