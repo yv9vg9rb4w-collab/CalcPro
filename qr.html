@@ -19,23 +19,23 @@
   </style>
 </head>
 <body>
-  <div class="qr-container">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://calcpro.com&size=200x200" alt="QR Code CalcPro">
-  </div>
+  <div class="qr-container" id="qrcode"></div>
   <p>Scannez pour visiter CalcPro</p>
+
+  <!-- Ajout de la librairie QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <script>
-window.onload = function() {
-    new QRCode(document.getElementById("qrcode"), {
-        text: "https://yv9vg9rb4w-collab.github.io/Lebbar-yahya/",
-        width: 220,
-        height: 220,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-    });
-};
-</script>
-  
+    window.onload = function() {
+      new QRCode(document.getElementById("qrcode"), {
+          text: "https://yv9vg9rb4w-collab.github.io/Lebbar-yahya/",
+          width: 220,
+          height: 220,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+      });
+    };
+  </script>
 </body>
 </html>
