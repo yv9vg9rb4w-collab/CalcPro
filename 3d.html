@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CalcPro Pyramid Fortress</title>
+    <title>CalcPro Radiant Diamond</title>
     <style>
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
         canvas { display: block; width: 100vw; height: 100vh; }
@@ -17,83 +17,52 @@
             color: #00ff88; 
             text-shadow: 0 0 10px #00ff88; 
             font-weight: bold; 
-            font-size: 12px;
-            line-height: 1.4;
+            font-size: 13px;
         }
-        .footer { 
-            text-align: right; 
-            font-size: 20px; 
-            text-shadow: 0 0 20px #00ff88;
-        }
+        .footer { text-align: center; font-size: 22px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div id="overlay">
         <div class="neon-green">
-            SYSTEM : PYRAMID_FORTRESS_V10 ><br>
-            ENGINE : QUANTUM_MATH_3D<br>
-            RENDER : SOLID_DYNAMIC_COLOR<br>
-            STATUS : OPERATIONAL
+            SYSTEM: CALCPRO_V11<br>
+            RENDER: RADIANT_DIAMOND<br>
+            EFFECT: NEON_GLOW_MAX
         </div>
         <div class="neon-green footer">CalcPro © Lebbar Yahya</div>
     </div>
 
-    <canvas id="render"></canvas>
+    <canvas id="diamondCanvas"></canvas>
 
     <script>
-        const canvas = document.getElementById('render');
+        const canvas = document.getElementById('diamondCanvas');
         const ctx = canvas.getContext('2d');
-        let w, h;
-        let angleX = 0, angleY = 0;
-        let stars = [];
+        let w, h, angleX = 0, angleY = 0;
 
-        // --- GÉOMÉTRIE : PYRAMIDE ---
+        // --- GÉOMÉTRIE DU DIAMANT ---
         const nodes = [
-            [0, -1, 0],   // Sommet (0)
-            [1, 1, 1],    // Base 1 (1)
-            [1, 1, -1],   // Base 2 (2)
-            [-1, 1, -1],  // Base 3 (3)
-            [-1, 1, 1]    // Base 4 (4)
+            [0, 1.2, 0], // Pointe du bas (0)
+            [0.7, 0, 0.7], [0.7, 0, -0.7], [-0.7, 0, -0.7], [-0.7, 0, 0.7], // Ceinture (1,2,3,4)
+            [0.4, -0.6, 0.4], [0.4, -0.6, -0.4], [-0.4, -0.6, -0.4], [-0.4, -0.6, 0.4], // Table (5,6,7,8)
+            [0, -0.6, 0] // Centre table (9)
         ];
 
         const faces = [
-            [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 1], // Côtés
-            [1, 2, 3, 4] // Base
+            [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 1], // Pavillon (bas)
+            [1, 2, 6, 5], [2, 3, 7, 6], [3, 4, 8, 7], [4, 1, 5, 8], // Couronne (côtés)
+            [5, 6, 7, 8] // Table (haut)
         ];
-
-        // --- EFFET ÉTOILES (HYPERDRIVE) ---
-        function initStars() {
-            stars = [];
-            for(let i=0; i<200; i++) {
-                stars.push({
-                    x: Math.random() * w - w/2,
-                    y: Math.random() * h - h/2,
-                    z: Math.random() * w,
-                    o: Math.random()
-                });
-            }
-        }
-
-        function updateStars() {
-            stars.forEach(s => {
-                s.z -= 5; // Vitesse vers l'avant
-                if(s.z <= 0) s.z = w;
-            });
-        }
 
         function resize() {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
-            initStars();
         }
 
         function rotate(node, ax, ay) {
             let x = node[0], y = node[1], z = node[2];
-            // Rotate Y
             let nx = x * Math.cos(ay) - z * Math.sin(ay);
             let nz = x * Math.sin(ay) + z * Math.cos(ay);
-            // Rotate X
             let ny = y * Math.cos(ax) - nz * Math.sin(ax);
             nz = y * Math.sin(ax) + nz * Math.cos(ax);
             return [nx, ny, nz];
@@ -103,40 +72,22 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, w, h);
 
-            // 1. DESSINER LES ÉTOILES
-            updateStars();
-            ctx.fillStyle = "#fff";
-            stars.forEach(s => {
-                let px = s.x / (s.z / w) + w/2;
-                let py = s.y / (s.z / w) + h/2;
-                if(px > 0 && px < w && py > 0 && py < h) {
-                    let size = (1 - s.z / w) * 3;
-                    ctx.fillRect(px, py, size, size);
-                }
-            });
+            angleX += 0.008;
+            angleY += 0.012;
 
-            angleX += 0.01;
-            angleY += 0.015;
-
-            // 2. PROJECTION PERSPECTIVE
+            // Projection & Tri
             let projected = nodes.map(n => {
                 let r = rotate(n, angleX, angleY);
-                let scale = w / (4 + r[2]); 
-                return [
-                    r[0] * scale * 0.8 + w/2,
-                    r[1] * scale * 0.8 + h/2,
-                    r[2]
-                ];
+                let scale = w / (3.5 + r[2]); 
+                return [r[0] * scale + w/2, r[1] * scale + h/2, r[2]];
             });
 
-            // 3. TRI DES FACES (Z-Sorting)
             const sorted = faces.map((f, i) => {
-                let zSum = 0;
-                f.forEach(pIdx => zSum += projected[pIdx][2]);
-                return { f, z: zSum / f.length, i };
+                let z = 0; f.forEach(p => z += projected[p][2]);
+                return { f, z: z/f.length, i };
             }).sort((a, b) => b.z - a.z);
 
-            // 4. RENDU SOLIDE
+            // Rendu des facettes
             sorted.forEach(obj => {
                 let f = obj.f;
                 ctx.beginPath();
@@ -144,18 +95,24 @@
                 for(let i=1; i<f.length; i++) ctx.lineTo(projected[f[i]][0], projected[f[i]][1]);
                 ctx.closePath();
 
-                // Couleur Dynamique (Cyan à Vert)
-                let hue = (Date.now() / 50 + obj.i * 20) % 60 + 140; 
-                ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
+                // Style Crystal : Variation de bleu/vert/blanc
+                let opaq = 0.5 + (obj.z + 1) / 4;
+                let hue = 160 + (obj.i * 10); // Teintes émeraude/diamant
+                
+                ctx.fillStyle = `hsla(${hue}, 80%, 60%, ${opaq})`;
                 ctx.fill();
 
-                // Lueur Néon sur les bords
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+                // Arêtes brillantes
+                ctx.strokeStyle = `rgba(255, 255, 255, 0.8)`;
+                ctx.lineWidth = 1.5;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `hsl(${hue}, 100%, 70%)`;
                 ctx.stroke();
                 ctx.shadowBlur = 0;
+
+                // Reflet interne (petit point blanc)
+                ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+                ctx.fill();
             });
 
             requestAnimationFrame(draw);
