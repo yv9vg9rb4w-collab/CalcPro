@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro • iOS 26</title>
+<title>Calculatrice scientifique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -149,7 +149,7 @@ button:active{
     <button onclick="add('4')">4</button>
     <button onclick="add('5')">5</button>
     <button onclick="add('6')">6</button>
-    <button class="op" onclick="add('*')">×</button>
+    <button class="op" onclick="add('×')">×</button>
     <button class="op" onclick="add('/')">÷</button>
 
     <button onclick="add('1')">1</button>
@@ -221,8 +221,8 @@ function calculate(){
     .replace(/ln\(/g,"Math.log(")
     .replace(/log\(/g,"Math.log10(")
     .replace(/\^/g,"**");
-
-  try{
+    .replace(/×/g,'*')
+ try{
     let result=eval(exp);
     history.innerHTML+=`<div>${input} = ${result}</div>`;
     display.innerText=result;
