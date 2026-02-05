@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro iOS 26 + ANS</title>
+<title>CalcPro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;}
@@ -39,6 +39,7 @@ button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px 
 .op{background:#ff9500}
 .equal{background:#34c759;grid-column:span 2;border-radius:30px;}
 .ans{background:#8b5cf6;}
+.sign{background:#f43f5e;}
 </style>
 </head>
 <body>
@@ -79,6 +80,7 @@ button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px 
     <button onclick="add('0')">0</button>
     <button onclick="add('.')">.</button>
     <button class="ans" onclick="addANS()">ANS</button>
+    <button class="sign" onclick="toggleSign()">+/-</button>
     <button class="equal" onclick="calculate()">=</button>
   </div>
 </div>
@@ -91,7 +93,7 @@ let calc=document.getElementById("calc");
 let input="";
 let lastResult=0;
 
-// animation ultra smooth
+// ultra smooth animation
 function animateDigits(str){
   display.innerHTML="";
   display.classList.remove("show");
@@ -109,10 +111,22 @@ function animateDigits(str){
 // boutons
 function updateDelButton(){delBtn.innerText=input?"⌫":"AC";}
 function add(v){if(input==="0")input="";input+=v;animateDigits(input);updateDelButton();}
-function addANS(){add(lastResult.toString());} // ✅ ajoute ANS
+function addANS(){add(lastResult.toString());}
 function deleteOrClear(){if(input.length>1){input=input.slice(0,-1);animateDigits(input);}else{input="";animateDigits("0");}updateDelButton();}
 
-// moteur math sécurisé sans eval
+// ✅ toggle +/-
+function toggleSign(){
+  if(input){
+    if(input[0]==="-") input=input.slice(1);
+    else input="-"+input;
+    animateDigits(input);
+  }else if(lastResult){
+    lastResult=-lastResult;
+    animateDigits(lastResult.toString());
+  }
+}
+
+// moteur math sécurisé
 function calculate(){
   if(!input) return;
   try{
