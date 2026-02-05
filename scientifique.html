@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro iOS 26 Apple Style</title>
+<title>CalcPro iOS 26 Sans Eval</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;}
@@ -40,7 +40,7 @@ button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px 
     <button onclick="add('7')">7</button>
     <button onclick="add('8')">8</button>
     <button onclick="add('9')">9</button>
-    <button class="op" onclick="add('+')">+</button>
+    <button class="op" onclick="add('×')">×</button>
     <button class="op" onclick="add('−')">−</button>
 
     <button onclick="add('4')">4</button>
@@ -68,7 +68,7 @@ let delBtn=document.getElementById("delBtn");
 let input="";
 let lastResult=0;
 
-// Affiche chiffres et symboles
+// Animate display
 function animateDigits(result){
   display.innerHTML="";
   let str=String(result);
@@ -81,35 +81,65 @@ function animateDigits(result){
   }
 }
 
-// Boutons
+// Buttons
 function updateDelButton(){delBtn.innerText=input?"⌫":"AC";}
 function add(v){if(input==="0")input="";input+=v;animateDigits(input);updateDelButton();}
 function deleteOrClear(){if(input.length>1){input=input.slice(0,-1);animateDigits(input);}else{input="";animateDigits(0);}updateDelButton();}
 
-// ===== MOTEUR MATH RAPIDE =====
+// ===== MOTEUR MATH SANS EVAL =====
 function calculate(){
   if(!input) return;
   try{
-    // Transforme affichage en calculable
-    let expr=input.replace(/π/g,"Math.PI")
-                  .replace(/e/g,"Math.E")
-                  .replace(/√/g,"Math.sqrt")
-                  .replace(/×/g,"*")
-                  .replace(/÷/g,"÷")
-                  .replace(/−/g,"-")
-                  .replace(/sin/g,"Math.sin")
-                  .replace(/cos/g,"Math.cos")
-                  .replace(/tan/g,"Math.tan")
-                  .replace(/ln/g,"Math.log")
-                  .replace(/log/g,"Math.log10")
-                  .replace(/\^/g,"**");
+    let expr = input
+      .replace(/π/g, Math.PI)
+      .replace(/e/g, Math.E)
+      .replace(/√/g, "sqrt")
+      .replace(/×/g, "*")
+      .replace(/÷/g, "/")
+      .replace(/−/g, "-");
 
-    let result=eval(expr); // Ici c’est sûr car on transforme les symboles en fonctions Math
+    let tokens = tokenize(expr);
+    let result = evaluate(tokens);
     history.innerHTML+=`<div>${input} = ${result}</div>`;
     animateDigits(result);
     input=""; lastResult=result;
-  }catch{animateDigits("Erreur"); input="";}
+  }catch{
+    animateDigits("Erreur"); input="";
+  }
   updateDelButton();
+}
+
+// ===== TOKENIZER =====
+function tokenize(str){
+  return str.match(/sqrt|sin|cos|tan|log|ln|\d+(\.\d+)?|\^|[()+\-*/]/g);
+}
+
+// ===== PRIORITÉ =====
+function precedence(op){if(op==="+"||op==="-")return 1;if(op==="*"||op==="/")return 2;if(op==="^")return 3;return 0;}
+
+// ===== APPLY OPERATOR =====
+function applyOp(a,op,b){if(op==="+")return a+b;if(op==="-")return a-b;if(op==="*")return a*b;if(op==="/")return a/b;if(op==="^")return Math.pow(a,b);}
+
+// ===== APPLY FUNCTION =====
+function applyFunc(func,value){if(func==="sin")return Math.sin(value);if(func==="cos")return Math.cos(value);if(func==="tan")return Math.tan(value);if(func==="log")return Math.log10(value);if(func==="ln")return Math.log(value);if(func==="sqrt")return Math.sqrt(value);}
+
+// ===== ÉVALUATION SANS EVAL =====
+function evaluate(tokens){
+  let values=[],ops=[];
+  for(let i=0;i<tokens.length;i++){
+    let t=tokens[i];
+    if(!isNaN(t)){values.push(Number(t));}
+    else if(["sin","cos","tan","log","ln","sqrt"].includes(t)){ops.push(t);}
+    else if(t==="("){ops.push(t);}
+    else if(t===")"){
+      while(ops.length&&ops[ops.length-1]!=="("){let op=ops.pop();let val=values.pop();values.push(applyFunc(op,val));}ops.pop();
+    }else{
+      while(ops.length&&precedence(ops[ops.length-1])>=precedence(t)){let op=ops.pop();let b=values.pop();let a=values.pop();values.push(applyOp(a,op,b));}
+      ops.push(t);
+    }
+  }
+  while(ops.length){let op=ops.pop();let b=values.pop();let a=values.pop();values.push(applyOp(a,op,b));}
+  return values[0];
 }
 
 updateDelButton();
