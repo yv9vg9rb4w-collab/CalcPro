@@ -2,16 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro</title>
+<title>CalcPro iOS 26 + ANS + +/- + Scroll Historique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;}
-body{margin:0;height:100vh;display:flex;justify-content:center;align-items:center;background:radial-gradient(circle at top,#111,#000);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:white;}
+body{margin:0;height:100vh;display:flex;justify-content:center;align-items:flex-end;background:radial-gradient(circle at top,#111,#000);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:white;padding-bottom:20px;}
 .calculator{
   width:380px;padding:22px;border-radius:42px;
   background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));
   backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
   box-shadow:0 50px 100px rgba(0,0,0,.9),inset 0 1px 1px rgba(255,255,255,.15);
+  display:flex;flex-direction:column;
   transition: backdrop-filter 0.2s ease;
 }
 .display{
@@ -20,6 +21,7 @@ body{margin:0;height:100vh;display:flex;justify-content:center;align-items:cente
   border-radius:26px;padding:18px;font-size:34px;color:#22c55e;
   text-align:right;min-height:70px;letter-spacing:0.6px;font-variant-numeric:tabular-nums;
   box-shadow:inset 0 1px 1px rgba(255,255,255,.2);overflow:hidden;position:relative;
+  margin-bottom:10px;
 }
 .display span{
   display:inline-block;
@@ -31,8 +33,10 @@ body{margin:0;height:100vh;display:flex;justify-content:center;align-items:cente
   transform:translateY(0);
   opacity:1;
 }
-.history{font-size:13px;color:#aaa;margin-bottom:10px;max-height:90px;overflow-y:auto;}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:15px;}
+.history{
+  font-size:13px;color:#aaa;max-height:150px;overflow-y:auto;margin-bottom:10px;
+}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
 button{border:none;border-radius:50%;padding:18px;font-size:18px;cursor:pointer;background:rgba(255,255,255,0.08);color:white;box-shadow:0 10px 25px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.15);transition:transform .12s cubic-bezier(.2,.8,.2,1),filter .12s,box-shadow .12s;}
 button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px rgba(0,0,0,.9),inset 0 2px 4px rgba(0,0,0,.4);}
 .func{color:#38bdf8}
@@ -44,8 +48,8 @@ button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px 
 </head>
 <body>
 <div class="calculator" id="calc">
-  <div class="history" id="history"></div>
   <div class="display" id="display"><span>0</span></div>
+  <div class="history" id="history"></div>
 
   <div class="grid">
     <button class="func" onclick="add('√(')">√</button>
@@ -62,7 +66,7 @@ button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px 
     <button onclick="add('7')">7</button>
     <button onclick="add('8')">8</button>
     <button onclick="add('9')">9</button>
-    <button class="op" onclick="add('+')">+</button>
+    <button class="op" onclick="add('×')">×</button>
     <button class="op" onclick="add('−')">−</button>
 
     <button onclick="add('4')">4</button>
@@ -93,7 +97,6 @@ let calc=document.getElementById("calc");
 let input="";
 let lastResult=0;
 
-// ultra smooth animation
 function animateDigits(str){
   display.innerHTML="";
   display.classList.remove("show");
@@ -108,21 +111,26 @@ function animateDigits(str){
   calc.style.backdropFilter=`blur(${blurValue}px)`;
 }
 
-// boutons
 function updateDelButton(){delBtn.innerText=input?"⌫":"AC";}
 function add(v){if(input==="0")input="";input+=v;animateDigits(input);updateDelButton();}
 function addANS(){add(lastResult.toString());}
 function deleteOrClear(){if(input.length>1){input=input.slice(0,-1);animateDigits(input);}else{input="";animateDigits("0");}updateDelButton();}
 
-// ✅ toggle +/-
+// toggle +/- iPhone style complet
 function toggleSign(){
-  if(input){
-    if(input[0]==="-") input=input.slice(1);
-    else input="-"+input;
-    animateDigits(input);
-  }else if(lastResult){
+  if(!input && lastResult!==0){
     lastResult=-lastResult;
     animateDigits(lastResult.toString());
+    return;
+  }
+  let regex=/(\d+(\.\d+)?)(?!.*\d)/;
+  let match=input.match(regex);
+  if(match){
+    let number=match[1];
+    let start=match.index;
+    let inverted = number.startsWith("-") ? number.slice(1) : "-"+number;
+    input = input.slice(0,start) + inverted + input.slice(start+number.length);
+    animateDigits(input);
   }
 }
 
@@ -141,6 +149,8 @@ function calculate(){
     let tokens=tokenize(expr);
     let result=evaluate(tokens);
     history.innerHTML+=`<div>${input} = ${result}</div>`;
+    // ✅ scroll automatique en bas
+    history.scrollTop = history.scrollHeight;
     animateDigits(result);
     input=""; lastResult=result;
   }catch{animateDigits("Erreur"); input="";}
