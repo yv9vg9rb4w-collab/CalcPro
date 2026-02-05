@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro iOS Ultra Smooth</title>
+<title>CalcPro iOS 26 Ultra Smooth</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;}
@@ -12,7 +12,7 @@ body{margin:0;height:100vh;display:flex;justify-content:center;align-items:cente
   background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));
   backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
   box-shadow:0 50px 100px rgba(0,0,0,.9),inset 0 1px 1px rgba(255,255,255,.15);
-  transition: backdrop-filter 0.3s ease;
+  transition: backdrop-filter 0.2s ease;
 }
 .display{
   background:rgba(255,255,255,0.06);
@@ -23,10 +23,14 @@ body{margin:0;height:100vh;display:flex;justify-content:center;align-items:cente
 }
 .display span{
   display:inline-block;
-  transition:transform 0.25s cubic-bezier(.25,.8,.25,1), opacity 0.25s;
+  transform:translateY(-100%);
   opacity:0;
+  transition: transform 0.15s cubic-bezier(.25,.8,.25,1), opacity 0.15s;
 }
-.display.show span{opacity:1;}
+.display.show span{
+  transform:translateY(0);
+  opacity:1;
+}
 .history{font-size:13px;color:#aaa;margin-bottom:10px;max-height:90px;overflow-y:auto;}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:15px;}
 button{border:none;border-radius:50%;padding:18px;font-size:18px;cursor:pointer;background:rgba(255,255,255,0.08);color:white;box-shadow:0 10px 25px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.15);transition:transform .12s cubic-bezier(.2,.8,.2,1),filter .12s,box-shadow .12s;}
@@ -56,7 +60,7 @@ button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px 
     <button onclick="add('7')">7</button>
     <button onclick="add('8')">8</button>
     <button onclick="add('9')">9</button>
-    <button class="op" onclick="add('+')">+</button>
+    <button class="op" onclick="add('×')">×</button>
     <button class="op" onclick="add('−')">−</button>
 
     <button onclick="add('4')">4</button>
@@ -85,19 +89,18 @@ let calc=document.getElementById("calc");
 let input="";
 let lastResult=0;
 
-// animate digits iPhone style
+// ultra iPhone style animation
 function animateDigits(str){
   display.innerHTML="";
   display.classList.remove("show");
   for(let i=0;i<str.length;i++){
     let span=document.createElement("span");
     span.innerText=str[i];
-    span.style.transform="translateY(-50px)";
     display.appendChild(span);
-    setTimeout(()=>{span.style.transform="translateY(0)";},i*60);
+    // 🚀 instant glide
+    setTimeout(()=>{span.style.transform="translateY(0)";span.style.opacity=1;},0);
   }
-  setTimeout(()=>display.classList.add("show"),str.length*60);
-  // blur dynamique
+  display.classList.add("show");
   let blurValue = 20 + Math.min(str.length*2,30);
   calc.style.backdropFilter=`blur(${blurValue}px)`;
 }
@@ -107,7 +110,7 @@ function updateDelButton(){delBtn.innerText=input?"⌫":"AC";}
 function add(v){if(input==="0")input="";input+=v;animateDigits(input);updateDelButton();}
 function deleteOrClear(){if(input.length>1){input=input.slice(0,-1);animateDigits(input);}else{input="";animateDigits("0");}updateDelButton();}
 
-// ===== moteur math sécurisé sans eval =====
+// secure math engine
 function calculate(){
   if(!input) return;
   try{
@@ -116,9 +119,9 @@ function calculate(){
       .replace(/e/g, Math.E)
       .replace(/√/g,"sqrt")
       .replace(/×/g,"*")
-      .replace(/÷/g,"÷")
+      .replace(/÷/g,"/")
       .replace(/−/g,"-");
-    
+
     let tokens=tokenize(expr);
     let result=evaluate(tokens);
     history.innerHTML+=`<div>${input} = ${result}</div>`;
@@ -129,9 +132,7 @@ function calculate(){
 }
 
 // tokenizer
-function tokenize(str){
-  return str.match(/sqrt|sin|cos|tan|log|ln|\d+(\.\d+)?|\^|[()+\-*/]/g);
-}
+function tokenize(str){return str.match(/sqrt|sin|cos|tan|log|ln|\d+(\.\d+)?|\^|[()+\-*/]/g);}
 function precedence(op){if(op==="+"||op==="-")return 1;if(op==="*"||op==="/")return 2;if(op==="^")return 3;return 0;}
 function applyOp(a,op,b){if(op==="+")return a+b;if(op==="-")return a-b;if(op==="*")return a*b;if(op==="/")return a/b;if(op==="^")return Math.pow(a,b);}
 function applyFunc(f,v){if(f==="sin")return Math.sin(v);if(f==="cos")return Math.cos(v);if(f==="tan")return Math.tan(v);if(f==="log")return Math.log10(v);if(f==="ln")return Math.log(v);if(f==="sqrt")return Math.sqrt(v);}
