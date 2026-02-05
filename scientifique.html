@@ -2,66 +2,116 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro • Scientific</title>
+<title>CalcPro • iOS 26</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 *{box-sizing:border-box}
+
 body{
   margin:0;
   height:100vh;
-  background:#000;
   display:flex;
   justify-content:center;
   align-items:center;
+  background:radial-gradient(circle at top,#111,#000);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   color:white;
 }
+
+/* === CALCULATOR GLASS === */
 .calculator{
   width:380px;
-  background:#111;
-  padding:20px;
-  border-radius:40px;
-  box-shadow:0 20px 50px rgba(0,0,0,.8);
+  padding:22px;
+  border-radius:42px;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.02)
+  );
+  backdrop-filter:blur(28px);
+  -webkit-backdrop-filter:blur(28px);
+  box-shadow:
+    0 50px 100px rgba(0,0,0,.9),
+    inset 0 1px 1px rgba(255,255,255,.15);
 }
+
+/* === DISPLAY === */
 .display{
-  background:#222;
+  background:rgba(255,255,255,0.06);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-radius:26px;
+  padding:18px;
+  font-size:34px;
   color:#22c55e;
-  font-size:32px;
-  padding:15px;
-  border-radius:20px;
   text-align:right;
-  min-height:60px;
-  overflow-x:auto;
+  min-height:70px;
+  letter-spacing:0.6px;
+  font-variant-numeric:tabular-nums;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.2);
+  transition:transform .15s cubic-bezier(.25,.8,.25,1),opacity .15s;
 }
+
+.display.pop{
+  transform:scale(1.06);
+  opacity:.85;
+}
+
+.display.result{
+  animation:iosResult .22s cubic-bezier(.25,.8,.25,1);
+}
+
+@keyframes iosResult{
+  0%{transform:scale(.85);opacity:0}
+  60%{transform:scale(1.05)}
+  100%{transform:scale(1);opacity:1}
+}
+
+/* === HISTORY === */
 .history{
+  font-size:13px;
+  color:#aaa;
   margin-bottom:10px;
-  font-size:14px;
   max-height:90px;
   overflow-y:auto;
-  color:#aaa;
 }
+
+/* === GRID === */
 .grid{
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:10px;
+  gap:12px;
   margin-top:15px;
 }
+
+/* === BUTTONS iOS 26 === */
 button{
   border:none;
   border-radius:50%;
   padding:18px;
   font-size:18px;
   cursor:pointer;
-  background:#222;
+  background:rgba(255,255,255,0.08);
   color:white;
-  box-shadow:0 5px #000;
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.6),
+    inset 0 1px 1px rgba(255,255,255,.15);
+  transition:
+    transform .12s cubic-bezier(.2,.8,.2,1),
+    filter .12s,
+    box-shadow .12s;
 }
+
 button:active{
-  transform:translateY(2px);
-  box-shadow:0 2px #000;
+  transform:scale(.9);
+  filter:brightness(1.25);
+  box-shadow:
+    0 3px 10px rgba(0,0,0,.9),
+    inset 0 2px 4px rgba(0,0,0,.4);
 }
-.func{background:#333;color:#38bdf8}
+
+.func{color:#38bdf8}
 .op{background:#ff9500}
 .equal{
   background:#34c759;
@@ -88,7 +138,7 @@ button:active{
     <button class="func" onclick="add('e')">e</button>
     <button class="func" onclick="add('√(')">√</button>
     <button class="func" onclick="add('^')">xʸ</button>
-    <button class="op" onclick="clearAll()">AC</button>
+    <button class="op" id="delBtn" onclick="deleteOrClear()">AC</button>
 
     <button onclick="add('7')">7</button>
     <button onclick="add('8')">8</button>
@@ -116,32 +166,52 @@ button:active{
 </div>
 
 <script>
-let display = document.getElementById("display");
-let history = document.getElementById("history");
-let input = "";
+let display=document.getElementById("display");
+let history=document.getElementById("history");
+let delBtn=document.getElementById("delBtn");
+let input="";
+let lastResult=0;
 
-function add(val){
-  input += val;
-  display.innerText = input;
+function animateDisplay(){
+  display.classList.add("pop");
+  setTimeout(()=>display.classList.remove("pop"),150);
 }
 
-function clearAll(){
-  input = "";
-  display.innerText = "0";
+function updateDelButton(){
+  delBtn.innerText = input ? "⌫" : "AC";
+}
+
+function add(v){
+  if(input==="0") input="";
+  input+=v;
+  display.innerText=input;
+  animateDisplay();
+  updateDelButton();
+}
+
+function deleteOrClear(){
+  if(input.length>1){
+    input=input.slice(0,-1);
+    display.innerText=input;
+  }else{
+    input="";
+    display.innerText="0";
+  }
+  animateDisplay();
+  updateDelButton();
 }
 
 function calculate(){
   if(!input) return;
 
-  // si x existe → on affiche l'expression
   if(/[x]/i.test(input)){
-    history.innerHTML += `<div>${input}</div>`;
-    display.innerText = input;
-    input = "";
+    history.innerHTML+=`<div>${input}</div>`;
+    display.innerText=input;
+    input="";
     return;
   }
 
-  let exp = input
+  let exp=input
     .replace(/π/g,"Math.PI")
     .replace(/e/g,"Math.E")
     .replace(/√/g,"Math.sqrt")
@@ -153,15 +223,21 @@ function calculate(){
     .replace(/\^/g,"**");
 
   try{
-    let result = eval(exp);
-    history.innerHTML += `<div>${input} = ${result}</div>`;
-    display.innerText = result;
-    input = "";
+    let result=eval(exp);
+    history.innerHTML+=`<div>${input} = ${result}</div>`;
+    display.innerText=result;
+    display.classList.add("result");
+    setTimeout(()=>display.classList.remove("result"),220);
+    lastResult=result;
+    input="";
   }catch{
-    display.innerText = "Erreur";
-    input = "";
+    display.innerText="Erreur";
+    input="";
   }
+  updateDelButton();
 }
+
+updateDelButton();
 </script>
 
 </body>
