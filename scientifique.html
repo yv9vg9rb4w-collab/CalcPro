@@ -104,20 +104,24 @@ let input="";
 let lastResult=0;
 
 function animateDigits(str){
-  display.innerHTML="";
-  display.classList.remove("show","glow");
-  for(let i=0;i<str.length;i++){
-    let span=document.createElement("span");
-    span.innerText=str[i];
-    display.appendChild(span);
-    setTimeout(()=>{span.style.transform="translateY(0)";span.style.opacity=1;},0);
-  }
-  display.classList.add("show");
-}
+  display.innerHTML = "";
 
-function glowResult(){
-  display.classList.add("glow");
-  setTimeout(()=>display.classList.remove("glow"),800);
+  for (let i = 0; i < str.length; i++) {
+    const span = document.createElement("span");
+    span.textContent = str[i];
+
+    span.style.display = "inline-block";
+    span.style.opacity = "0";
+    span.style.transform = "translateY(-6px)";
+    span.style.transition = "0.12s ease-out";
+
+    display.appendChild(span);
+
+    requestAnimationFrame(() => {
+      span.style.opacity = "1";
+      span.style.transform = "translateY(0)";
+    });
+  }
 }
 
 function updateDelButton(){delBtn.innerText=input?"⌫":"AC";}
