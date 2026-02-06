@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculatrice iPhone Style</title>
+  <title>Calculatrice  Scientifique</title>
   <style>
     body {
       background-color: #000;
@@ -43,7 +43,7 @@
       border: none;
       border-radius: 50%;
       height: 70px;
-      font-size: 28px;
+      font-size: 22px;
       color: white;
       background-color: #333;
       transition: 0.2s;
@@ -76,7 +76,16 @@
       <button class="gray" onclick="clearDisplay()">AC</button>
       <button class="gray" onclick="negate()">±</button>
       <button class="gray" onclick="percent()">%</button>
-      <button class="orange" onclick="appendOperator('÷')">÷</button>
+      <button class="orange" onclick="appendOperator('/')">÷</button>
+
+      <!-- Scientific functions -->
+      <button onclick="appendFunction('Math.sin(')">sin</button>
+      <button onclick="appendFunction('Math.cos(')">cos</button>
+      <button onclick="appendFunction('Math.tan(')">tan</button>
+      <button onclick="appendFunction('Math.log10(')">log</button>
+      <button onclick="appendFunction('Math.log(')">ln</button>
+      <button onclick="appendFunction('Math.sqrt(')">√</button>
+      <button onclick="appendFunction('Math.PI')">π</button>
 
       <button onclick="appendNumber('7')">7</button>
       <button onclick="appendNumber('8')">8</button>
@@ -118,6 +127,11 @@
       display.value = currentInput;
     }
 
+    function appendFunction(func) {
+      currentInput += func;
+      display.value = currentInput;
+    }
+
     function clearDisplay() {
       currentInput = '';
       display.value = '';
@@ -125,7 +139,9 @@
 
     function calculate() {
       try {
-        currentInput = eval(currentInput).toString();
+        let exp = currentInput.replace('÷','/'); // convert ÷ to /
+        let result = eval(exp);
+        currentInput = result.toString();
         display.value = currentInput;
       } catch {
         display.value = 'Erreur';
@@ -134,14 +150,23 @@
     }
 
     function percent() {
-      currentInput = (parseFloat(currentInput) / 100).toString();
-      display.value = currentInput;
+      try {
+        currentInput = (parseFloat(eval(currentInput)) / 100).toString();
+        display.value = currentInput;
+      } catch {
+        display.value = 'Erreur';
+        currentInput = '';
+      }
     }
 
     function negate() {
-      if (!currentInput) return;
-      currentInput = (parseFloat(currentInput) * -1).toString();
-      display.value = currentInput;
+      try {
+        currentInput = (parseFloat(eval(currentInput)) * -1).toString();
+        display.value = currentInput;
+      } catch {
+        display.value = 'Erreur';
+        currentInput = '';
+      }
     }
   </script>
 </body>
