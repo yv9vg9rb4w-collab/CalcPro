@@ -2,12 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>iOS Calculator 26</title>
+<title>CalcPro iOS 26</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
 body{
   margin:0;
   height:100vh;
@@ -15,139 +13,124 @@ body{
   justify-content:center;
   align-items:center;
   background:#000;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   color:white;
 }
 
-/* GLASS */
-.calculator{
-  width:390px;
+.calc{
+  width:360px;
   padding:20px;
   border-radius:40px;
   background:rgba(255,255,255,.08);
-  backdrop-filter:blur(35px);
-  box-shadow:0 40px 120px rgba(0,0,0,.9);
+  backdrop-filter:blur(30px);
+  box-shadow:0 40px 80px rgba(0,0,0,.9);
 }
 
-/* DISPLAY */
 .display{
-  height:90px;
-  padding:18px;
-  border-radius:26px;
-  background:rgba(255,255,255,.1);
-  font-size:38px;
+  font-size:42px;
   text-align:right;
+  padding:20px;
+  border-radius:25px;
+  background:rgba(255,255,255,.05);
+  color:#22c55e;
   overflow:hidden;
+  transition:transform .15s;
 }
 
-.display span{
-  display:inline-block;
-  transform:translateY(100%);
-  animation:scroll .18s ease-out forwards;
+.display.pop{transform:scale(1.05)}
+
+.history{
+  max-height:80px;
+  overflow-y:auto;
+  font-size:13px;
+  color:#aaa;
+  margin-top:8px;
 }
 
-@keyframes scroll{
-  to{transform:translateY(0)}
-}
-
-/* GRID */
 .grid{
-  margin-top:18px;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:12px;
+  margin-top:15px;
 }
 
 button{
-  height:64px;
   border:none;
   border-radius:50%;
-  font-size:20px;
-  background:rgba(255,255,255,.12);
+  padding:20px;
+  font-size:18px;
+  background:rgba(255,255,255,.1);
   color:white;
-  box-shadow:inset 0 1px 1px rgba(255,255,255,.2);
+  cursor:pointer;
+  transition:.1s;
 }
 
-button:active{transform:scale(.92)}
-
-.op{background:#ff9f0a}
-.func{color:#5ac8fa}
-.equal{background:#34c759}
-.zero{grid-column:span 2;border-radius:40px}
-
-/* HISTORY BOTTOM */
-.history{
-  margin-top:14px;
-  max-height:90px;
-  overflow-y:auto;
-  font-size:14px;
-  color:#aaa;
-}
+button:active{transform:scale(.9)}
+.op{background:#ff9500}
+.eq{background:#34c759}
+.func{color:#38bdf8}
+.zero{grid-column:span 2;border-radius:30px}
 </style>
 </head>
 
 <body>
 
-<div class="calculator">
-
+<div class="calc">
   <div class="display" id="display">0</div>
+  <div class="history" id="history"></div>
 
   <div class="grid">
-    <button class="func" onclick="fn('sqrt')">√</button>
-    <button class="func" onclick="fn('sin')">sin</button>
-    <button class="func" onclick="fn('cos')">cos</button>
-    <button class="func" onclick="fn('log')">log</button>
-
-    <button onclick="clearAll()">AC</button>
-    <button onclick="toggleSign()">+/−</button>
-    <button onclick="useAns()">ANS</button>
-    <button class="op" onclick="op('/')">÷</button>
+    <button class="func" onclick="clearAll()">AC</button>
+    <button class="func" onclick="toggleSign()">±</button>
+    <button class="func" onclick="useAns()">ANS</button>
+    <button class="op" onclick="setOp('/')">÷</button>
 
     <button onclick="num(7)">7</button>
     <button onclick="num(8)">8</button>
     <button onclick="num(9)">9</button>
-    <button class="op" onclick="op('*')">×</button>
+    <button class="op" onclick="setOp('*')">×</button>
 
     <button onclick="num(4)">4</button>
     <button onclick="num(5)">5</button>
     <button onclick="num(6)">6</button>
-    <button class="op" onclick="op('-')">−</button>
+    <button class="op" onclick="setOp('-')">−</button>
 
     <button onclick="num(1)">1</button>
     <button onclick="num(2)">2</button>
     <button onclick="num(3)">3</button>
-    <button class="op" onclick="op('+')">+</button>
+    <button class="op" onclick="setOp('+')">+</button>
 
+    <button class="func" onclick="sqrt()">√</button>
     <button class="zero" onclick="num(0)">0</button>
     <button onclick="dot()">.</button>
-    <button class="equal" onclick="calc()">=</button>
+    <button class="eq" onclick="calc()">=</button>
   </div>
-
-  <div class="history" id="history"></div>
-
 </div>
 
 <script>
-let current="0";
-let operator=null;
-let prev=null;
-let ans=0;
+let display=document.getElementById("display");
+let history=document.getElementById("history");
 
-const display=document.getElementById("display");
-const history=document.getElementById("history");
+let current="0";
+let prev=null;
+let operator=null;
+let ans=0;
+let waiting=false;
 
 function render(){
-  display.innerHTML="";
-  [...current].forEach(c=>{
-    let s=document.createElement("span");
-    s.textContent=c;
-    display.appendChild(s);
-  });
+  display.innerText=current;
+  display.classList.add("pop");
+  setTimeout(()=>display.classList.remove("pop"),120);
 }
 
 function num(n){
-  if(current==="0") current="";
-  current+=n;
+  if(waiting){
+    current=n.toString();
+    waiting=false;
+  }else{
+    if(current==="0") current="";
+    current+=n;
+  }
   render();
 }
 
@@ -158,45 +141,47 @@ function dot(){
   }
 }
 
-function op(o){
+function setOp(op){
   prev=parseFloat(current);
-  operator=o;
-  current="0";
-}
-
-function toggleSign(){
-  current = (parseFloat(current)*-1).toString();
-  render();
-}
-
-function fn(f){
-  let x=parseFloat(current);
-  if(f==="sqrt") current=Math.sqrt(x).toString();
-  if(f==="sin") current=Math.sin(x*Math.PI/180).toString();
-  if(f==="cos") current=Math.cos(x*Math.PI/180).toString();
-  if(f==="log") current=Math.log10(x).toString();
-  render();
+  operator=op;
+  waiting=true;
 }
 
 function calc(){
-  let x=prev;
-  let y=parseFloat(current);
-  let r=0;
-  if(operator==="+") r=x+y;
-  if(operator==="-") r=x-y;
-  if(operator==="*") r=x*y;
-  if(operator==="/") r=y===0?"Erreur":x/y;
+  if(operator===null || waiting) return;
 
-  history.innerHTML+=`<div>${x} ${operator} ${y} = ${r}</div>`;
+  let a=prev;
+  let b=parseFloat(current);
+  let r=0;
+
+  if(operator==="+") r=a+b;
+  if(operator==="-") r=a-b;
+  if(operator==="*") r=a*b;
+  if(operator==="/") r=b===0?"Erreur":a/b;
+
+  history.innerHTML+=`<div>${a} ${operator} ${b} = ${r}</div>`;
   history.scrollTop=history.scrollHeight;
 
+  current=r.toString();
+  ans=r;
+  operator=null;
+  waiting=false;
+  render();
+}
+
+function sqrt(){
+  let v=parseFloat(current);
+  if(v<0) return;
+  let r=Math.sqrt(v);
+  history.innerHTML+=`<div>√${v} = ${r}</div>`;
   current=r.toString();
   ans=r;
   render();
 }
 
-function clearAll(){
-  current="0";prev=null;operator=null;
+function toggleSign(){
+  if(current==="0") return;
+  current=(parseFloat(current)*-1).toString();
   render();
 }
 
@@ -205,7 +190,13 @@ function useAns(){
   render();
 }
 
-render();
+function clearAll(){
+  current="0";
+  prev=null;
+  operator=null;
+  waiting=false;
+  render();
+}
 </script>
 
 </body>
