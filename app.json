@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "CalcPro",
+    "slug": "calcpro",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "bundleIdentifier": "com.tonnom.calcpro"
+    },
+    "android": {
+      "package": "com.tonnom.calcpro"
+    }
+  }
+}
