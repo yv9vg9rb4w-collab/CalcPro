@@ -1,120 +1,130 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CalcPro iPhone Style</title>
-<style>
-body {
-  margin:0;
-  background:#000;
-  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-.calc {
-  background:#1c1c1e;
-  border-radius:40px;
-  padding:20px;
-  width:360px;
-  box-shadow:0 10px 40px rgba(0,0,0,0.8);
-}
-.screen {
-  background:#000;
-  color:#fff;
-  font-size:48px;
-  text-align:right;
-  padding:20px 10px;
-  border-radius:20px;
-  margin-bottom:12px;
-  min-height:80px;
-}
-.buttons {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-}
-button {
-  border:none;
-  border-radius:50%;
-  height:70px;
-  font-size:20px;
-  color:white;
-  background:#2c2c2e;
-  cursor:pointer;
-  transition:.1s;
-}
-button:hover{filter:brightness(1.2);}
-button:active{transform:scale(.95); filter:brightness(1.4);}
-.op {background:#ff9500;}
-.gray {background:#a5a5a5; color:black;}
-.wide {grid-column:span 2; border-radius:35px;}
-.scientific {background:#3a3a3c; color:#ff9500;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalcPro – Calculatrice Scientifique</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .calculator {
+      background: #111;
+      padding: 20px;
+      border-radius: 15px;
+      width: 380px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+    #display {
+      width: 100%;
+      height: 50px;
+      font-size: 20px;
+      margin-bottom: 10px;
+      padding: 5px;
+      border-radius: 8px;
+      border: none;
+      text-align: right;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    button {
+      padding: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #2c5364;
+      color: #fff;
+    }
+    button:hover {
+      background: #3a6d86;
+    }
+    .op { background: #ff9800; }
+    .op:hover { background: #ffb74d; }
+    .equal { background: #4caf50; grid-column: span 2; }
+    .clear { background: #f44336; }
+  </style>
 </head>
-
 <body>
-<div class="calc">
-  <div class="screen" id="screen">0</div>
-  
-  <div class="buttons">
-    <!-- Scientific buttons like iPhone -->
-    <button class="scientific" onclick="sample(Math.sin(Math.PI/6))">sin(π/6)</button>
-    <button class="scientific" onclick="sample(Math.cos(Math.PI/3))">cos(π/3)</button>
-    <button class="scientific" onclick="sample(Math.tan(Math.PI/4))">tg(π/4)</button>
-    <button class="scientific" onclick="percent()">%</button>
-    <button class="scientific" onclick="sample(Math.PI)">π</button>
+  <div class="calculator">
+    <h1>CalcPro Scientifique</h1>
+    <input type="text" id="display" disabled />
+    <div class="buttons">
+      <button onclick="clearDisplay()" class="clear">C</button>
+      <button onclick="append('(')">(</button>
+      <button onclick="append(')')">)</button>
+      <button onclick="append('%')" class="op">%</button>
+      <button onclick="append('**')" class="op">^</button>
 
-    <!-- Standard buttons -->
-    <button class="gray" onclick="clearDisplay()">AC</button>
-    <button class="gray" onclick="negate()">±</button>
-    <button class="op" onclick="appendOperator('/')">÷</button>
-    <button class="op" onclick="appendOperator('*')">×</button>
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button onclick="append('/')" class="op">÷</button>
+      <button onclick="append('Math.log(')">ln</button>
 
-    <button onclick="appendNumber('7')">7</button>
-    <button onclick="appendNumber('8')">8</button>
-    <button onclick="appendNumber('9')">9</button>
-    <button class="op" onclick="appendOperator('-')">−</button>
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button onclick="append('*')" class="op">×</button>
+      <button onclick="append('Math.log10(')">log</button>
 
-    <button onclick="appendNumber('4')">4</button>
-    <button onclick="appendNumber('5')">5</button>
-    <button onclick="appendNumber('6')">6</button>
-    <button class="op" onclick="appendOperator('+')">+</button>
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button onclick="append('-')" class="op">−</button>
+      <button onclick="append('Math.E')">e</button>
 
-    <button onclick="appendNumber('1')">1</button>
-    <button onclick="appendNumber('2')">2</button>
-    <button onclick="appendNumber('3')">3</button>
-    <button class="op" onclick="calculate()">=</button>
+      <button onclick="append('0')">0</button>
+      <button onclick="append('.')">.</button>
+      <button onclick="calculate()" class="equal">=</button>
+      <button onclick="append('+')" class="op">+</button>
+      <button onclick="append('Math.PI')">π</button>
 
-    <button class="wide" onclick="appendNumber('0')">0</button>
-    <button onclick="appendNumber('.')">.</button>
+      <button onclick="append('Math.sin(')">sin</button>
+      <button onclick="append('Math.cos(')">cos</button>
+      <button onclick="append('Math.tan(')">tan</button>
+      <button onclick="append('Math.sqrt(')">√</button>
+      <button onclick="append('ANS')">ANS</button>
+    </div>
   </div>
-</div>
 
-<script>
-let screen = document.getElementById("screen");
-let currentInput = '';
+  <script>
+    const display = document.getElementById('display');
+    let ANS = 0;
 
-function appendNumber(num){ currentInput+=num; screen.innerText=currentInput; }
-function appendOperator(op){ 
-  if(currentInput==='') return;
-  const last = currentInput.slice(-1);
-  if(['+','-','*','/'].includes(last)){ currentInput=currentInput.slice(0,-1); }
-  currentInput+=op; screen.innerText=currentInput; 
-}
-function clearDisplay(){ currentInput=''; screen.innerText='0'; }
-function negate(){ if(!currentInput) return; currentInput=(parseFloat(eval(currentInput))*-1).toString(); screen.innerText=currentInput; }
-function calculate(){ 
-  try{ currentInput=eval(currentInput).toString(); screen.innerText=currentInput; } 
-  catch{ screen.innerText='Erreur'; currentInput=''; } 
-}
-function sample(val){ currentInput=val.toString(); screen.innerText=currentInput; }
-function percent(){ 
-  try{ currentInput=(parseFloat(eval(currentInput))/100).toString(); screen.innerText=currentInput; } 
-  catch{ screen.innerText='Erreur'; currentInput=''; } 
-}
-</script>
+    function append(value) {
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = '';
+    }
+
+    function calculate() {
+      try {
+        // Remplace ANS par sa valeur actuelle
+        let expression = display.value.replace(/ANS/g, ANS);
+        ANS = eval(expression);
+        display.value = ANS;
+      } catch {
+        display.value = 'Erreur';
+      }
+    }
+  </script>
 </body>
 </html>
