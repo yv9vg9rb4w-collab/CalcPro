@@ -2,224 +2,150 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro iOS 26 PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculatrice Scientifique iOS</title>
 
 <style>
-:root{
-  --bg:#000;
-  --glass:rgba(255,255,255,.08);
-  --txt:#22c55e;
-}
-@media (prefers-color-scheme: light){
-  :root{
-    --bg:#f5f5f7;
-    --glass:rgba(0,0,0,.08);
-    --txt:#0a7f3f;
-  }
+body {
+    margin: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-body{
-  margin:0;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:var(--bg);
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+.calculator {
+    width: 360px;
+    background: #000;
+    border-radius: 30px;
+    padding: 20px;
 }
 
-.calc{
-  width:360px;
-  padding:20px;
-  border-radius:42px;
-  background:var(--glass);
-  backdrop-filter:blur(30px);
-  box-shadow:0 40px 80px rgba(0,0,0,.8);
+.screen {
+    color: white;
+    font-size: 42px;
+    text-align: right;
+    padding: 20px 10px;
+    min-height: 70px;
+    overflow-x: auto;
 }
 
-.display{
-  font-size:44px;
-  text-align:right;
-  padding:22px;
-  border-radius:26px;
-  background:rgba(255,255,255,.06);
-  color:var(--txt);
-  overflow:hidden;
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
 }
 
-.history{
-  max-height:90px;
-  overflow-y:auto;
-  font-size:13px;
-  color:#aaa;
-  margin-top:10px;
+button {
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
 }
 
-.history div{
-  cursor:pointer;
-}
-.history div:hover{color:#fff}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-top:15px;
+.gray {
+    background: #a5a5a5;
+    color: black;
 }
 
-button{
-  border:none;
-  border-radius:50%;
-  padding:20px;
-  font-size:18px;
-  background:rgba(255,255,255,.1);
-  color:white;
-  cursor:pointer;
-  transition:.1s;
+.orange {
+    background: #ff9f0a;
+    color: white;
 }
-button:active{transform:scale(.9)}
-.op{background:#ff9500}
-.eq{background:#34c759}
-.func{color:#38bdf8}
-.zero{grid-column:span 2;border-radius:30px}
+
+.dark {
+    background: #333;
+    color: white;
+}
+
+.wide {
+    grid-column: span 2;
+    border-radius: 40px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="calc">
-  <div class="display" id="display">0</div>
-  <div class="history" id="history"></div>
+<div class="calculator">
+    <div class="screen" id="screen">0</div>
 
-  <div class="grid">
-    <button class="func" onclick="clearAll()">AC</button>
-    <button class="func" onclick="toggleSign()">±</button>
-    <button class="func" onclick="useAns()">ANS</button>
-    <button class="op" onclick="setOp('/')">÷</button>
+    <div class="buttons">
+        <button class="gray" onclick="clearAll()">AC</button>
+        <button class="gray" onclick="del()">DEL</button>
+        <button class="gray" onclick="insert('(')">(</button>
+        <button class="gray" onclick="insert(')')">)</button>
 
-    <button onclick="num(7)">7</button>
-    <button onclick="num(8)">8</button>
-    <button onclick="num(9)">9</button>
-    <button class="op" onclick="setOp('*')">×</button>
+        <button class="dark" onclick="insert('Math.sin(')">sin</button>
+        <button class="dark" onclick="insert('Math.cos(')">cos</button>
+        <button class="dark" onclick="insert('Math.tan(')">tan</button>
+        <button class="orange" onclick="insert('/')">÷</button>
 
-    <button onclick="num(4)">4</button>
-    <button onclick="num(5)">5</button>
-    <button onclick="num(6)">6</button>
-    <button class="op" onclick="setOp('-')">−</button>
+        <button class="dark" onclick="insert('Math.sqrt(')">√</button>
+        <button class="dark" onclick="insert('**2')">x²</button>
+        <button class="dark" onclick="insert('**')">xʸ</button>
+        <button class="orange" onclick="insert('*')">×</button>
 
-    <button onclick="num(1)">1</button>
-    <button onclick="num(2)">2</button>
-    <button onclick="num(3)">3</button>
-    <button class="op" onclick="setOp('+')">+</button>
+        <button class="dark" onclick="insert('Math.PI')">π</button>
+        <button class="dark" onclick="insert('Math.E')">e</button>
+        <button class="dark" onclick="useAns()">ANS</button>
+        <button class="orange" onclick="insert('-')">−</button>
 
-    <button class="func" onclick="applyFunc('sqrt')">√</button>
-    <button class="zero" onclick="num(0)">0</button>
-    <button onclick="dot()">.</button>
-    <button class="eq" onclick="calc()">=</button>
+        <button class="dark" onclick="insert('7')">7</button>
+        <button class="dark" onclick="insert('8')">8</button>
+        <button class="dark" onclick="insert('9')">9</button>
+        <button class="orange" onclick="insert('+')">+</button>
 
-    <button class="func" onclick="applyFunc('sin')">sin</button>
-    <button class="func" onclick="applyFunc('cos')">cos</button>
-    <button class="func" onclick="applyFunc('log')">log</button>
-    <button class="func" onclick="applyFunc('ln')">ln</button>
-  </div>
+        <button class="dark" onclick="insert('4')">4</button>
+        <button class="dark" onclick="insert('5')">5</button>
+        <button class="dark" onclick="insert('6')">6</button>
+
+        <button class="dark" onclick="insert('1')">1</button>
+        <button class="dark" onclick="insert('2')">2</button>
+        <button class="dark" onclick="insert('3')">3</button>
+
+        <button class="dark wide" onclick="insert('0')">0</button>
+        <button class="dark" onclick="insert('.')">.</button>
+        <button class="orange" onclick="calculate()">=</button>
+    </div>
 </div>
 
 <script>
-let display=document.getElementById("display");
-let history=document.getElementById("history");
+let screen = document.getElementById("screen");
+let ans = 0;
 
-let current="0";
-let prev=null;
-let operator=null;
-let ans=0;
-let waiting=false;
-
-function haptic(){
-  if(navigator.vibrate) navigator.vibrate(10);
+function insert(value) {
+    if (screen.innerText === "0") {
+        screen.innerText = value;
+    } else {
+        screen.innerText += value;
+    }
 }
 
-function render(){
-  display.innerText=current;
-  haptic();
+function clearAll() {
+    screen.innerText = "0";
 }
 
-function num(n){
-  if(waiting){
-    current=n.toString();
-    waiting=false;
-  }else{
-    if(current==="0") current="";
-    current+=n;
-  }
-  render();
+function del() {
+    screen.innerText = screen.innerText.slice(0, -1);
+    if (screen.innerText === "") screen.innerText = "0";
 }
 
-function dot(){
-  if(!current.includes(".")){
-    current+=".";
-    render();
-  }
+function calculate() {
+    try {
+        let result = eval(screen.innerText);
+        ans = result;
+        screen.innerText = result;
+    } catch {
+        screen.innerText = "Erreur";
+    }
 }
 
-function setOp(op){
-  prev=parseFloat(current);
-  operator=op;
-  waiting=true;
-}
-
-function calc(){
-  if(operator===null || waiting) return;
-  let a=prev,b=parseFloat(current),r=0;
-
-  if(operator==="+") r=a+b;
-  if(operator==="-") r=a-b;
-  if(operator==="*") r=a*b;
-  if(operator==="/") r=b===0?"Erreur":a/b;
-
-  addHistory(`${a} ${operator} ${b} = ${r}`,r);
-}
-
-function applyFunc(f){
-  let v=parseFloat(current),r=0;
-  if(f==="sqrt") r=Math.sqrt(v);
-  if(f==="sin") r=Math.sin(v*Math.PI/180);
-  if(f==="cos") r=Math.cos(v*Math.PI/180);
-  if(f==="log") r=Math.log10(v);
-  if(f==="ln") r=Math.log(v);
-
-  addHistory(`${f}(${v}) = ${r}`,r);
-}
-
-function addHistory(txt,val){
-  let d=document.createElement("div");
-  d.innerText=txt;
-  d.onclick=()=>{current=val.toString();render();}
-  history.appendChild(d);
-  history.scrollTop=history.scrollHeight;
-  current=val.toString();
-  ans=val;
-  operator=null;
-  waiting=false;
-  render();
-}
-
-function toggleSign(){
-  current=(parseFloat(current)*-1).toString();
-  render();
-}
-
-function useAns(){
-  current=ans.toString();
-  render();
-}
-
-function clearAll(){
-  current="0";
-  prev=null;
-  operator=null;
-  waiting=false;
-  render();
+function useAns() {
+    insert(ans.toString());
 }
 </script>
 
