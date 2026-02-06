@@ -1,181 +1,45 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Calculatrice scientifique</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-*{box-sizing:border-box;}
-body{margin:0;height:100vh;display:flex;justify-content:center;align-items:center;background:radial-gradient(circle at top,#111,#000);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:white;}
-.calculator{
-  width:380px;padding:22px;border-radius:42px;
-  background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));
-  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
-  box-shadow:0 50px 100px rgba(0,0,0,.9),inset 0 1px 1px rgba(255,255,255,.15);
-  display:flex;flex-direction:column;
-  max-height:95vh;
-}
-.display{
-  background:rgba(255,255,255,0.06);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-radius:26px;padding:18px;font-size:34px;color:#22c55e;
-  text-align:right;min-height:70px;letter-spacing:0.6px;font-variant-numeric:tabular-nums;
-  box-shadow:inset 0 1px 1px rgba(255,255,255,.2);overflow:hidden;position:relative;
-  margin-bottom:10px;
-}
-.display span{display:inline-block;transform:translateY(-100%);opacity:0;transition: transform 0.15s cubic-bezier(.25,.8,.25,1), opacity 0.15s;}
-.display.show span{transform:translateY(0);opacity:1;}
-.display.glow{text-shadow:0 0 8px #22c55e,0 0 16px #22c55e,0 0 24px #22c55e;}
-
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px; margin-bottom:10px;}
-button{border:none;border-radius:50%;padding:18px;font-size:18px;cursor:pointer;background:rgba(255,255,255,0.08);color:white;box-shadow:0 10px 25px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.15);transition:transform .12s cubic-bezier(.2,.8,.2,1),filter .12s,box-shadow .12s;}
-button:active{transform:scale(.9);filter:brightness(1.25);box-shadow:0 3px 10px rgba(0,0,0,.9),inset 0 2px 4px rgba(0,0,0,.4);}
-.func{color:#38bdf8}
-.op{background:#ff9500}
-.equal{background:#34c759;grid-column:span 2;border-radius:30px;}
-.ans{background:#8b5cf6;}
-.sign{background:#f43f5e;}
-.history-container{
-  flex-shrink:0;
-  max-height:120px;
-  overflow-y:auto;
-  border-top:1px solid rgba(255,255,255,0.1);
-  padding-top:5px;
-  font-size:13px;color:#aaa;
-}
-.history-container div{
-  margin-bottom:3px;
-}
-.history-container::-webkit-scrollbar{width:5px;}
-.history-container::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);border-radius:5px;}
-.history-container::-webkit-scrollbar-track{background:transparent;}
-</style>
+  <meta charset="UTF-8">
+  <title>iOS Calculator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="calculator" id="calc">
-  <div class="display" id="display"><span>0</span></div>
 
-  <div class="grid">
-    <button class="func" onclick="add('√(')">√</button>
-    <button class="func" onclick="add('sin(')">sin</button>
-    <button class="func" onclick="add('cos(')">cos</button>
-    <button class="func" onclick="add('tan(')">tan</button>
-    <button class="func" onclick="add('ln(')">ln</button>
-
-    <button class="func" onclick="add('log(')">log</button>
-    <button class="func" onclick="add('π')">π</button>
-    <button class="func" onclick="add('e')">e</button>
-    <button class="func" onclick="add('^')">xʸ</button>
-    <button class="op" id="delBtn" onclick="deleteOrClear()">AC</button>
-
-    <button onclick="add('7')">7</button>
-    <button onclick="add('8')">8</button>
-    <button onclick="add('9')">9</button>
-    <button class="op" onclick="add('+')">+</button>
-    <button class="op" onclick="add('−')">−</button>
-
-    <button onclick="add('4')">4</button>
-    <button onclick="add('5')">5</button>
-    <button onclick="add('6')">6</button>
-    <button class="op" onclick="add('×')">×</button>
-    <button class="op" onclick="add('÷')">÷</button>
-
-    <button onclick="add('1')">1</button>
-    <button onclick="add('2')">2</button>
-    <button onclick="add('3')">3</button>
-    <button class="op" onclick="add('(')">(</button>
-    <button class="op" onclick="add(')')">)</button>
-
-    <button onclick="add('0')">0</button>
-    <button onclick="add('.')">.</button>
-    <button class="ans" onclick="addANS()">ANS</button>
-    <button class="sign" onclick="toggleSign()">+/-</button>
-    <button class="equal" onclick="calculate()">=</button>
+<div class="calculator">
+  <div class="screen">
+    <div id="display" class="display"></div>
+    <div id="history" class="history"></div>
   </div>
 
-  <div class="history-container" id="history"></div>
+  <div class="buttons">
+    <button onclick="clearAll()">AC</button>
+    <button onclick="toggleSign()">+/-</button>
+    <button onclick="useANS()">ANS</button>
+    <button onclick="addOp('÷')">÷</button>
+
+    <button onclick="addNum('7')">7</button>
+    <button onclick="addNum('8')">8</button>
+    <button onclick="addNum('9')">9</button>
+    <button onclick="addOp('×')">×</button>
+
+    <button onclick="addNum('4')">4</button>
+    <button onclick="addNum('5')">5</button>
+    <button onclick="addNum('6')">6</button>
+    <button onclick="addOp('-')">−</button>
+
+    <button onclick="addNum('1')">1</button>
+    <button onclick="addNum('2')">2</button>
+    <button onclick="addNum('3')">3</button>
+    <button onclick="addOp('+')">+</button>
+
+    <button class="zero" onclick="addNum('0')">0</button>
+    <button onclick="addNum('.')">.</button>
+    <button onclick="calculate()">=</button>
+  </div>
 </div>
 
-<script>
-let display=document.getElementById("display");
-let history=document.getElementById("history");
-let delBtn=document.getElementById("delBtn");
-let input="";
-let lastResult=0;
-
-function animateDigits(str){
-  display.innerHTML = "";
-
-  for (let i = 0; i < str.length; i++) {
-    const span = document.createElement("span");
-    span.textContent = str[i];
-
-    // affichage immédiat (0s)
-    span.style.display = "inline-block";
-    span.style.opacity = "1";
-    span.style.transform = "translateY(0)";
-
-    display.appendChild(span);
-  }
-}
-
-function updateDelButton(){delBtn.innerText=input?"⌫":"AC";}
-function add(v){if(input==="0")input="";input+=v;animateDigits(input);updateDelButton();}
-function addANS(){add(lastResult.toString());}
-function deleteOrClear(){if(input.length>1){input=input.slice(0,-1);animateDigits(input);}else{input="";animateDigits("0");}updateDelButton();}
-function toggleSign(){
-  if(!input && lastResult!==0){lastResult=-lastResult;animateDigits(lastResult.toString());return;}
-  let regex=/(\d+(\.\d+)?)(?!.*\d)/;
-  let match=input.match(regex);
-  if(match){
-    let number=match[1];
-    let start=match.index;
-    let inverted = number.startsWith("-") ? number.slice(1) : "-"+number;
-    input = input.slice(0,start) + inverted + input.slice(start+number.length);
-    animateDigits(input);
-  }
-}
-
-// moteur math sécurisé
-function calculate(){
-  if(!input) return;
-  try{
-    let expr=input.replace(/π/g,Math.PI).replace(/e/g,Math.E).replace(/√/g,"sqrt").replace(/×/g,"*").replace(/÷/g,"/").replace(/−/g,"-");
-    let tokens=tokenize(expr);
-    let result=evaluate(tokens);
-    history.innerHTML+=`<div>${input} = ${result}</div>`;
-    history.scrollTop = history.scrollHeight; // scroll auto
-    animateDigits(result);
-    glowResult();
-    input=""; lastResult=result;
-  }catch{animateDigits("Erreur"); input="";}
-  updateDelButton();
-}
-
-// tokenizer + moteur
-function tokenize(str){return str.match(/sqrt|sin|cos|tan|log|ln|\d+(\.\d+)?|\^|[()+\-*/]/g);}
-function precedence(op){if(op==="+"||op==="-")return 1;if(op==="*"||op==="/")return 2;if(op==="^")return 3;return 0;}
-function applyOp(a,op,b){if(op==="+")return a+b;if(op==="-")return a-b;if(op==="*")return a*b;if(op==="/")return a/b;if(op==="^")return Math.pow(a,b);}
-function applyFunc(f,v){if(f==="sin")return Math.sin(v);if(f==="cos")return Math.cos(v);if(f==="tan")return Math.tan(v);if(f==="log")return Math.log10(v);if(f==="ln")return Math.log(v);if(f==="sqrt")return Math.sqrt(v);}
-function evaluate(tokens){
-  let values=[],ops=[];
-  for(let i=0;i<tokens.length;i++){
-    let t=tokens[i];
-    if(!isNaN(t)){values.push(Number(t));}
-    else if(["sin","cos","tan","log","ln","sqrt"].includes(t)){ops.push(t);}
-    else if(t==="("){ops.push(t);}
-    else if(t===")"){
-      while(ops.length&&ops[ops.length-1]!=="("){let op=ops.pop();let val=values.pop();values.push(applyFunc(op,val));}ops.pop();
-    }else{
-      while(ops.length&&precedence(ops[ops.length-1])>=precedence(t)){let op=ops.pop();let b=values.pop();let a=values.pop();values.push(applyOp(a,op,b));}
-      ops.push(t);
-    }
-  }
-  while(ops.length){let op=ops.pop();let b=values.pop();let a=values.pop();values.push(applyOp(a,op,b));}
-  return values[0];
-}
-
-updateDelButton();
-</script>
+<script src="script.js"></script>
 </body>
 </html>
