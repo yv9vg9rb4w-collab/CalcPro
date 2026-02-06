@@ -110,17 +110,12 @@ function animateDigits(str){
     const span = document.createElement("span");
     span.textContent = str[i];
 
+    // affichage immédiat (0s)
     span.style.display = "inline-block";
-    span.style.opacity = "0";
-    span.style.transform = "translateY(-6px)";
-    span.style.transition = "0.12s ease-out";
+    span.style.opacity = "1";
+    span.style.transform = "translateY(0)";
 
     display.appendChild(span);
-
-    requestAnimationFrame(() => {
-      span.style.opacity = "1";
-      span.style.transform = "translateY(0)";
-    });
   }
 }
 
