@@ -1,54 +1,147 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculatrice Scientifique</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculatrice iPhone Style</title>
   <style>
     body {
-      background-color: #f6f6f6;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
     }
-    input, button {
-      font-size: 1.2em;
-      padding: 10px;
-      margin: 5px;
+
+    .calc {
+      background-color: #1c1c1c;
+      border-radius: 40px;
+      padding: 20px;
+      width: 320px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
     }
-    #resultat {
-      margin-top: 15px;
-      font-size: 1.5em;
-      color: #007700;
+
+    .display {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 48px;
+      text-align: right;
+      width: 100%;
+      margin-bottom: 20px;
+      outline: none;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 50%;
+      height: 70px;
+      font-size: 28px;
+      color: white;
+      background-color: #333;
+      transition: 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .orange {
+      background-color: #f1a33c;
+    }
+
+    .gray {
+      background-color: #a5a5a5;
+      color: black;
+    }
+
+    .zero {
+      grid-column: span 2;
+      border-radius: 35px;
     }
   </style>
 </head>
 
 <body>
-  <h1>🔬 Calculatrice Scientifique en HTML/JS</h1>
-  
-  <input type="text" id="expression" placeholder="Exemple : sin(3.14) + sqrt(16)" size="40">
-  <br>
-  <button onclick="calculer()">Calculer</button>
-  <button onclick="effacer()">Effacer</button>
+  <div class="calc">
+    <input type="text" class="display" id="display" disabled>
+    <div class="buttons">
+      <button class="gray" onclick="clearDisplay()">AC</button>
+      <button class="gray" onclick="negate()">±</button>
+      <button class="gray" onclick="percent()">%</button>
+      <button class="orange" onclick="appendOperator('÷')">÷</button>
 
-  <p id="resultat"></p>
+      <button onclick="appendNumber('7')">7</button>
+      <button onclick="appendNumber('8')">8</button>
+      <button onclick="appendNumber('9')">9</button>
+      <button class="orange" onclick="appendOperator('*')">×</button>
+
+      <button onclick="appendNumber('4')">4</button>
+      <button onclick="appendNumber('5')">5</button>
+      <button onclick="appendNumber('6')">6</button>
+      <button class="orange" onclick="appendOperator('-')">−</button>
+
+      <button onclick="appendNumber('1')">1</button>
+      <button onclick="appendNumber('2')">2</button>
+      <button onclick="appendNumber('3')">3</button>
+      <button class="orange" onclick="appendOperator('+')">+</button>
+
+      <button class="zero" onclick="appendNumber('0')">0</button>
+      <button onclick="appendNumber('.')">.</button>
+      <button class="orange" onclick="calculate()">=</button>
+    </div>
+  </div>
 
   <script>
-    function calculer() {
+    let display = document.getElementById('display');
+    let currentInput = '';
+
+    function appendNumber(num) {
+      currentInput += num;
+      display.value = currentInput;
+    }
+
+    function appendOperator(op) {
+      if (currentInput === '') return;
+      const lastChar = currentInput.slice(-1);
+      if (['+', '-', '*', '/'].includes(lastChar)) {
+        currentInput = currentInput.slice(0, -1);
+      }
+      currentInput += op;
+      display.value = currentInput;
+    }
+
+    function clearDisplay() {
+      currentInput = '';
+      display.value = '';
+    }
+
+    function calculate() {
       try {
-        const expr = document.getElementById('expression').value;
-        // On utilise Math pour les fonctions scientifiques
-        const resultat = Function('"use strict"; return (' + expr.replace(/([a-zA-Z]+)/g, "Math.$1") + ')')();
-        document.getElementById('resultat').textContent = "Résultat : " + resultat;
-      } catch (e) {
-        document.getElementById('resultat').textContent = "Erreur dans l'expression.";
+        currentInput = eval(currentInput).toString();
+        display.value = currentInput;
+      } catch {
+        display.value = 'Erreur';
+        currentInput = '';
       }
     }
 
-    function effacer() {
-      document.getElementById('expression').value = "";
-      document.getElementById('resultat').textContent = "";
+    function percent() {
+      currentInput = (parseFloat(currentInput) / 100).toString();
+      display.value = currentInput;
+    }
+
+    function negate() {
+      if (!currentInput) return;
+      currentInput = (parseFloat(currentInput) * -1).toString();
+      display.value = currentInput;
     }
   </script>
 </body>
