@@ -1,45 +1,212 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>iOS Calculator</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>iOS Calculator 26</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#000;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color:white;
+}
+
+/* GLASS */
+.calculator{
+  width:390px;
+  padding:20px;
+  border-radius:40px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(35px);
+  box-shadow:0 40px 120px rgba(0,0,0,.9);
+}
+
+/* DISPLAY */
+.display{
+  height:90px;
+  padding:18px;
+  border-radius:26px;
+  background:rgba(255,255,255,.1);
+  font-size:38px;
+  text-align:right;
+  overflow:hidden;
+}
+
+.display span{
+  display:inline-block;
+  transform:translateY(100%);
+  animation:scroll .18s ease-out forwards;
+}
+
+@keyframes scroll{
+  to{transform:translateY(0)}
+}
+
+/* GRID */
+.grid{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+button{
+  height:64px;
+  border:none;
+  border-radius:50%;
+  font-size:20px;
+  background:rgba(255,255,255,.12);
+  color:white;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.2);
+}
+
+button:active{transform:scale(.92)}
+
+.op{background:#ff9f0a}
+.func{color:#5ac8fa}
+.equal{background:#34c759}
+.zero{grid-column:span 2;border-radius:40px}
+
+/* HISTORY BOTTOM */
+.history{
+  margin-top:14px;
+  max-height:90px;
+  overflow-y:auto;
+  font-size:14px;
+  color:#aaa;
+}
+</style>
 </head>
+
 <body>
 
 <div class="calculator">
-  <div class="screen">
-    <div id="display" class="display"></div>
-    <div id="history" class="history"></div>
-  </div>
 
-  <div class="buttons">
+  <div class="display" id="display">0</div>
+
+  <div class="grid">
+    <button class="func" onclick="fn('sqrt')">√</button>
+    <button class="func" onclick="fn('sin')">sin</button>
+    <button class="func" onclick="fn('cos')">cos</button>
+    <button class="func" onclick="fn('log')">log</button>
+
     <button onclick="clearAll()">AC</button>
-    <button onclick="toggleSign()">+/-</button>
-    <button onclick="useANS()">ANS</button>
-    <button onclick="addOp('÷')">÷</button>
+    <button onclick="toggleSign()">+/−</button>
+    <button onclick="useAns()">ANS</button>
+    <button class="op" onclick="op('/')">÷</button>
 
-    <button onclick="addNum('7')">7</button>
-    <button onclick="addNum('8')">8</button>
-    <button onclick="addNum('9')">9</button>
-    <button onclick="addOp('×')">×</button>
+    <button onclick="num(7)">7</button>
+    <button onclick="num(8)">8</button>
+    <button onclick="num(9)">9</button>
+    <button class="op" onclick="op('*')">×</button>
 
-    <button onclick="addNum('4')">4</button>
-    <button onclick="addNum('5')">5</button>
-    <button onclick="addNum('6')">6</button>
-    <button onclick="addOp('-')">−</button>
+    <button onclick="num(4)">4</button>
+    <button onclick="num(5)">5</button>
+    <button onclick="num(6)">6</button>
+    <button class="op" onclick="op('-')">−</button>
 
-    <button onclick="addNum('1')">1</button>
-    <button onclick="addNum('2')">2</button>
-    <button onclick="addNum('3')">3</button>
-    <button onclick="addOp('+')">+</button>
+    <button onclick="num(1)">1</button>
+    <button onclick="num(2)">2</button>
+    <button onclick="num(3)">3</button>
+    <button class="op" onclick="op('+')">+</button>
 
-    <button class="zero" onclick="addNum('0')">0</button>
-    <button onclick="addNum('.')">.</button>
-    <button onclick="calculate()">=</button>
+    <button class="zero" onclick="num(0)">0</button>
+    <button onclick="dot()">.</button>
+    <button class="equal" onclick="calc()">=</button>
   </div>
+
+  <div class="history" id="history"></div>
+
 </div>
 
-<script src="script.js"></script>
+<script>
+let current="0";
+let operator=null;
+let prev=null;
+let ans=0;
+
+const display=document.getElementById("display");
+const history=document.getElementById("history");
+
+function render(){
+  display.innerHTML="";
+  [...current].forEach(c=>{
+    let s=document.createElement("span");
+    s.textContent=c;
+    display.appendChild(s);
+  });
+}
+
+function num(n){
+  if(current==="0") current="";
+  current+=n;
+  render();
+}
+
+function dot(){
+  if(!current.includes(".")){
+    current+=".";
+    render();
+  }
+}
+
+function op(o){
+  prev=parseFloat(current);
+  operator=o;
+  current="0";
+}
+
+function toggleSign(){
+  current = (parseFloat(current)*-1).toString();
+  render();
+}
+
+function fn(f){
+  let x=parseFloat(current);
+  if(f==="sqrt") current=Math.sqrt(x).toString();
+  if(f==="sin") current=Math.sin(x*Math.PI/180).toString();
+  if(f==="cos") current=Math.cos(x*Math.PI/180).toString();
+  if(f==="log") current=Math.log10(x).toString();
+  render();
+}
+
+function calc(){
+  let x=prev;
+  let y=parseFloat(current);
+  let r=0;
+  if(operator==="+") r=x+y;
+  if(operator==="-") r=x-y;
+  if(operator==="*") r=x*y;
+  if(operator==="/") r=y===0?"Erreur":x/y;
+
+  history.innerHTML+=`<div>${x} ${operator} ${y} = ${r}</div>`;
+  history.scrollTop=history.scrollHeight;
+
+  current=r.toString();
+  ans=r;
+  render();
+}
+
+function clearAll(){
+  current="0";prev=null;operator=null;
+  render();
+}
+
+function useAns(){
+  current=ans.toString();
+  render();
+}
+
+render();
+</script>
+
 </body>
 </html>
