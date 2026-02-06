@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CalcPro Scientific</title>
+<title>CalcPro Scientific Clean</title>
 <style>
 :root{
   --bg:#05070c;
@@ -82,12 +82,20 @@ button:active{
 .wide{grid-column:span 2;border-radius:40px;}
 
 /* SCIENTIFIC BUTTONS (landscape only) */
-.scientific{display:none;}
+.scientific{
+  display:none;
+  font-size:16px;
+}
 
 @media (orientation: landscape){
   .calcpro{width:720px;}
-  .buttons{grid-template-columns:repeat(6,1fr);}
-  .scientific{display:block;}
+  .scientific{display:inline-block;}
+  .scientific-container{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:10px;
+    margin-bottom:12px;
+  }
 }
 </style>
 </head>
@@ -103,8 +111,8 @@ button:active{
 
   <div class="screen" id="screen">0</div>
 
-  <div class="buttons">
-    <!-- Scientific functions -->
+  <!-- Scientific buttons container -->
+  <div class="scientific-container">
     <button class="scientific" onclick="appendFunction('Math.sin(')">sin</button>
     <button class="scientific" onclick="appendFunction('Math.cos(')">cos</button>
     <button class="scientific" onclick="appendFunction('Math.tan(')">tan</button>
@@ -112,7 +120,10 @@ button:active{
     <button class="scientific" onclick="appendFunction('Math.log(')">ln</button>
     <button class="scientific" onclick="appendFunction('Math.sqrt(')">√</button>
     <button class="scientific" onclick="appendFunction('Math.PI')">π</button>
+  </div>
 
+  <div class="buttons">
+    <!-- Standard buttons, always fixed -->
     <button class="gray" onclick="clearDisplay()">AC</button>
     <button class="gray" onclick="negate()">±</button>
     <button class="gray" onclick="percent()">%</button>
