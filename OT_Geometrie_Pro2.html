@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>OT Géométrie Pro</title>
+<title>OT Géométrie Complet</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
@@ -18,6 +18,7 @@ button,input,select{
 }
 canvas{
     margin-top:10px;
+    border:1px solid #ccc;
 }
 #definition{
     margin-top:10px;
@@ -31,7 +32,11 @@ canvas{
 </head>
 <body>
 
+<!-- Logo -->
+<img src="logo.png" alt="Logo OT Géométrie" width="80" style="margin-top:10px;">
+
 <h1>OT Géométrie Pro</h1>
+<h3 style="color:#555; font-weight:normal;">Explore toutes les figures et solides facilement 🏀</h3>
 
 <button onclick="show2D()">2D</button>
 <button onclick="show3D()">3D</button>
@@ -45,7 +50,6 @@ canvas{
 let scene,camera,renderer,currentObject,controls;
 
 /* ========= MENU ========= */
-
 function show2D(){
 document.getElementById("options").innerHTML=`
 <h3>Figures 2D</h3>
@@ -76,7 +80,6 @@ Largeur <input type="number" id="w" value="3">
 }
 
 /* ========= UTIL ========= */
-
 function clearCanvas(){
 const old=document.querySelector("canvas");
 if(old) old.remove();
@@ -84,7 +87,6 @@ if(controls) controls=null;
 }
 
 /* ========= 2D ========= */
-
 function baseCanvas(){
 clearCanvas();
 let c=document.createElement("canvas");
@@ -101,9 +103,10 @@ ctx.lineTo(50,350);
 ctx.lineTo(350,350);
 ctx.closePath();
 ctx.stroke();
+
 document.getElementById("definition").innerHTML="Triangle : figure à 3 côtés.";
 
-let a=300; let b=300; let c_side=282.84; // approx distance
+let a=300, b=300, c_side=282.84; // approx
 let s=(a+b+c_side)/2;
 let area=Math.sqrt(s*(s-a)*(s-b)*(s-c_side));
 let perimeter=a+b+c_side;
@@ -180,7 +183,6 @@ document.getElementById("result").innerHTML=
 }
 
 /* ========= 3D ========= */
-
 function init3D(){
 clearCanvas();
 scene=new THREE.Scene();
