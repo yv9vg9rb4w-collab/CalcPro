@@ -24,7 +24,7 @@ header p{margin-top:5px;color:var(--muted);}
 /* BOUTONS */
 #controls{
   display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; 
-  position:relative; z-index:10; /* boutons au-dessus */
+  position:relative; z-index:10; /* boutons toujours au-dessus */
 }
 #controls button{
   background:var(--card); border:none; border-radius:12px;
@@ -43,10 +43,12 @@ header p{margin-top:5px;color:var(--muted);}
   border-radius:16px; background:#1b1b1b; box-shadow:0 0 20px rgba(0,255,204,0.3);
   overflow:hidden; z-index:1;
 }
-#canvas2D, #threejs-container{
-  position:absolute; top:0; left:0; width:100%; height:100%;
+#canvas2D{
+  position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; /* canvas 2D au-dessus de 3D */
 }
-#threejs-container{pointer-events:none;} /* 3D ne bloque pas les clics */
+#threejs-container{
+  position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;
+}
 
 #definition{text-align:center;margin-top:10px;color:var(--accent);font-size:16px;}
 </style>
