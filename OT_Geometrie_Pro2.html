@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OT Géométrie Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+body{
+    font-family: Arial;
+    text-align:center;
+    background:#f4f4f4;
+}
+button,input,select{
+    padding:6px;
+    margin:4px;
+    font-size:15px;
+}
+canvas{
+    margin-top:10px;
+}
+#definition{
+    margin-top:10px;
+    font-weight:bold;
+}
+#result{
+    margin-top:5px;
+    font-size:17px;
+}
+</style>
+</head>
+<body>
+
+<h1>OT Géométrie Pro</h1>
+
+<button onclick="show2D()">2D</button>
+<button onclick="show3D()">3D</button>
+
+<div id="options"></div>
+<div id="definition"></div>
+<div id="result"></div>
+
+<script>
+
+let scene,camera,renderer,currentObject,controls;
+
+/* ========= MENU ========= */
+
+function show2D(){
+document.getElementById("options").innerHTML=`
+<h3>Figures 2D</h3>
+<button onclick="triangle()">Triangle</button>
+<button onclick="square()">Carré</button>
+<button onclick="rectangle()">Rectangle</button>
+<button onclick="circle()">Cercle</button>
+<button onclick="polygon()">Polygone régulier</button>
+Côtés <input type="number" id="sides" value="5" min="3" max="20">
+Longueur côté <input type="number" id="sideLength" value="5">
+`;
+}
+
+function show3D(){
+document.getElementById("options").innerHTML=`
+<h3>Solides 3D</h3>
+<button onclick="cube()">Cube</button>
+<button onclick="box()">Pavé droit</button>
+<button onclick="sphere()">Sphère</button>
+<button onclick="cylinder()">Cylindre</button>
+<button onclick="cone()">Cône</button>
+<button onclick="pyramid()">Pyramide</button>
+<br>
+Rayon <input type="number" id="r" value="2">
+Hauteur <input type="number" id="h" value="4">
+Largeur <input type="number" id="w" value="3">
+`;
+}
+
+/* ========= UTIL ========= */
+
+function clearCanvas(){
+const old=document.querySelector("canvas");
+if(old) old.remove();
+if(controls) controls=null;
+}
+
+/* ========= 2D ========= */
+
+function baseCanvas(){
+clearCanvas();
+let c=document.createElement("canvas");
+c.width=400; c.height=400;
+document.body.appendChild(c);
+return c.getContext("2d");
+}
+
+function triangle(){
+let ctx=baseCanvas();
+ctx.beginPath();
+ctx.moveTo(200,50);
+ctx.lineTo(50,350);
+ctx.lineTo(350,350);
+ctx.closePath();
+ctx.stroke();
+document.getElementById("definition").innerHTML="Triangle : figure à 3 côtés.";
+
+let a=300; let b=300; let c_side=282.84; // approx distance
+let s=(a+b+c_side)/2;
+let area=Math.sqrt(s*(s-a)*(s-b)*(s-c_side));
+let perimeter=a+b+c_side;
+
+document.getElementById("result").innerHTML=
+`Surface ≈ ${area.toFixed(2)}, Périmètre ≈ ${perimeter.toFixed(2)}`;
+}
+
+function square(){
+let ctx=baseCanvas();
+ctx.strokeRect(100,100,200,200);
+document.getElementById("definition").innerHTML=
+"Carré : quadrilatère avec 4 côtés égaux et 4 angles droits.";
+
+let side=200;
+let area=side*side;
+let perimeter=4*side;
+document.getElementById("result").innerHTML=
+`Surface = ${area}, Périmètre = ${perimeter}`;
+}
+
+function rectangle(){
+let ctx=baseCanvas();
+ctx.strokeRect(80,150,250,120);
+document.getElementById("definition").innerHTML=
+"Rectangle : quadrilatère avec 4 angles droits.";
+
+let width=250; let height=120;
+let area=width*height;
+let perimeter=2*(width+height);
+document.getElementById("result").innerHTML=
+`Surface = ${area}, Périmètre = ${perimeter}`;
+}
+
+function circle(){
+let ctx=baseCanvas();
+ctx.beginPath();
+ctx.arc(200,200,150,0,2*Math.PI);
+ctx.stroke();
+document.getElementById("definition").innerHTML=
+"Cercle : ensemble des points à égale distance d’un centre.";
+
+let r=150;
+let area=Math.PI*r*r;
+let perimeter=2*Math.PI*r;
+document.getElementById("result").innerHTML=
+`Surface ≈ ${area.toFixed(2)}, Périmètre ≈ ${perimeter.toFixed(2)}`;
+}
+
+function polygon(){
+let sides=parseInt(document.getElementById("sides").value);
+let side=parseFloat(document.getElementById("sideLength").value);
+let ctx=baseCanvas();
+let cx=200, cy=200, r=150;
+
+ctx.beginPath();
+for(let i=0;i<sides;i++){
+let angle=(i*2*Math.PI/sides)-Math.PI/2;
+let x=cx+r*Math.cos(angle);
+let y=cy+r*Math.sin(angle);
+if(i===0) ctx.moveTo(x,y);
+else ctx.lineTo(x,y);
+}
+ctx.closePath();
+ctx.stroke();
+
+let area=(sides*side*side)/(4*Math.tan(Math.PI/sides));
+let perimeter=sides*side;
+
+document.getElementById("definition").innerHTML=
+`Polygone régulier à ${sides} côtés.`;
+document.getElementById("result").innerHTML=
+`Surface ≈ ${area.toFixed(2)}, Périmètre = ${perimeter.toFixed(2)}`;
+}
+
+/* ========= 3D ========= */
+
+function init3D(){
+clearCanvas();
+scene=new THREE.Scene();
+camera=new THREE.PerspectiveCamera(75,1,0.1,1000);
+renderer=new THREE.WebGLRenderer();
+renderer.setSize(400,400);
+document.body.appendChild(renderer.domElement);
+camera.position.z=10;
+
+let light=new THREE.PointLight(0xffffff,1);
+light.position.set(5,5,5);
+scene.add(light);
+
+controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.enableZoom = true;
+controls.enablePan = true;
+}
+
+function animate(){
+requestAnimationFrame(animate);
+if(currentObject) currentObject.rotation.x+=0.005;
+if(controls) controls.update();
+renderer.render(scene,camera);
+}
+
+function cube(){
+init3D();
+let w=parseFloat(document.getElementById("w").value);
+let geo=new THREE.BoxGeometry(w,w,w);
+let mat=new THREE.MeshStandardMaterial({color:0x00ffff});
+currentObject=new THREE.Mesh(geo,mat);
+scene.add(currentObject);
+animate();
+
+document.getElementById("definition").innerHTML="Cube : 6 faces carrées égales.";
+document.getElementById("result").innerHTML=`Volume = ${(w*w*w).toFixed(2)}, Surface = ${(6*w*w).toFixed(2)}`;
+}
+
+function box(){
+init3D();
+let w=parseFloat(document.getElementById("w").value);
+let h=parseFloat(document.getElementById("h").value);
+let geo=new THREE.BoxGeometry(w,h,2);
+let mat=new THREE.MeshStandardMaterial({color:0xff8800});
+currentObject=new THREE.Mesh(geo,mat);
+scene.add(currentObject);
+animate();
+
+document.getElementById("definition").innerHTML="Pavé droit : 6 faces rectangulaires.";
+document.getElementById("result").innerHTML=`Volume = ${(w*h*2).toFixed(2)}, Surface = ${(2*(w*h + w*2 + h*2)).toFixed(2)}`;
+}
+
+function sphere(){
+init3D();
+let r=parseFloat(document.getElementById("r").value);
+let geo=new THREE.SphereGeometry(r,32,32);
+let mat=new THREE.MeshStandardMaterial({color:0x00ffcc});
+currentObject=new THREE.Mesh(geo,mat);
+scene.add(currentObject);
+animate();
+
+document.getElementById("definition").innerHTML="Sphère : tous points à égale distance du centre.";
+document.getElementById("result").innerHTML=`Volume ≈ ${(4/3*Math.PI*r*r*r).toFixed(2)}, Surface ≈ ${(4*Math.PI*r*r).toFixed(2)}`;
+}
+
+function cylinder(){
+init3D();
+let r=parseFloat(document.getElementById("r").value);
+let h=parseFloat(document.getElementById("h").value);
+let geo=new THREE.CylinderGeometry(r,r,h,32);
+let mat=new THREE.MeshStandardMaterial({color:0xaa00ff});
+currentObject=new THREE.Mesh(geo,mat);
+scene.add(currentObject);
+animate();
+
+document.getElementById("definition").innerHTML="Cylindre : deux bases circulaires parallèles.";
+document.getElementById("result").innerHTML=`Volume ≈ ${(Math.PI*r*r*h).toFixed(2)}, Surface ≈ ${(2*Math.PI*r*h + 2*Math.PI*r*r).toFixed(2)}`;
+}
+
+function cone(){
+init3D();
+let r=parseFloat(document.getElementById("r").value);
+let h=parseFloat(document.getElementById("h").value);
+let geo=new THREE.ConeGeometry(r,h,32);
+let mat=new THREE.MeshStandardMaterial({color:0xff0000});
+currentObject=new THREE.Mesh(geo,mat);
+scene.add(currentObject);
+animate();
+
+document.getElementById("definition").innerHTML="Cône : base circulaire et sommet.";
+let volume=(1/3*Math.PI*r*r*h);
+let surface=(Math.PI*r*(r + Math.sqrt(h*h + r*r)));
+document.getElementById("result").innerHTML=`Volume ≈ ${volume.toFixed(2)}, Surface ≈ ${surface.toFixed(2)}`;
+}
+
+function pyramid(){
+init3D();
+let w=parseFloat(document.getElementById("w").value);
+let h=parseFloat(document.getElementById("h").value);
+let geo=new THREE.ConeGeometry(w,h,4);
+let mat=new THREE.MeshStandardMaterial({color:0x009900});
+currentObject=new THREE.Mesh(geo,mat);
+scene.add(currentObject);
+animate();
+
+document.getElementById("definition").innerHTML="Pyramide : base polygonale et sommet.";
+let volume=(1/3*w*w*h);
+let surface=(w*w + 2*w*Math.sqrt((w/2)*(w/2)+h*h));
+document.getElementById("result").innerHTML=`Volume ≈ ${volume.toFixed(2)}, Surface ≈ ${surface.toFixed(2)}`;
+}
+
+</script>
+
+</body>
+</html>
