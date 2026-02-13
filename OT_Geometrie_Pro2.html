@@ -74,7 +74,7 @@ header p{margin-top:5px;color:var(--muted);}
   <button onclick="draw3DShape('cube')">Cube</button>
   <button onclick="draw3DShape('sphere')">Sphère</button>
   <button onclick="draw3DShape('cylindre')">Cylindre</button>
-  <button onclick="draw3DShape('cône')">Cône</button>
+  <button onclick="draw3DShape('cone')">Cône</button>
   <button onclick="draw3DShape('pyramide')">Pyramide</button>
   <button onclick="draw3DShape('tore')">Tore</button>
 </div>
@@ -86,7 +86,9 @@ header p{margin-top:5px;color:var(--muted);}
 
 <div id="definition">Sélectionne une figure pour voir sa définition</div>
 
+<!-- Three.js -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 // ==== 2D CANVAS ====
 const canvas2D = document.getElementById('canvas2D');
@@ -104,16 +106,25 @@ resizeCanvas();
 const container3D = document.getElementById('threejs-container');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1b1b1b);
+
 const camera = new THREE.PerspectiveCamera(75, container3D.clientWidth/container3D.clientHeight, 0.1, 1000);
+camera.position.z = 5;
+
 const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
 renderer.setSize(container3D.clientWidth,container3D.clientHeight);
 container3D.appendChild(renderer.domElement);
 
 const light = new THREE.DirectionalLight(0xffffff,1);
-light.position.set(5,5,5); scene.add(light);
+light.position.set(5,5,5);
+scene.add(light);
 scene.add(new THREE.AmbientLight(0x404040));
-camera.position.z = 5;
 
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enablePan = false;
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+
+// ==== VARIABLES ====
 let current3D = null;
 
 // ==== EFFACER TOUT ====
@@ -127,40 +138,13 @@ function drawShape2D(shape){
   clearCanvas();
   ctx.fillStyle="#00ffcc";
   switch(shape){
-    case 'carré':
-      ctx.fillRect(200,150,100,100);
-      def.textContent="Carré : quadrilatère avec côtés égaux et angles droits.";
-      break;
-    case 'rectangle':
-      ctx.fillRect(180,160,140,100);
-      def.textContent="Rectangle : côtés opposés égaux.";
-      break;
-    case 'cercle':
-      ctx.beginPath(); ctx.arc(300,200,50,0,2*Math.PI); ctx.fill();
-      def.textContent="Cercle : ensemble de points équidistants d’un centre.";
-      break;
-    case 'triangle':
-      ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(240,270); ctx.lineTo(360,270); ctx.closePath(); ctx.fill();
-      def.textContent="Triangle : polygone à trois côtés.";
-      break;
-    case 'equilateral':
-      ctx.beginPath();
-      ctx.moveTo(300,130); ctx.lineTo(220,270); ctx.lineTo(380,270);
-      ctx.closePath(); ctx.fill();
-      def.textContent="Triangle Équilatéral : trois côtés égaux et trois angles égaux (60° chacun).";
-      break;
-    case 'isocele':
-      ctx.beginPath();
-      ctx.moveTo(300,130); ctx.lineTo(240,270); ctx.lineTo(360,270);
-      ctx.closePath(); ctx.fill();
-      def.textContent="Triangle Isocèle : deux côtés égaux et deux angles égaux.";
-      break;
-    case 'scalene':
-      ctx.beginPath();
-      ctx.moveTo(300,130); ctx.lineTo(230,270); ctx.lineTo(370,250);
-      ctx.closePath(); ctx.fill();
-      def.textContent="Triangle Scalène : trois côtés de longueurs différentes et trois angles différents.";
-      break;
+    case 'carré': ctx.fillRect(200,150,100,100); def.textContent="Carré : quadrilatère avec côtés égaux et angles droits."; break;
+    case 'rectangle': ctx.fillRect(180,160,140,100); def.textContent="Rectangle : côtés opposés égaux."; break;
+    case 'cercle': ctx.beginPath(); ctx.arc(300,200,50,0,2*Math.PI); ctx.fill(); def.textContent="Cercle : ensemble de points équidistants d’un centre."; break;
+    case 'triangle': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(240,270); ctx.lineTo(360,270); ctx.closePath(); ctx.fill(); def.textContent="Triangle : polygone à trois côtés."; break;
+    case 'equilateral': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(220,270); ctx.lineTo(380,270); ctx.closePath(); ctx.fill(); def.textContent="Triangle Équilatéral : trois côtés égaux et trois angles égaux (60° chacun)."; break;
+    case 'isocele': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(240,270); ctx.lineTo(360,270); ctx.closePath(); ctx.fill(); def.textContent="Triangle Isocèle : deux côtés égaux et deux angles égaux."; break;
+    case 'scalene': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(230,270); ctx.lineTo(370,250); ctx.closePath(); ctx.fill(); def.textContent="Triangle Scalène : trois côtés de longueurs différentes et trois angles différents."; break;
   }
 }
 
@@ -172,7 +156,7 @@ function draw3DShape(shape){
     case 'cube': geometry=new THREE.BoxGeometry(2,2,2); def.textContent="Cube : 6 faces carrées."; break;
     case 'sphere': geometry=new THREE.SphereGeometry(1.5,32,32); def.textContent="Sphère : points équidistants d’un centre."; break;
     case 'cylindre': geometry=new THREE.CylinderGeometry(1,1,3,32); def.textContent="Cylindre : bases circulaires."; break;
-    case 'cône': geometry=new THREE.ConeGeometry(1.5,3,32); def.textContent="Cône : base circulaire et sommet unique."; break;
+    case 'cone': geometry=new THREE.ConeGeometry(1.5,3,32); def.textContent="Cône : base circulaire et sommet unique."; break;
     case 'pyramide': geometry=new THREE.ConeGeometry(1.5,3,4); def.textContent="Pyramide : base polygonale et sommet."; break;
     case 'tore': geometry=new THREE.TorusGeometry(1,0.4,16,100); def.textContent="Tore : anneau 3D."; break;
   }
@@ -185,6 +169,7 @@ function draw3DShape(shape){
 function animate(){
   requestAnimationFrame(animate);
   if(current3D) current3D.rotation.y +=0.01;
+  controls.update();
   renderer.render(scene,camera);
 }
 animate();
@@ -196,5 +181,6 @@ window.addEventListener('resize', ()=>{
   renderer.setSize(container3D.clientWidth,container3D.clientHeight);
 });
 </script>
+
 </body>
 </html>
