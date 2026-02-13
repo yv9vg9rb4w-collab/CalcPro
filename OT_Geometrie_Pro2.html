@@ -20,8 +20,11 @@ body{
 header{text-align:center;margin-bottom:20px;}
 header h1{margin:0;font-size:2em;color:var(--accent);}
 header p{margin-top:5px;color:var(--muted);}
+
+/* BOUTONS */
 #controls{
-  display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; z-index:10; position:relative;
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; 
+  position:relative; z-index:10; /* boutons au-dessus */
 }
 #controls button{
   background:var(--card); border:none; border-radius:12px;
@@ -33,17 +36,18 @@ header p{margin-top:5px;color:var(--muted);}
   transform:translateY(-3px) scale(1.05);
   box-shadow:0 0 20px rgba(0,255,204,0.35);
 }
+
+/* TABLEAU / CANVAS */
 #canvasContainer{
-  position:relative;
-  width:90%; max-width:700px; height:400px;
-  margin:auto; border-radius:16px;
-  background:#1b1b1b; box-shadow:0 0 20px rgba(0,255,204,0.3);
-  overflow:hidden;
+  position:relative; width:90%; max-width:700px; height:400px; margin:auto;
+  border-radius:16px; background:#1b1b1b; box-shadow:0 0 20px rgba(0,255,204,0.3);
+  overflow:hidden; z-index:1;
 }
 #canvas2D, #threejs-container{
   position:absolute; top:0; left:0; width:100%; height:100%;
 }
-#threejs-container{pointer-events:none;} /* Les boutons restent cliquables */
+#threejs-container{pointer-events:none;} /* 3D ne bloque pas les clics */
+
 #definition{text-align:center;margin-top:10px;color:var(--accent);font-size:16px;}
 </style>
 </head>
@@ -77,11 +81,12 @@ header p{margin-top:5px;color:var(--muted);}
   <canvas id="canvas2D"></canvas>
   <div id="threejs-container"></div>
 </div>
+
 <div id="definition">Sélectionne une figure pour voir sa définition</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 <script>
-// ==== 2D Canvas ====
+// ==== 2D CANVAS ====
 const canvas2D = document.getElementById('canvas2D');
 const ctx = canvas2D.getContext('2d');
 const def = document.getElementById('definition');
@@ -93,7 +98,7 @@ function resizeCanvas(){
 window.addEventListener('resize',resizeCanvas);
 resizeCanvas();
 
-// ==== 3D Three.js ====
+// ==== 3D THREE.JS ====
 const container3D = document.getElementById('threejs-container');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1b1b1b);
@@ -101,18 +106,21 @@ const camera = new THREE.PerspectiveCamera(75, container3D.clientWidth/container
 const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
 renderer.setSize(container3D.clientWidth,container3D.clientHeight);
 container3D.appendChild(renderer.domElement);
-scene.add(new THREE.DirectionalLight(0xffffff,1));
+
+const light = new THREE.DirectionalLight(0xffffff,1);
+light.position.set(5,5,5); scene.add(light);
 scene.add(new THREE.AmbientLight(0x404040));
 camera.position.z = 5;
+
 let current3D = null;
 
-// Efface tout
+// ==== EFFACER TOUT ====
 function clearCanvas(){
   ctx.clearRect(0,0,canvas2D.width,canvas2D.height);
-  if(current3D){ scene.remove(current3D); current3D=null; }
+  if(current3D){ scene.remove(current3D); current3D = null; }
 }
 
-// ==== 2D Figure ====
+// ==== 2D FIGURE ====
 function drawShape2D(shape){
   clearCanvas();
   ctx.fillStyle="#00ffcc";
@@ -135,35 +143,26 @@ function drawShape2D(shape){
       break;
     case 'equilateral':
       ctx.beginPath();
-      ctx.moveTo(300,130);
-      ctx.lineTo(220,270);
-      ctx.lineTo(380,270);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(300,130); ctx.lineTo(220,270); ctx.lineTo(380,270);
+      ctx.closePath(); ctx.fill();
       def.textContent="Triangle Équilatéral : trois côtés égaux et trois angles égaux (60° chacun).";
       break;
     case 'isocele':
       ctx.beginPath();
-      ctx.moveTo(300,130);
-      ctx.lineTo(240,270);
-      ctx.lineTo(360,270);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(300,130); ctx.lineTo(240,270); ctx.lineTo(360,270);
+      ctx.closePath(); ctx.fill();
       def.textContent="Triangle Isocèle : deux côtés égaux et deux angles égaux.";
       break;
     case 'scalene':
       ctx.beginPath();
-      ctx.moveTo(300,130);
-      ctx.lineTo(230,270);
-      ctx.lineTo(370,250);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(300,130); ctx.lineTo(230,270); ctx.lineTo(370,250);
+      ctx.closePath(); ctx.fill();
       def.textContent="Triangle Scalène : trois côtés de longueurs différentes et trois angles différents.";
       break;
   }
 }
 
-// ==== 3D Figure ====
+// ==== 3D FIGURE ====
 function draw3DShape(shape){
   clearCanvas();
   let geometry;
@@ -180,7 +179,7 @@ function draw3DShape(shape){
   scene.add(current3D);
 }
 
-// Animation 3D
+// ==== ANIMATION 3D ====
 function animate(){
   requestAnimationFrame(animate);
   if(current3D) current3D.rotation.y +=0.01;
@@ -188,12 +187,13 @@ function animate(){
 }
 animate();
 
-// Resize Three.js
+// ==== RESIZE THREE.JS ====
 window.addEventListener('resize', ()=>{
   camera.aspect = container3D.clientWidth/container3D.clientHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(container3D.clientWidth,container3D.clientHeight);
 });
 </script>
+
 </body>
 </html>
