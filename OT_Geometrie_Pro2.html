@@ -1,191 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>OT Géométrie CalcPro</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<title>Outil de Géométrie 2D et 3D</title>
 <style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f4f4;
-    text-align:center;
-    margin:0;
-    padding:0;
-}
-button{
-    padding:10px 15px;
-    margin:5px;
-    font-size:16px;
-    border:none;
-    border-radius:6px;
-    background:#4CAF50;
-    color:#fff;
-    cursor:pointer;
-    transition:0.2s;
-}
-button:hover{
-    background:#45a049;
-}
-canvas{
-    margin-top:10px;
-    border:1px solid #ccc;
-    border-radius:6px;
-}
-#definition{
-    margin-top:10px;
-    font-weight:bold;
-}
-#result{
-    margin-top:5px;
-    font-size:17px;
-}
+  body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; background: #f0f0f0; }
+  canvas { border: 1px solid #000; margin-bottom: 10px; background: #fff; }
+  #controls { margin-bottom: 20px; }
+  button { margin: 5px; padding: 10px; }
+  #definition { margin-top: 10px; font-weight: bold; }
+  #threejs-container { width: 500px; height: 400px; border: 1px solid #000; background: #fff; }
 </style>
 </head>
 <body>
 
-<div style="margin-top:10px;">
-<button onclick="show2D()">2D</button>
-<button onclick="show3D()">3D</button>
+<h1>Outil de Géométrie 2D et 3D</h1>
+
+<div id="controls">
+  <button onclick="drawShape('rectangle')">Rectangle</button>
+  <button onclick="drawShape('carré')">Carré</button>
+  <button onclick="drawShape('cercle')">Cercle</button>
+  <button onclick="drawShape('triangle')">Triangle</button>
+  <button onclick="draw3DShape('cube')">Cube 3D</button>
+  <button onclick="draw3DShape('sphere')">Sphère 3D</button>
+  <button onclick="draw3DShape('cylindre')">Cylindre 3D</button>
 </div>
 
-<div id="options"></div>
-<div id="definition"></div>
-<div id="result"></div>
+<canvas id="canvas2D" width="500" height="400"></canvas>
+<div id="definition">Sélectionne une forme pour voir sa définition</div>
+
+<h2>Vue 3D</h2>
+<div id="threejs-container"></div>
+
+<!-- Three.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 
 <script>
+// ==== 2D Canvas ====
+const canvas = document.getElementById('canvas2D');
+const ctx = canvas.getContext('2d');
+const def = document.getElementById('definition');
 
-let scene,camera,renderer,currentObject,controls;
+function drawShape(shape) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-/* ========= MENU ========= */
-function show2D(){
-document.getElementById("options").innerHTML=`
-<h3>Figures 2D</h3>
-<button onclick="triangle()">Triangle</button>
-<button onclick="square()">Carré</button>
-<button onclick="rectangle()">Rectangle</button>
-<button onclick="circle()">Cercle</button>
-<button onclick="polygon(5)">Polygone 5 côtés</button>
-<button onclick="polygon(6)">Polygone 6 côtés</button>
-<button onclick="polygon(8)">Polygone 8 côtés</button>
-<button onclick="polygon(10)">Polygone 10 côtés</button>
-`;
+  switch(shape) {
+    case 'rectangle':
+      ctx.fillStyle = '#FF5733';
+      ctx.fillRect(50, 50, 200, 100);
+      def.textContent = "Rectangle : quadrilatère avec côtés opposés égaux.";
+      break;
+    case 'carré':
+      ctx.fillStyle = '#33FF57';
+      ctx.fillRect(100, 100, 150, 150);
+      def.textContent = "Carré : quadrilatère avec tous les côtés égaux et angles droits.";
+      break;
+    case 'cercle':
+      ctx.fillStyle = '#3357FF';
+      ctx.beginPath();
+      ctx.arc(250, 200, 80, 0, 2*Math.PI);
+      ctx.fill();
+      def.textContent = "Cercle : ensemble de points équidistants d’un centre.";
+      break;
+    case 'triangle':
+      ctx.fillStyle = '#FF33A8';
+      ctx.beginPath();
+      ctx.moveTo(250, 50);
+      ctx.lineTo(150, 300);
+      ctx.lineTo(350, 300);
+      ctx.closePath();
+      ctx.fill();
+      def.textContent = "Triangle : polygone à trois côtés.";
+      break;
+  }
 }
 
-function show3D(){
-document.getElementById("options").innerHTML=`
-<h3>Solides 3D</h3>
-<button onclick="cube()">Cube</button>
-<button onclick="box()">Pavé droit</button>
-<button onclick="sphere()">Sphère</button>
-<button onclick="cylinder()">Cylindre</button>
-<button onclick="cone()">Cône</button>
-<button onclick="pyramid()">Pyramide</button>
-`;
-}
+// ==== 3D avec Three.js ====
+const container = document.getElementById('threejs-container');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(container.clientWidth, container.clientHeight);
+container.appendChild(renderer.domElement);
 
-/* ========= UTIL ========= */
-function clearCanvas(){
-const old=document.querySelector("canvas");
-if(old) old.remove();
-if(controls) controls=null;
-}
-
-/* ========= 2D ========= */
-function baseCanvas(){
-clearCanvas();
-let c=document.createElement("canvas");
-c.width=400; c.height=400;
-document.body.appendChild(c);
-return c.getContext("2d");
-}
-
-function triangle(){
-let ctx=baseCanvas();
-ctx.beginPath();
-ctx.moveTo(200,50);
-ctx.lineTo(50,350);
-ctx.lineTo(350,350);
-ctx.closePath();
-ctx.stroke();
-document.getElementById("definition").innerHTML="Triangle : figure à 3 côtés.";
-let a=300,b=300,c_side=282.84;
-let s=(a+b+c_side)/2;
-let area=Math.sqrt(s*(s-a)*(s-b)*(s-c_side));
-let perimeter=a+b+c_side;
-document.getElementById("result").innerHTML=`Surface ≈ ${area.toFixed(2)}, Périmètre ≈ ${perimeter.toFixed(2)}`;
-}
-
-function square(){
-let ctx=baseCanvas();
-ctx.strokeRect(100,100,200,200);
-document.getElementById("definition").innerHTML="Carré : 4 côtés égaux et 4 angles droits.";
-let side=200;
-document.getElementById("result").innerHTML=`Surface = ${side*side}, Périmètre = ${4*side}`;
-}
-
-function rectangle(){
-let ctx=baseCanvas();
-ctx.strokeRect(80,150,250,120);
-document.getElementById("definition").innerHTML="Rectangle : 4 angles droits.";
-document.getElementById("result").innerHTML=`Surface = ${250*120}, Périmètre = ${2*(250+120)}`;
-}
-
-function circle(){
-let ctx=baseCanvas();
-ctx.beginPath();
-ctx.arc(200,200,150,0,2*Math.PI);
-ctx.stroke();
-document.getElementById("definition").innerHTML="Cercle : points à égale distance d’un centre.";
-let r=150;
-document.getElementById("result").innerHTML=`Surface ≈ ${(Math.PI*r*r).toFixed(2)}, Périmètre ≈ ${(2*Math.PI*r).toFixed(2)}`;
-}
-
-function polygon(sides){
-let ctx=baseCanvas();
-let cx=200,cy=200,r=150;
-ctx.beginPath();
-for(let i=0;i<sides;i++){
-let angle=(i*2*Math.PI/sides)-Math.PI/2;
-let x=cx+r*Math.cos(angle);
-let y=cy+r*Math.sin(angle);
-if(i===0) ctx.moveTo(x,y);
-else ctx.lineTo(x,y);
-}
-ctx.closePath();ctx.stroke();
-let sideLength=100; 
-let area=(sides*sideLength*sideLength)/(4*Math.tan(Math.PI/sides));
-let perimeter=sides*sideLength;
-document.getElementById("definition").innerHTML=`Polygone régulier à ${sides} côtés.`;
-document.getElementById("result").innerHTML=`Surface ≈ ${area.toFixed(2)}, Périmètre = ${perimeter}`;
-}
-
-/* ========= 3D ========= */
-function init3D(){
-clearCanvas();
-scene=new THREE.Scene();
-camera=new THREE.PerspectiveCamera(75,1,0.1,1000);
-renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(400,400);
-document.body.appendChild(renderer.domElement);
-camera.position.z=10;
-let light=new THREE.PointLight(0xffffff,1);
+const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(5,5,5);
 scene.add(light);
-controls=new THREE.OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;controls.dampingFactor=0.05;
-controls.enableZoom=true;controls.enablePan=true;
+
+camera.position.z = 5;
+let current3DShape;
+
+function draw3DShape(shape) {
+  if(current3DShape) scene.remove(current3DShape);
+
+  let geometry;
+  switch(shape) {
+    case 'cube':
+      geometry = new THREE.BoxGeometry(2,2,2);
+      def.textContent = "Cube : solide à 6 faces carrées égales.";
+      break;
+    case 'sphere':
+      geometry = new THREE.SphereGeometry(1.5, 32, 32);
+      def.textContent = "Sphère : ensemble de points équidistants d’un centre dans l’espace 3D.";
+      break;
+    case 'cylindre':
+      geometry = new THREE.CylinderGeometry(1,1,3,32);
+      def.textContent = "Cylindre : solide avec deux bases circulaires parallèles.";
+      break;
+  }
+
+  const material = new THREE.MeshPhongMaterial({ color: 0xff0000, flatShading: true });
+  current3DShape = new THREE.Mesh(geometry, material);
+  scene.add(current3DShape);
 }
 
-function animate(){requestAnimationFrame(animate);if(currentObject) currentObject.rotation.x+=0.005; if(controls) controls.update(); renderer.render(scene,camera);}
-
-function cube(){init3D();let w=3; let geo=new THREE.BoxGeometry(w,w,w); let mat=new THREE.MeshStandardMaterial({color:0x00ffff}); currentObject=new THREE.Mesh(geo,mat); scene.add(currentObject); animate(); document.getElementById("definition").innerHTML="Cube : 6 faces carrées égales."; document.getElementById("result").innerHTML=`Volume = ${(w*w*w).toFixed(2)}, Surface = ${(6*w*w).toFixed(2)}`;}
-function box(){init3D();let w=3,h=4,d=2;let geo=new THREE.BoxGeometry(w,h,d); let mat=new THREE.MeshStandardMaterial({color:0xff8800});currentObject=new THREE.Mesh(geo,mat);scene.add(currentObject);animate();document.getElementById("definition").innerHTML="Pavé droit : 6 faces rectangulaires.";document.getElementById("result").innerHTML=`Volume = ${(w*h*d).toFixed(2)}, Surface = ${(2*(w*h+w*d+h*d)).toFixed(2)`;}
-function sphere(){init3D();let r=2;let geo=new THREE.SphereGeometry(r,32,32);let mat=new THREE.MeshStandardMaterial({color:0x00ffcc});currentObject=new THREE.Mesh(geo,mat);scene.add(currentObject);animate();document.getElementById("definition").innerHTML="Sphère : tous points à égale distance du centre.";document.getElementById("result").innerHTML=`Volume ≈ ${(4/3*Math.PI*r*r*r).toFixed(2)}, Surface ≈ ${(4*Math.PI*r*r).toFixed(2)}`;}
-function cylinder(){init3D();let r=2,h=4;let geo=new THREE.CylinderGeometry(r,r,h,32);let mat=new THREE.MeshStandardMaterial({color:0xaa00ff});currentObject=new THREE.Mesh(geo,mat);scene.add(currentObject);animate();document.getElementById("definition").innerHTML="Cylindre : deux bases circulaires parallèles.";document.getElementById("result").innerHTML=`Volume ≈ ${(Math.PI*r*r*h).toFixed(2)}, Surface ≈ ${(2*Math.PI*r*h+2*Math.PI*r*r).toFixed(2)}`;}
-function cone(){init3D();let r=2,h=4;let geo=new THREE.ConeGeometry(r,h,32);let mat=new THREE.MeshStandardMaterial({color:0xff0000});currentObject=new THREE.Mesh(geo,mat);scene.add(currentObject);animate();document.getElementById("definition").innerHTML="Cône : base circulaire et sommet.";let volume=(1/3*Math.PI*r*r*h);let surface=(Math.PI*r*(r+Math.sqrt(h*h+r*r)));document.getElementById("result").innerHTML=`Volume ≈ ${volume.toFixed(2)}, Surface ≈ ${surface.toFixed(2)}`;}
-function pyramid(){init3D();let w=3,h=4;let geo=new THREE.ConeGeometry(w,h,4);let mat=new THREE.MeshStandardMaterial({color:0x009900});currentObject=new THREE.Mesh(geo,mat);scene.add(currentObject);animate();document.getElementById("definition").innerHTML="Pyramide : base polygonale et sommet.";let volume=(1/3*w*w*h);let surface=(w*w+2*w*Math.sqrt((w/2)*(w/2)+h*h));document.getElementById("result").innerHTML=`Volume ≈ ${volume.toFixed(2)}, Surface ≈ ${surface.toFixed(2)}`;}
+function animate() {
+  requestAnimationFrame(animate);
+  if(current3DShape) current3DShape.rotation.y += 0.01;
+  renderer.render(scene, camera);
+}
+animate();
 
 </script>
+
 </body>
 </html>
