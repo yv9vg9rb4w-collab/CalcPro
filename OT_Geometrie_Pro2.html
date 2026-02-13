@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro | Outil Géométrie Pro</title>
+<title>CalcPro | Géométrie 2D & 3D</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 :root{
@@ -44,10 +44,10 @@ header p{margin-top:5px;color:var(--muted);}
   overflow:hidden; z-index:1;
 }
 #canvas2D{
-  position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; /* canvas 2D au-dessus de 3D */
+  position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; /* canvas 2D au-dessus de 3D */
 }
 #threejs-container{
-  position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;
+  position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; /* 3D derrière 2D et boutons */
 }
 
 #definition{text-align:center;margin-top:10px;color:var(--accent);font-size:16px;}
@@ -79,14 +79,13 @@ header p{margin-top:5px;color:var(--muted);}
   <button onclick="draw3DShape('tore')">Tore</button>
 </div>
 
-<div id="canvasContainer" style="position:relative; width:600px; height:400px;">
-  <canvas id="canvas2D" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></canvas>
-  <div id="threejs-container" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0;"></div>
-</div
+<div id="canvasContainer">
+  <canvas id="canvas2D"></canvas>
+  <div id="threejs-container"></div>
+</div>
 
 <div id="definition">Sélectionne une figure pour voir sa définition</div>
 
-<!-- Three.js -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 <script>
 // ==== 2D CANVAS ====
@@ -197,6 +196,5 @@ window.addEventListener('resize', ()=>{
   renderer.setSize(container3D.clientWidth,container3D.clientHeight);
 });
 </script>
-
 </body>
 </html>
