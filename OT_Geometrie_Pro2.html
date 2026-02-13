@@ -79,10 +79,10 @@ header p{margin-top:5px;color:var(--muted);}
   <button onclick="draw3DShape('tore')">Tore</button>
 </div>
 
-<div id="canvasContainer">
-  <canvas id="canvas2D"></canvas>
-  <div id="threejs-container"></div>
-</div>
+<div id="canvasContainer" style="position:relative; width:600px; height:400px;">
+  <canvas id="canvas2D" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></canvas>
+  <div id="threejs-container" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0;"></div>
+</div
 
 <div id="definition">Sélectionne une figure pour voir sa définition</div>
 
