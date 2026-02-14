@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro • GeoGraph Max</title>
+<title>CalcPro • GeoGraph Ultimate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -10,8 +10,8 @@
 <style>
 body{
     margin:0;
-    background:linear-gradient(135deg,#0f172a,#020617);
-    font-family:Arial,sans-serif;
+    background: linear-gradient(135deg,#0f172a,#020617);
+    font-family: Arial,sans-serif;
     display:flex;
     justify-content:center;
     align-items:flex-start;
@@ -21,7 +21,7 @@ body{
 }
 .box{
     width:95%;
-    max-width:1000px;
+    max-width:1100px;
     background:#020617;
     border-radius:20px;
     padding:25px;
@@ -34,9 +34,10 @@ body{
     color:#38bdf8;
     margin-bottom:15px;
 }
-input{
+textarea{
     width:100%;
-    padding:14px;
+    height:60px;
+    padding:12px;
     border-radius:12px;
     border:1px solid #334155;
     background:#0f172a;
@@ -74,9 +75,9 @@ button{
 <body>
 
 <div class="box">
-<div class="title">📊 CalcPro • GeoGraph Max</div>
+<div class="title">📊 CalcPro • GeoGraph Ultimate</div>
 
-<input id="fx" placeholder="Ex: x^2-3x+2, sin(x), ln(x), 1/x, racin(x), e^x">
+<textarea id="fxs" placeholder="Entrez plusieurs fonctions séparées par des virgules, ex: x^2-2*x+1, sin(x), 1/x"></textarea>
 
 <div class="btns">
 <button class="zoomIn" onclick="zoom(0.5)">ZOOM +</button>
@@ -86,79 +87,67 @@ button{
 
 <div class="result" id="res"></div>
 <canvas id="graph2D"></canvas>
-
 </div>
 
 <script>
 let ctx = document.getElementById("graph2D");
 let chart;
 let scale = 10;
+let colors = ['#38bdf8','#f472b6','#22c55e','#facc15','#8b5cf6','#fb923c','#3b82f6','#ec4899'];
 
+// Parse fonction
 function parseFunction(f,x){
-    return f.replace(/\^/g,"**")
-            .replace(/racin/gi,"Math.sqrt")
-            .replace(/sin/gi,"Math.sin")
-            .replace(/cos/gi,"Math.cos")
-            .replace(/tg/gi,"Math.tan")
-            .replace(/tan/gi,"Math.tan")
-            .replace(/ln/gi,"Math.log")
-            .replace(/log/gi,"Math.log10")
-            .replace(/e/gi,"Math.E")
-            .replace(/π/gi,"Math.PI")
-            .replace(/x/gi,`(${x})`)
-            .replace(/abs/gi,"Math.abs")
-            .replace(/sqrt/gi,"Math.sqrt");
+    try{
+        return f.replace(/\^/g,"**")
+                .replace(/racin/gi,"Math.sqrt")
+                .replace(/sqrt/gi,"Math.sqrt")
+                .replace(/sin/gi,"Math.sin")
+                .replace(/cos/gi,"Math.cos")
+                .replace(/tg/gi,"Math.tan")
+                .replace(/tan/gi,"Math.tan")
+                .replace(/ln/gi,"Math.log")
+                .replace(/log/gi,"Math.log10")
+                .replace(/e/gi,"Math.E")
+                .replace(/π/gi,"Math.PI")
+                .replace(/abs/gi,"Math.abs")
+                .replace(/x/gi,`(${x})`);
+    } catch {
+        return "0";
+    }
 }
 
 function draw(){
-    const f = document.getElementById("fx").value;
-    const res = document.getElementById("res");
-    if(!f) return;
+    let input = document.getElementById("fxs").value;
+    let res = document.getElementById("res");
+    if(!input) return;
 
-    let xVals=[], yVals=[], sumY=0, points=[], axisSymmetry=null;
+    let funcs = input.split(',').map(f=>f.trim());
+    let xVals=[], datasets=[], intersections=[];
 
-    for(let x=-scale;x<=scale;x+=0.1){
-        try{
-            let y = eval(parseFunction(f,x));
-            if(isFinite(y)){
-                xVals.push(x.toFixed(2));
-                yVals.push(y);
-                sumY += y;
-                points.push({x:x.toFixed(2),y:y.toFixed(2)});
+    for(let i=0;i<funcs.length;i++){
+        let f = funcs[i];
+        let yVals=[], prevY=null;
+        for(let x=-scale; x<=scale; x+=0.1){
+            let y=NaN;
+            try{ y = eval(parseFunction(f,x)); } catch{}
+            if(isFinite(y)) yVals.push(y);
+            else yVals.push(null);
+            if(prevY!==null && Math.abs(prevY-y)<0.1){
+                intersections.push({x:x.toFixed(2),y:y.toFixed(2)});
             }
-        }catch{}
-    }
-
-    // Axe de symétrie pour parabole ax^2+bx+c
-    let fNorm = f.replace(/\s/g,'');
-    let matchA = fNorm.match(/([+-]?\d*)x\^2/);
-    let matchB = fNorm.match(/([+-]?\d*)x(?!\^)/);
-    if(matchA){
-        let a = matchA[1]==""||matchA[1]=="+" ? 1 : matchA[1]=="-" ? -1 : Number(matchA[1]);
-        let b = matchB ? (matchB[1]==""||matchB[1]=="+" ? 1 : matchB[1]=="-" ? -1 : Number(matchB[1])) : 0;
-        axisSymmetry = -b/(2*a);
+            prevY=y;
+            if(i===0) xVals.push(x.toFixed(2));
+        }
+        datasets.push({label:f,data:yVals,borderColor:colors[i%colors.length],tension:0.3,pointRadius:0});
     }
 
     if(chart) chart.destroy();
-
     chart = new Chart(ctx,{
         type:'line',
-        data:{
-            labels:xVals,
-            datasets:[{
-                label:"f(x) = "+f,
-                data:yVals,
-                borderColor:'#38bdf8',
-                tension:0.3,
-                pointRadius:4,
-                pointBackgroundColor:'#facc15'
-            }]
-        },
+        data:{labels:xVals,datasets:datasets},
         options:{
             responsive:true,
-            plugins:{
-                legend:{labels:{color:'white'}}
-            },
+            plugins:{legend:{labels:{color:'white'}}},
             scales:{
                 x:{grid:{color:'#1e293b'},ticks:{color:'#22c55e'}},
                 y:{grid:{color:'#1e293b'},ticks:{color:'#22c55e'}}
@@ -166,10 +155,11 @@ function draw(){
         }
     });
 
-    // Affichage points, Σ, axe de symétrie
-    let txt = `📍 Points: ${points.length} | Σy ≈ ${sumY.toFixed(2)}`;
-    if(axisSymmetry!==null) txt += ` | Axe de symétrie: x=${axisSymmetry.toFixed(2)}`;
-    res.innerHTML = txt;
+    if(intersections.length>0){
+        let txt = "🎯 Intersections: ";
+        intersections.forEach(p=>{txt+=`(${p.x},${p.y}) `;});
+        res.innerHTML = txt;
+    } else res.innerHTML = "Pas d'intersections détectées";
 }
 
 // Zoom
@@ -177,13 +167,13 @@ function zoom(factor){ scale*=factor; draw(); }
 
 // Reset
 function resetGraph(){
-    document.getElementById("fx").value="";
+    document.getElementById("fxs").value="";
     document.getElementById("res").innerHTML="";
     if(chart) chart.destroy();
 }
 
 // Event input
-document.getElementById("fx").addEventListener("input",draw);
+document.getElementById("fxs").addEventListener("input",draw);
 draw();
 </script>
 
