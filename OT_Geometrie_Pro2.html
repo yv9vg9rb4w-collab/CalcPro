@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>CalcPro 2D - Géométrie & Définitions</title>
+    <title>CalcPro : L'Encyclopédie Géométrique 2D/3D</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
@@ -10,7 +10,6 @@
             --bg: #0d0d0d;
             --card: #1a1a1a;
             --danger: #ff4d4d;
-            --text-dim: #888;
         }
 
         body {
@@ -24,21 +23,27 @@
             align-items: center;
         }
 
-        .container { width: 100%; max-width: 600px; }
+        .container { width: 100%; max-width: 700px; }
+
+        .interface {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
         .btn-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
         }
 
         .btn-shape {
             background: var(--card);
             border: 1px solid #333;
             color: #eee;
-            border-radius: 6px;
-            padding: 10px;
-            font-size: 12px;
+            border-radius: 4px;
+            padding: 8px 4px;
+            font-size: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
@@ -48,25 +53,27 @@
         .btn-shape:hover { border-color: var(--accent); color: var(--accent); }
         .btn-shape:active { background: var(--accent); color: black; }
 
-        .full { grid-column: span 2; border-color: var(--danger); color: var(--danger); }
+        .full { grid-column: span 3; border-color: var(--danger); color: var(--danger); font-size: 12px; margin-bottom: 5px;}
 
         .titre {
-            grid-column: span 2;
+            grid-column: span 3;
             text-align: center;
             color: var(--accent);
-            padding: 8px;
-            font-size: 14px;
-            border-bottom: 1px solid #333;
-            margin-top: 10px;
+            padding: 5px;
+            font-size: 12px;
+            border-bottom: 1px solid #444;
+            background: rgba(0, 255, 204, 0.05);
+            margin-top: 5px;
         }
 
         #ecran {
-            height: 300px;
+            height: 350px;
             width: 100%;
             background: #000;
             border-radius: 12px;
             margin: 15px 0;
-            border: 1px solid #222;
+            border: 2px solid #222;
+            position: relative;
         }
 
         #canvas2D { width: 100%; height: 100%; display: block; }
@@ -76,38 +83,45 @@
             padding: 15px;
             border-radius: 8px;
             border-left: 4px solid var(--accent);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
         #nom-figure { color: var(--accent); font-size: 18px; margin-bottom: 5px; font-weight: bold; }
-        #def-figure { color: #ccc; font-size: 14px; line-height: 1.4; }
+        #def-figure { color: #ccc; font-size: 13px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="btn-grid">
-        <button class="btn-shape full" onclick="resetAll()">🗑️ EFFACER TOUT</button>
+    <div class="interface">
+        <div class="btn-grid">
+            <button class="btn-shape full" onclick="resetAll()">🗑️ EFFACER L'ÉCRAN</button>
 
-        <div class="titre">TRIANGLES</div>
-        <button class="btn-shape" onclick="draw2D('tri_equi')">Équilatéral</button>
-        <button class="btn-shape" onclick="draw2D('tri_iso')">Isocèle</button>
-        <button class="btn-shape" onclick="draw2D('tri_rect')">Rectangle</button>
-        <button class="btn-shape" onclick="draw2D('tri_sca')">Scalène</button>
+            <div class="titre">TRIANGLES (2D)</div>
+            <button class="btn-shape" onclick="draw('tri_equi')">Équilatéral</button>
+            <button class="btn-shape" onclick="draw('tri_iso')">Isocèle</button>
+            <button class="btn-shape" onclick="draw('tri_rect')">Rectangle</button>
+            <button class="btn-shape" onclick="draw('tri_sca')">Scalène</button>
 
-        <div class="titre">QUADRILATÈRES & POLYGONES</div>
-        <button class="btn-shape" onclick="draw2D('carre')">Carré</button>
-        <button class="btn-shape" onclick="draw2D('rect')">Rectangle</button>
-        <button class="btn-shape" onclick="draw2D('losange')">Losange</button>
-        <button class="btn-shape" onclick="draw2D('para')">Parallélogramme</button>
-        <button class="btn-shape" onclick="draw2D('trapeze')">Trapèze</button>
-        <button class="btn-shape" onclick="draw2D('penta')">Pentagone</button>
-        <button class="btn-shape" onclick="draw2D('hexa')">Hexagone</button>
-        <button class="btn-shape" onclick="draw2D('octo')">Octogone</button>
+            <div class="titre">FORMES PLANES (2D)</div>
+            <button class="btn-shape" onclick="draw('carre')">Carré</button>
+            <button class="btn-shape" onclick="draw('rect')">Rectangle</button>
+            <button class="btn-shape" onclick="draw('losange')">Losange</button>
+            <button class="btn-shape" onclick="draw('para')">Parallélo.</button>
+            <button class="btn-shape" onclick="draw('trapeze')">Trapèze</button>
+            <button class="btn-shape" onclick="draw('cercle')">Cercle</button>
+            <button class="btn-shape" onclick="draw('penta')">Pentagone</button>
+            <button class="btn-shape" onclick="draw('hexa')">Hexagone</button>
+            <button class="btn-shape" onclick="draw('etoile')">Étoile</button>
 
-        <div class="titre">COURBES & AUTRES</div>
-        <button class="btn-shape" onclick="draw2D('cercle')">Cercle</button>
-        <button class="btn-shape" onclick="draw2D('ellipse')">Ellipse</button>
-        <button class="btn-shape" onclick="draw2D('spirale')">Spirale</button>
+            <div class="titre">VOLUMES (3D)</div>
+            <button class="btn-shape" onclick="draw('cube')">Cube</button>
+            <button class="btn-shape" onclick="draw('pyramide')">Pyramide</button>
+            <button class="btn-shape" onclick="draw('cylindre')">Cylindre</button>
+            <button class="btn-shape" onclick="draw('cone')">Cône</button>
+            <button class="btn-shape" onclick="draw('sphere')">Sphère</button>
+            <button class="btn-shape" onclick="draw('prisme')">Prisme</button>
+        </div>
     </div>
 
     <div id="ecran">
@@ -115,8 +129,8 @@
     </div>
 
     <div class="info-box">
-        <div id="nom-figure">SÉLECTIONNEZ UNE FIGURE</div>
-        <div id="def-figure">Cliquez sur un bouton pour voir la définition et le dessin.</div>
+        <div id="nom-figure">CALCPRO EXPERT</div>
+        <div id="def-figure">Sélectionnez une figure pour explorer ses propriétés géométriques.</div>
     </div>
 </div>
 
@@ -126,24 +140,28 @@ const ctx = canvas.getContext("2d");
 const nomEl = document.getElementById("nom-figure");
 const defEl = document.getElementById("def-figure");
 
-// Base de données des définitions
-const definitions = {
-    tri_equi: ["TRIANGLE ÉQUILATÉRAL", "Triangle ayant 3 côtés de même longueur et 3 angles égaux à 60°."],
-    tri_iso: ["TRIANGLE ISOCÈLE", "Triangle ayant au moins 2 côtés de même longueur."],
-    tri_rect: ["TRIANGLE RECTANGLE", "Triangle possédant un angle droit (90°)."],
-    tri_sca: ["TRIANGLE SCALÈNE", "Triangle dont les 3 côtés sont de longueurs différentes."],
-    carre: ["CARRÉ", "Quadrilatère avec 4 côtés égaux et 4 angles droits."],
-    rect: ["RECTANGLE", "Quadrilatère avec 4 angles droits et des côtés opposés égaux."],
-    losange: ["LOSANGE", "Quadrilatère avec 4 côtés égaux (angles non forcément droits)."],
-    para: ["PARALLÉLOGRAMME", "Quadrilatère dont les côtés opposés sont parallèles deux à deux."],
-    trapeze: ["TRAPÈZE", "Quadrilatère ayant au moins deux côtés parallèles."],
-    penta: ["PENTAGONE", "Polygone régulier à 5 côtés égaux."],
-    hexa: ["HEXAGONE", "Polygone régulier à 6 côtés égaux."],
-    octo: ["OCTOGONE", "Polygone régulier à 8 côtés égaux."],
-    cercle: ["CERCLE", "Ensemble de points situés à égale distance d'un centre."],
-    ellipse: ["ELLIPSE", "Forme ovale résultant de l'étirement d'un cercle."],
-    etoile: ["ÉTOILE", "Polygone étoilé régulier à 5 branches."],
-    spirale: ["SPIRALE", "Courbe qui s'éloigne progressivement de son centre."]
+const biblio = {
+    // 2D
+    tri_equi: { nom: "TRIANGLE ÉQUILATÉRAL", def: "Polygone à 3 côtés égaux. Tous ses angles internes mesurent 60°." },
+    tri_iso: { nom: "TRIANGLE ISOCÈLE", def: "Triangle possédant au moins 2 côtés de même longueur et 2 angles égaux." },
+    tri_rect: { nom: "TRIANGLE RECTANGLE", def: "Triangle ayant un angle droit (90°). Le côté opposé est l'hypoténuse." },
+    tri_sca: { nom: "TRIANGLE SCALÈNE", def: "Triangle dont les trois côtés et les trois angles sont tous différents." },
+    carre: { nom: "CARRÉ", def: "Quadrilatère régulier avec 4 côtés égaux et 4 angles droits." },
+    rect: { nom: "RECTANGLE", def: "Quadrilatère avec 4 angles droits. Les côtés opposés sont égaux et parallèles." },
+    losange: { nom: "LOSANGE", def: "Quadrilatère aux 4 côtés égaux. Ses diagonales se coupent perpendiculairement." },
+    para: { nom: "PARALLÉLOGRAMME", def: "Quadrilatère dont les côtés opposés sont parallèles et de même longueur." },
+    trapeze: { nom: "TRAPÈZE", def: "Quadrilatère ayant deux côtés opposés parallèles (les bases)." },
+    cercle: { nom: "CERCLE", def: "Ensemble de points situés à une distance constante (rayon) d'un centre." },
+    penta: { nom: "PENTAGONE", def: "Polygone à 5 côtés. L'angle interne d'un pentagone régulier est de 108°." },
+    hexa: { nom: "HEXAGONE", def: "Polygone à 6 côtés. Il peut être décomposé en 6 triangles équilatéraux." },
+    etoile: { nom: "ÉTOILE", def: "Figure étoilée à 5 branches souvent construite à partir d'un pentagone." },
+    // 3D
+    cube: { nom: "CUBE", def: "Solide à 6 faces carrées égales, 12 arêtes et 8 sommets." },
+    pyramide: { nom: "PYRAMIDE", def: "Solide ayant une base polygonale et des faces triangulaires se rejoignant à un apex." },
+    cylindre: { nom: "CYLINDRE", def: "Solide de révolution avec deux bases circulaires parallèles et une surface latérale courbe." },
+    cone: { nom: "CÔNE", def: "Solide composé d'une base circulaire et d'une surface courbe rejoignant un sommet." },
+    sphere: { nom: "SPHÈRE", def: "Solide dont tous les points de la surface sont à égale distance du centre." },
+    prisme: { nom: "PRISME DROIT", def: "Solide avec deux bases polygonales identiques et des faces latérales rectangulaires." }
 };
 
 function resizeCanvas(){
@@ -155,54 +173,92 @@ resizeCanvas();
 
 function resetAll(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    nomEl.textContent = "SÉLECTIONNEZ UNE FIGURE";
-    defEl.textContent = "Écran nettoyé.";
+    nomEl.textContent = "SÉLECTION";
+    defEl.textContent = "En attente d'une figure...";
 }
 
-function draw2D(type){
+function draw(type){
     resetAll();
-    ctx.fillStyle = "#00ffcc";
     ctx.strokeStyle = "#00ffcc";
-    ctx.lineWidth = 3;
-    const x = canvas.width/2, y = canvas.height/2;
-    
-    nomEl.textContent = definitions[type][0];
-    defEl.textContent = definitions[type][1];
+    ctx.fillStyle = "rgba(0, 255, 204, 0.15)";
+    ctx.lineWidth = 2;
+    const x = canvas.width/2;
+    const y = canvas.height/2;
+
+    nomEl.textContent = biblio[type].nom;
+    defEl.textContent = biblio[type].def;
 
     ctx.beginPath();
+    
+    // LOGIQUE 2D
     if(type === 'tri_equi'){
         let h = 120 * Math.sqrt(3)/2;
         ctx.moveTo(x, y-h/2); ctx.lineTo(x-60, y+h/2); ctx.lineTo(x+60, y+h/2); ctx.closePath();
-    }
+    } 
     else if(type === 'tri_iso'){
-        ctx.moveTo(x, y-70); ctx.lineTo(x-50, y+70); ctx.lineTo(x+50, y+70); ctx.closePath();
+        ctx.moveTo(x, y-80); ctx.lineTo(x-50, y+60); ctx.lineTo(x+50, y+60); ctx.closePath();
     }
     else if(type === 'tri_rect'){
-        ctx.moveTo(x-50, y-50); ctx.lineTo(x-50, y+50); ctx.lineTo(x+70, y+50); ctx.closePath();
+        ctx.moveTo(x-50, y-50); ctx.lineTo(x-50, y+70); ctx.lineTo(x+80, y+70); ctx.closePath();
     }
     else if(type === 'tri_sca'){
-        ctx.moveTo(x-20, y-60); ctx.lineTo(x-70, y+60); ctx.lineTo(x+90, y+20); ctx.closePath();
+        ctx.moveTo(x-20, y-60); ctx.lineTo(x-70, y+60); ctx.lineTo(x+90, y+30); ctx.closePath();
     }
     else if(type === 'carre') ctx.rect(x-60, y-60, 120, 120);
-    else if(type === 'rect') ctx.rect(x-90, y-50, 180, 100);
+    else if(type === 'rect') ctx.rect(x-100, y-50, 200, 100);
     else if(type === 'losange'){
-        ctx.moveTo(x, y-70); ctx.lineTo(x-90, y); ctx.lineTo(x, y+70); ctx.lineTo(x+90, y); ctx.closePath();
+        ctx.moveTo(x, y-80); ctx.lineTo(x-110, y); ctx.lineTo(x, y+80); ctx.lineTo(x+110, y); ctx.closePath();
     }
     else if(type === 'para'){
-        ctx.moveTo(x-70, y-50); ctx.lineTo(x+70, y-50); ctx.lineTo(x+40, y+50); ctx.lineTo(x-100, y+50); ctx.closePath();
+        ctx.moveTo(x-60, y-50); ctx.lineTo(x+100, y-50); ctx.lineTo(x+60, y+50); ctx.lineTo(x-100, y+50); ctx.closePath();
     }
     else if(type === 'trapeze'){
-        ctx.moveTo(x-50, y-60); ctx.lineTo(x+50, y-60); ctx.lineTo(x+90, y+60); ctx.lineTo(x-90, y+60); ctx.closePath();
+        ctx.moveTo(x-50, y-60); ctx.lineTo(x+50, y-60); ctx.lineTo(x+110, y+60); ctx.lineTo(x-110, y+60); ctx.closePath();
     }
-    else if(type === 'penta') drawPoly(5, 75);
-    else if(type === 'hexa') drawPoly(6, 75);
-    else if(type === 'octo') drawPoly(8, 75);
-    else if(type === 'cercle') ctx.arc(x, y, 70, 0, Math.PI*2);
-    else if(type === 'ellipse') ctx.ellipse(x, y, 90, 55, 0, 0, Math.PI*2);
-    else if(type === 'etoile') drawStar(5, 85, 35);
-    else if(type === 'spirale') { drawSpiral(); return; }
+    else if(type === 'cercle') ctx.arc(x, y, 75, 0, Math.PI*2);
+    else if(type === 'penta') drawPoly(5, 80);
+    else if(type === 'hexa') drawPoly(6, 80);
+    else if(type === 'etoile') drawStar(5, 90, 40);
+
+    // LOGIQUE 3D
+    else if(type === 'cube'){
+        ctx.rect(x-40, y-80, 100, 100); ctx.stroke();
+        ctx.rect(x-70, y-50, 100, 100); ctx.stroke();
+        ctx.moveTo(x-40, y-80); ctx.lineTo(x-70, y-50);
+        ctx.moveTo(x+60, y-80); ctx.lineTo(x+30, y-50);
+        ctx.moveTo(x+60, y+20); ctx.lineTo(x+30, y+50);
+        ctx.moveTo(x-40, y+20); ctx.lineTo(x-70, y+50);
+    }
+    else if(type === 'pyramide'){
+        ctx.moveTo(x-80, y+40); ctx.lineTo(x, y+70); ctx.lineTo(x+80, y+40); ctx.lineTo(x, y+15); ctx.closePath(); ctx.stroke();
+        ctx.moveTo(x-80, y+40); ctx.lineTo(x, y-80);
+        ctx.moveTo(x, y+70); ctx.lineTo(x, y-80);
+        ctx.moveTo(x+80, y+40); ctx.lineTo(x, y-80);
+    }
+    else if(type === 'cylindre'){
+        ctx.ellipse(x, y-60, 65, 25, 0, 0, Math.PI*2); ctx.stroke();
+        ctx.ellipse(x, y+60, 65, 25, 0, 0, Math.PI*2); ctx.stroke();
+        ctx.moveTo(x-65, y-60); ctx.lineTo(x-65, y+60);
+        ctx.moveTo(x+65, y-60); ctx.lineTo(x+65, y+60);
+    }
+    else if(type === 'cone'){
+        ctx.ellipse(x, y+60, 65, 25, 0, 0, Math.PI*2); ctx.stroke();
+        ctx.moveTo(x-65, y+60); ctx.lineTo(x, y-80); ctx.lineTo(x+65, y+60);
+    }
+    else if(type === 'sphere'){
+        ctx.arc(x, y, 80, 0, Math.PI*2); ctx.stroke();
+        ctx.moveTo(x+80, y); ctx.ellipse(x, y, 80, 25, 0, 0, Math.PI*2);
+    }
+    else if(type === 'prisme'){
+        ctx.moveTo(x-60, y-40); ctx.lineTo(x+20, y-40); ctx.lineTo(x-20, y-80); ctx.closePath(); ctx.stroke();
+        ctx.moveTo(x-60, y+60); ctx.lineTo(x+20, y+60); ctx.lineTo(x-20, y+20); ctx.closePath(); ctx.stroke();
+        ctx.moveTo(x-60, y-40); ctx.lineTo(x-60, y+60);
+        ctx.moveTo(x+20, y-40); ctx.lineTo(x+20, y+60);
+        ctx.moveTo(x-20, y-80); ctx.lineTo(x-20, y+20);
+    }
 
     ctx.fill();
+    ctx.stroke();
 }
 
 function drawPoly(s, r){
@@ -223,17 +279,7 @@ function drawStar(p, out, inn){
     }
     ctx.closePath();
 }
-
-function drawSpiral(){
-    const x = canvas.width/2, y = canvas.height/2;
-    let a = 0, r = 0;
-    ctx.beginPath();
-    while(r < 110){
-        ctx.lineTo(x + r*Math.cos(a), y + r*Math.sin(a));
-        a += 0.2; r += 0.5;
-    }
-    ctx.stroke();
-}
 </script>
+
 </body>
 </html>
