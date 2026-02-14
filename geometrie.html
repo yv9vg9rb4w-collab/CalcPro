@@ -2,193 +2,278 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro – Géométrie + Trigonométrie</title>
+<title>CalcPro Géométrie PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{background:#0d0d0d;color:white;font-family:'Roboto',sans-serif;margin:0}
-header{background:#111;text-align:center;padding:20px;font-size:24px;font-weight:700;border-bottom:2px solid #00c853}
-.container{max-width:800px;margin:auto;padding:20px}
-h3{color:#00c853;margin-top:25px;cursor:pointer}
-input,textarea{width:100%;padding:12px;margin:8px 0;background:#181818;color:white;border:1px solid #333;border-radius:6px;font-size:16px}
-button{width:100%;padding:14px;margin-top:12px;background:#00c853;border:none;font-size:16px;font-weight:700;border-radius:6px;cursor:pointer;transition:0.3s}
-button:hover{background:#00e676}
-.result{margin-top:20px;padding:16px;background:#111;border:1px solid #333;line-height:1.8;border-radius:6px;font-size:14px}
-.formule{color:#00e5ff;font-weight:700}
-.exp{color:#ccc}
-.collapsible{background:#222;color:white;padding:12px;border:none;width:100%;text-align:left;font-size:16px;border-radius:6px;margin-top:10px;cursor:pointer;outline:none;}
-.content{padding:0 12px;display:none;overflow:hidden;border-left:3px solid #00c853;margin-bottom:10px;}
-/* Styles tableau trigonométrie */
-.code-window{background:#1e1e1e;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5);width:100%;max-width:700px;overflow-x:auto;border:1px solid #333;margin-top:10px;}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{background:#252526;color:#00ff88;padding:12px;text-align:left;border-bottom:2px solid #00ff88}
-td{padding:12px;border-bottom:1px solid #2d2d2d}
-.val-deg { color: #ffb86c; font-weight:bold; }
-.val-rad { color:#bd93f9; }
-.val-sin { color:#8be9fd; }
-.val-cos { color:#ff79c6; }
-.symbol { color:#ff5555; }
-tr:hover { background: rgba(255,255,255,0.05); }
-.brand{margin-top:20px;color:#00ff88;text-shadow:0 0 10px #00ff88;font-size:20px;text-align:center;}
+:root {
+  --accent:#00ffcc;
+  --bg:#0d0d0d;
+  --card:#1a1a1a;
+}
+body {
+  background:var(--bg);
+  color:white;
+  font-family:sans-serif;
+  margin:0;
+  padding:10px;
+}
+.interface {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.btn-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.btn-shape {
+  background:var(--card);
+  border:1px solid #333;
+  color:white;
+  border-radius:8px;
+  padding:9px;
+  font-size:12px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+.btn-shape:hover {
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.btn-shape:active {
+  background:var(--accent);
+  color:black;
+}
+.full {
+  grid-column:span 2;
+  border-color:#ff4d4d;
+  color:#ff4d4d;
+}
+.titre {
+  grid-column:span 2;
+  text-align:center;
+  color:var(--accent);
+  border-bottom:1px solid #333;
+  margin-top:5px;
+}
+#ecran {
+  position:relative;
+  height:65vh;
+  width:100%;
+  background:#000;
+  border-radius:12px;
+  margin-top:10px;
+}
+#canvas2D, #container3D {
+  width:100%;
+  height:100%;
+  display:block;
+}
+#container3D {
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:5;
+}
+#definition, #mesures, #formules {
+  text-align:center;
+  color:var(--accent);
+  margin-top:8px;
+  font-size:14px;
+}
+#mesures { color:#ff4d4d; }
+#formules { color:#ffff66; font-size:12px; line-height:1.4; }
 </style>
 </head>
 <body>
-<header>📐 CalcPro – Géométrie + Trigonométrie</header>
-<div class="container">
 
-<h3>Coordonnées des points</h3>
-<input id="x1" placeholder="x₁"><input id="y1" placeholder="y₁">
-<input id="x2" placeholder="x₂"><input id="y2" placeholder="y₂">
-<input id="x3" placeholder="x₃ (optionnel)"><input id="y3" placeholder="y₃ (optionnel)">
+<div class="interface">
+  <div class="btn-grid">
+    <button class="btn-shape full" onclick="resetAll()">🗑️ EFFACER</button>
 
-<h3>Polygone (x,y)</h3>
-<textarea id="poly" placeholder="Ex: 0,0 4,0 4,3 0,3"></textarea>
+    <div class="titre">FIGURES 2D</div>
+    <button class="btn-shape" onclick="draw2D('carre')">Carré</button>
+    <button class="btn-shape" onclick="draw2D('rect')">Rectangle</button>
+    <button class="btn-shape" onclick="draw2D('cercle')">Cercle</button>
+    <button class="btn-shape" onclick="draw2D('equi')">Triangle équilatéral</button>
+    <button class="btn-shape" onclick="draw2D('iso')">Triangle isocèle</button>
+    <button class="btn-shape" onclick="draw2D('sca')">Triangle scalène</button>
+    <button class="btn-shape" onclick="draw2D('rectTri')">Triangle rectangle</button>
+    <button class="btn-shape" onclick="draw2D('pentagone')">Pentagone</button>
+    <button class="btn-shape" onclick="draw2D('hexagone')">Hexagone</button>
 
-<button onclick="calc()">Calculer ✅</button>
-
-<div class="result" id="res">Résultats expliqués…</div>
-
-<button class="collapsible">📘 Leçon Trigonométrie</button>
-<div class="content">
-<h4>Triangle rectangle & Formules</h4>
-<ul>
-<li><span class="formule">sin θ = opposé / hypotenuse</span></li>
-<li><span class="formule">cos θ = adjacent / hypotenuse</span></li>
-<li><span class="formule">tan θ = opposé / adjacent</span></li>
-</ul>
-<h4>Loi des sinus</h4>
-<span class="formule">a / sin A = b / sin B = c / sin C</span>
-<h4>Loi des cosinus</h4>
-<span class="formule">c² = a² + b² − 2ab cos C</span>
-<h4>Conversion</h4>
-<span class="formule">rad = deg × π/180 | deg = rad × 180/π</span>
-
-<!-- Tableau trigonométrie -->
-<div class="code-window">
-    <table>
-        <thead>
-            <tr>
-                <th>  Angle  </th>
-                <th>  Radians  </th>
-                <th>  Sinus  </th>
-                <th> Cosinus </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><span class="val-deg">0°</span></td>
-                <td><span class="val-rad">0</span></td>
-                <td><span class="val-sin">0</span></td>
-                <td><span class="val-cos">1</span></td>
-            </tr>
-            <tr>
-                <td><span class="val-deg">30°</span></td>
-                <td><span class="val-rad"><span class="symbol">π</span> / 6</span></td>
-                <td><span class="val-sin">1 / 2</span></td>
-                <td><span class="val-cos"><span class="symbol">√</span>3 / 2</span></td>
-            </tr>
-            <tr>
-                <td><span class="val-deg">45°</span></td>
-                <td><span class="val-rad"><span class="symbol">π</span> / 4</span></td>
-                <td><span class="val-sin"><span class="symbol">√</span>2 / 2</span></td>
-                <td><span class="val-cos"><span class="symbol">√</span>2 / 2</span></td>
-            </tr>
-            <tr>
-                <td><span class="val-deg">60°</span></td>
-                <td><span class="val-rad"><span class="symbol">π</span> / 3</span></td>
-                <td><span class="val-sin"><span class="symbol">√</span>3 / 2</span></td>
-                <td><span class="val-cos">1 / 2</span></td>
-            </tr>
-            <tr>
-                <td><span class="val-deg">90°</span></td>
-                <td><span class="val-rad"><span class="symbol">π</span> / 2</span></td>
-                <td><span class="val-sin">1</span></td>
-                <td><span class="val-cos">0</span></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+    <div class="titre">FIGURES 3D</div>
+    <button class="btn-shape" onclick="draw3D('cube')">Cube</button>
+    <button class="btn-shape" onclick="draw3D('sphere')">Sphère</button>
+    <button class="btn-shape" onclick="draw3D('cone')">Cône</button>
+    <button class="btn-shape" onclick="draw3D('cylindre')">Cylindre</button>
+    <button class="btn-shape" onclick="draw3D('pyramide')">Pyramide</button>
+    <button class="btn-shape" onclick="draw3D('tore')">Tore</button>
+  </div>
 </div>
 
+<div id="ecran">
+  <canvas id="canvas2D"></canvas>
+  <div id="container3D"></div>
 </div>
-<footer class="brand">CalcPro © Lebbar Yahya</footer>
 
+<div id="definition">Choisissez une figure</div>
+<div id="mesures">Mesures : —</div>
+<div id="formules">Formules : —</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const d=(x1,y1,x2,y2)=>Math.hypot(x2-x1,y2-y1);
+// 🌟 Variables globales
+const canvas = document.getElementById("canvas2D");
+const ctx = canvas.getContext("2d");
+const def = document.getElementById("definition");
+const mesures = document.getElementById("mesures");
+const formules = document.getElementById("formules");
+const container3D = document.getElementById("container3D");
 
-function calc(){
-const A={x:+x1.value,y:+y1.value};
-const B={x:+x2.value,y:+y2.value};
-const C={x:+x3.value,y:+y3.value};
-let t="";
+let scene, camera, renderer, controls, meshActuel=null;
 
-/* SEGMENT */
-const AB=d(A.x,A.y,B.x,B.y);
-t+=`<b>📏 Distance AB</b><br>`;
-t+=`<span class="formule">AB = √[(x₂−x₁)² + (y₂−y₁)²]</span><br>`;
-t+=`<span class="exp">AB = ${AB.toFixed(3)}</span><br>`;
-t+=`Milieu M = (${((A.x+B.x)/2).toFixed(2)} ; ${((A.y+B.y)/2).toFixed(2)})<br><br>`;
+function resizeCanvas(){
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  if(renderer){
+    renderer.setSize(container3D.clientWidth, container3D.clientHeight);
+    camera.aspect = container3D.clientWidth/container3D.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+}
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
 
-/* DROITE */
-t+=`<b>📊 Droite AB</b><br>`;
-if(A.x!==B.x){
-const a=(B.y-A.y)/(B.x-A.x);
-const b=A.y-a*A.x;
-t+=`<span class="formule">y = ax + b</span> → y = ${a.toFixed(3)}x + ${b.toFixed(3)}<br><br>`;
-}else{t+=`Droite verticale x = ${A.x.toFixed(2)}<br><br>`;}
-
-/* CERCLE */
-const r=AB;
-t+=`<b>⭕ Cercle (centre A)</b><br>`;
-t+=`Rayon r = ${r.toFixed(3)}<br>`;
-t+=`Diamètre D = ${(2*r).toFixed(3)}<br>`;
-t+=`Aire = ${(Math.PI*r*r).toFixed(3)}<br>`;
-t+=`Circonférence = ${(2*Math.PI*r).toFixed(3)}<br><br>`;
-
-/* TRIANGLE */
-if(!isNaN(C.x)){
-const BC=d(B.x,B.y,C.x,C.y);
-const AC=d(A.x,A.y,C.x,C.y);
-const P=AB+BC+AC;
-const area=Math.abs(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y))/2;
-t+=`<b>🔺 Triangle ABC</b><br>`;
-t+=`Périmètre = ${P.toFixed(3)}<br>`;
-t+=`Aire = ${area.toFixed(3)}<br>`;
-const angleA=Math.acos((BC*BC + AC*AC - AB*AB)/(2*BC*AC))*180/Math.PI;
-const angleB=Math.acos((AC*AC + AB*AB - BC*BC)/(2*AC*AB))*180/Math.PI;
-const angleC=180-angleA-angleB;
-t+=`Angles : A=${angleA.toFixed(2)}° , B=${angleB.toFixed(2)}° , C=${angleC.toFixed(2)}°<br><br>`;
+function resetAll(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(meshActuel){ scene.remove(meshActuel); meshActuel=null; }
+  def.textContent="Écran nettoyé";
+  mesures.textContent="Mesures : —";
+  formules.textContent="Formules : —";
 }
 
-/* POLYGONE */
-const poly=document.getElementById("poly").value.trim();
-if(poly){
-const pts=poly.split(/\s+/).map(p=>p.split(',').map(Number));
-let A2=0,P2=0;
-for(let i=0;i<pts.length;i++){
-let [x1,y1]=pts[i];
-let [x2,y2]=pts[(i+1)%pts.length];
-A2+=x1*y2-x2*y1;
-P2+=Math.hypot(x2-x1,y2-y1);
-}
-t+=`<b>🔷 Polygone</b><br>`;
-t+=`Aire = ${(Math.abs(A2)/2).toFixed(3)}<br>`;
-t+=`Périmètre = ${P2.toFixed(3)}<br>`;
+// --- 2D ---
+function draw2D(type){
+  resetAll();
+  ctx.fillStyle="#00ffcc";
+  ctx.strokeStyle="#00ffcc";
+  ctx.lineWidth=2;
+  const x = canvas.width/2;
+  const y = canvas.height/2;
+  let mesureTexte="", formuleTexte="—";
+  ctx.beginPath();
+
+  if(type==="carre"){
+    const side=120; ctx.fillRect(x-side/2,y-side/2,side,side);
+    mesureTexte=`Périmètre: ${4*side}px | Aire: ${side*side}px²`;
+  }
+  else if(type==="rect"){
+    const w=180,h=100; ctx.fillRect(x-w/2,y-h/2,w,h);
+    mesureTexte=`Périmètre: ${2*(w+h)}px | Aire: ${w*h}px²`;
+  }
+  else if(type==="cercle"){
+    const r=70; ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    mesureTexte=`Circonférence: ${(2*Math.PI*r).toFixed(2)}px | Aire: ${(Math.PI*r*r).toFixed(2)}px²`;
+  }
+  else if(type==="equi"){
+    const a=120; const h=a*Math.sqrt(3)/2;
+    ctx.moveTo(x,y-h/2); ctx.lineTo(x-a/2,y+h/2); ctx.lineTo(x+a/2,y+h/2); ctx.closePath(); ctx.fill();
+    mesureTexte=`Périmètre: ${(3*a).toFixed(2)}px | Aire: ${(a*h/2).toFixed(2)}px²`;
+  }
+  else if(type==="iso"){
+    const b=100,h=120; ctx.moveTo(x,y-h/2); ctx.lineTo(x-b/2,y+h/2); ctx.lineTo(x+b/2,y+h/2); ctx.closePath(); ctx.fill();
+    mesureTexte=`Périmètre: ~${(2*Math.sqrt((b/2)**2+h**2)+b).toFixed(2)}px | Aire: ${(b*h/2).toFixed(2)}px²`;
+  }
+  else if(type==="sca"){
+    ctx.moveTo(x-40,y-60); ctx.lineTo(x-40+100/2,y+60); ctx.lineTo(x+40+90/2,y+20); ctx.closePath(); ctx.fill();
+    mesureTexte="Triangle scalène (approximatif)";
+  }
+  else if(type==="rectTri"){
+    const base=120,height=100;
+    ctx.moveTo(x-base/2,y+height/2); ctx.lineTo(x-base/2,y-height/2); ctx.lineTo(x+base/2,y+height/2); ctx.closePath(); ctx.fill();
+    const hyp=Math.sqrt(base**2+height**2);
+    mesureTexte=`Base:${base}px | Hauteur:${height}px | Hypothénuse:${hyp.toFixed(2)}px | Aire:${(base*height/2).toFixed(2)}px²`;
+    formuleTexte=`sin θ = opposé/hypoténuse | cos θ = adjacent/hypoténuse | tan θ = opposé/adjacent
+Loi des sinus: a/sinA = b/sinB = c/sinC
+Loi des cosinus: c² = a² + b² − 2ab cos C
+Conversion: rad = deg × π/180 | deg = rad × 180/π
+Angles:
+0° 0 0 1
+30° π/6 1/2 √3/2
+45° π/4 √2/2 √2/2
+60° π/3 √3/2 1/2
+90° π/2 1 0`;
+  }
+
+  ctx.fill();
+  def.textContent=type.toUpperCase();
+  mesures.textContent=`Mesures : ${mesureTexte}`;
+  formules.textContent=formuleTexte;
 }
 
-document.getElementById("res").innerHTML=t;
+// Polygone régulier
+function drawPoly(sides,radius){
+  const x = canvas.width/2;
+  const y = canvas.height/2;
+  const angle = 2*Math.PI/sides;
+  ctx.beginPath();
+  for(let i=0;i<sides;i++){
+    const px = x + radius*Math.cos(i*angle - Math.PI/2);
+    const py = y + radius*Math.sin(i*angle - Math.PI/2);
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.closePath(); ctx.fill();
+  mesures.textContent=`Mesures : ${sides}-gon régulier (rayon:${radius}px)`;
+  formules.textContent="Formules : —";
 }
 
-/* Collapsible trig leçon */
-var coll=document.getElementsByClassName("collapsible");
-for(let i=0;i<coll.length;i++){
-  coll[i].addEventListener("click",function(){
-    this.classList.toggle("active");
-    var content=this.nextElementSibling;
-    if(content.style.display==="block"){content.style.display="none";}
-    else{content.style.display="block";}
-  });
+// --- 3D ---
+function init3D(){
+  if(!scene){
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, container3D.clientWidth/container3D.clientHeight, 0.1, 1000);
+    camera.position.z=5;
+    renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+    renderer.setSize(container3D.clientWidth,container3D.clientHeight);
+    container3D.appendChild(renderer.domElement);
+    const light = new THREE.DirectionalLight(0xffffff,1);
+    light.position.set(2,2,5);
+    scene.add(light,new THREE.AmbientLight(0x404040));
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping=true;
+    animate3D();
+  }
+}
+
+function draw3D(type){
+  resetAll();
+  init3D();
+  let geometry;
+  if(type==="cube") geometry = new THREE.BoxGeometry(2,2,2);
+  else if(type==="sphere") geometry = new THREE.SphereGeometry(1.5,32,32);
+  else if(type==="cone") geometry = new THREE.ConeGeometry(1.5,3,32);
+  else if(type==="cylindre") geometry = new THREE.CylinderGeometry(1,1,3,32);
+  else if(type==="pyramide") geometry = new THREE.ConeGeometry(1.8,2.5,4);
+  else if(type==="tore") geometry = new THREE.TorusGeometry(1,0.4,16,100);
+  const material = new THREE.MeshPhongMaterial({color:0x00ffcc,flatShading:true});
+  meshActuel = new THREE.Mesh(geometry,material);
+  scene.add(meshActuel);
+  def.textContent=type.toUpperCase()+" 3D";
+  mesures.textContent="Volume/Surface : calcul à ajouter selon dimensions";
+  formules.textContent="Formules 3D : Volume = ..., Surface = ...";
+}
+
+function animate3D(){
+  requestAnimationFrame(animate3D);
+  if(meshActuel) meshActuel.rotation.y += 0.01;
+  controls.update();
+  renderer.render(scene,camera);
 }
 </script>
 </body>
 </html>
+
