@@ -24,7 +24,8 @@ header p{margin-top:5px;color:var(--muted);}
 /* BOUTONS */
 #controls{
   display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; 
-  position:relative; z-index:10; /* boutons toujours au-dessus */
+  position:relative; 
+  z-index:100; /* On s'assure qu'ils sont tout en haut */
 }
 #controls button{
   background:var(--card); border:none; border-radius:12px;
@@ -41,13 +42,18 @@ header p{margin-top:5px;color:var(--muted);}
 #canvasContainer{
   position:relative; width:90%; max-width:700px; height:400px; margin:auto;
   border-radius:16px; background:#1b1b1b; box-shadow:0 0 20px rgba(0,255,204,0.3);
-  overflow:hidden; z-index:1;
+  overflow:hidden;
 }
+
 #canvas2D{
-  position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; /* canvas 2D au-dessus de 3D */
+  position:absolute; top:0; left:0; width:100%; height:100%; 
+  z-index:10; 
+  pointer-events: none; /* CORRECTION : Permet de cliquer à travers le canvas */
 }
+
 #threejs-container{
-  position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; /* 3D derrière 2D et boutons */
+  position:absolute; top:0; left:0; width:100%; height:100%; 
+  z-index:5; 
 }
 
 #definition{text-align:center;margin-top:10px;color:var(--accent);font-size:16px;}
@@ -61,16 +67,16 @@ header p{margin-top:5px;color:var(--muted);}
 </header>
 
 <div id="controls">
-  <strong>2D :</strong>
+  <div style="width:100%; text-align:center; margin-bottom:5px;"><strong>2D :</strong></div>
   <button onclick="drawShape2D('carré')">Carré</button>
   <button onclick="drawShape2D('rectangle')">Rectangle</button>
   <button onclick="drawShape2D('cercle')">Cercle</button>
   <button onclick="drawShape2D('triangle')">Triangle</button>
-  <button onclick="drawShape2D('equilateral')">Triangle Équilatéral</button>
-  <button onclick="drawShape2D('isocele')">Triangle Isocèle</button>
-  <button onclick="drawShape2D('scalene')">Triangle Scalène</button>
+  <button onclick="drawShape2D('equilateral')">Équilatéral</button>
+  <button onclick="drawShape2D('isocele')">Isocèle</button>
+  <button onclick="drawShape2D('scalene')">Scalène</button>
 
-  <strong>3D :</strong>
+  <div style="width:100%; text-align:center; margin:10px 0 5px 0;"><strong>3D :</strong></div>
   <button onclick="draw3DShape('cube')">Cube</button>
   <button onclick="draw3DShape('sphere')">Sphère</button>
   <button onclick="draw3DShape('cylindre')">Cylindre</button>
@@ -86,7 +92,6 @@ header p{margin-top:5px;color:var(--muted);}
 
 <div id="definition">Sélectionne une figure pour voir sa définition</div>
 
-<!-- Three.js -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -96,8 +101,8 @@ const ctx = canvas2D.getContext('2d');
 const def = document.getElementById('definition');
 
 function resizeCanvas(){
-  canvas2D.width = canvas2D.clientWidth;
-  canvas2D.height = canvas2D.clientHeight;
+  canvas2D.width = canvas2D.offsetWidth;
+  canvas2D.height = canvas2D.offsetHeight;
 }
 window.addEventListener('resize',resizeCanvas);
 resizeCanvas();
@@ -119,36 +124,38 @@ light.position.set(5,5,5);
 scene.add(light);
 scene.add(new THREE.AmbientLight(0x404040));
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enablePan = false;
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
+// On lie les contrôles au container et non au document
+const controls3D = new THREE.OrbitControls(camera, renderer.domElement);
+controls3D.enablePan = false;
+controls3D.enableDamping = true;
 
 // ==== VARIABLES ====
 let current3D = null;
 
-// ==== EFFACER TOUT ====
 function clearCanvas(){
   ctx.clearRect(0,0,canvas2D.width,canvas2D.height);
   if(current3D){ scene.remove(current3D); current3D = null; }
 }
 
-// ==== 2D FIGURE ====
 function drawShape2D(shape){
   clearCanvas();
   ctx.fillStyle="#00ffcc";
+  const centerX = canvas2D.width / 2;
+  const centerY = canvas2D.height / 2;
+
   switch(shape){
-    case 'carré': ctx.fillRect(200,150,100,100); def.textContent="Carré : quadrilatère avec côtés égaux et angles droits."; break;
-    case 'rectangle': ctx.fillRect(180,160,140,100); def.textContent="Rectangle : côtés opposés égaux."; break;
-    case 'cercle': ctx.beginPath(); ctx.arc(300,200,50,0,2*Math.PI); ctx.fill(); def.textContent="Cercle : ensemble de points équidistants d’un centre."; break;
-    case 'triangle': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(240,270); ctx.lineTo(360,270); ctx.closePath(); ctx.fill(); def.textContent="Triangle : polygone à trois côtés."; break;
-    case 'equilateral': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(220,270); ctx.lineTo(380,270); ctx.closePath(); ctx.fill(); def.textContent="Triangle Équilatéral : trois côtés égaux et trois angles égaux (60° chacun)."; break;
-    case 'isocele': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(240,270); ctx.lineTo(360,270); ctx.closePath(); ctx.fill(); def.textContent="Triangle Isocèle : deux côtés égaux et deux angles égaux."; break;
-    case 'scalene': ctx.beginPath(); ctx.moveTo(300,130); ctx.lineTo(230,270); ctx.lineTo(370,250); ctx.closePath(); ctx.fill(); def.textContent="Triangle Scalène : trois côtés de longueurs différentes et trois angles différents."; break;
+    case 'carré': ctx.fillRect(centerX-50,centerY-50,100,100); def.textContent="Carré : 4 côtés égaux et angles droits."; break;
+    case 'rectangle': ctx.fillRect(centerX-70,centerY-50,140,100); def.textContent="Rectangle : côtés opposés égaux."; break;
+    case 'cercle': ctx.beginPath(); ctx.arc(centerX,centerY,60,0,2*Math.PI); ctx.fill(); def.textContent="Cercle : ensemble de points équidistants d’un centre."; break;
+    case 'triangle': 
+    case 'equilateral':
+    case 'isocele':
+    case 'scalene':
+        ctx.beginPath(); ctx.moveTo(centerX,centerY-60); ctx.lineTo(centerX-70,centerY+60); ctx.lineTo(centerX+70,centerY+60); ctx.closePath(); ctx.fill(); 
+        def.textContent="Triangle : polygone à trois côtés."; break;
   }
 }
 
-// ==== 3D FIGURE ====
 function draw3DShape(shape){
   clearCanvas();
   let geometry;
@@ -165,22 +172,19 @@ function draw3DShape(shape){
   scene.add(current3D);
 }
 
-// ==== ANIMATION 3D ====
 function animate(){
   requestAnimationFrame(animate);
   if(current3D) current3D.rotation.y +=0.01;
-  controls.update();
+  controls3D.update();
   renderer.render(scene,camera);
 }
 animate();
 
-// ==== RESIZE THREE.JS ====
 window.addEventListener('resize', ()=>{
   camera.aspect = container3D.clientWidth/container3D.clientHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(container3D.clientWidth,container3D.clientHeight);
 });
 </script>
-
 </body>
 </html>
