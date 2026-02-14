@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Mobile | Géométrie</title>
+<title>CalcPro Géo | Collection Complète</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
 :root{
@@ -11,66 +11,70 @@
   --accent:#00ffcc;
   --text:#ffffff;
   --muted:#aaaaaa;
+  --danger:#ff4d4d;
 }
 body{
-  margin:0; padding:15px;
+  margin:0; padding:10px;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
   background:var(--bg); color:var(--text);
-  touch-action: manipulation; /* Optimise le tactile */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
-header{text-align:center;margin-bottom:15px;}
-header h1{margin:0;font-size:1.5em;color:var(--accent);}
+header{text-align:center; margin-bottom:10px;}
+header h1{margin:0; font-size:1.5em; color:var(--accent);}
 
-/* CONTROLES : On booste le z-index pour le mobile */
+/* SECTION BOUTONS */
+.section-title { font-size: 12px; color: var(--muted); text-transform: uppercase; margin: 10px 0 5px; width: 100%; text-align: center; border-bottom: 1px solid #333;}
 #controls{
-  display:flex; flex-wrap:wrap; gap:8px; justify-content:center; 
-  margin-bottom:20px;
-  position:relative;
-  z-index:9999; /* Toujours au-dessus de tout */
+  display:flex; flex-wrap:wrap; gap:6px; justify-content:center; 
+  margin-bottom:15px; position:relative; z-index:9999;
 }
 #controls button{
-  background:var(--card); border:1px solid #333; border-radius:10px;
-  padding:12px 10px; color:var(--text); font-weight:bold;
-  cursor:pointer; font-size: 13px;
-  flex: 1 1 28%; /* S'adapte mieux aux petits écrans */
-  min-width: 80px;
+  background:var(--card); border:1px solid #444; border-radius:8px;
+  padding:8px 5px; color:var(--text); font-weight:bold;
+  cursor:pointer; font-size: 11px; flex: 1 1 22%; min-width: 75px;
 }
+#controls button:active { background: var(--accent); color: #000; transform: scale(0.95); }
+#controls .btn-clear { border-color: var(--danger); color: var(--danger); flex: 1 1 100%; margin-bottom: 5px;}
 
+/* AFFICHAGE */
 #canvasContainer{
-  position:relative; width:100%; height:300px; margin:auto;
-  border-radius:16px; background:#1b1b1b; 
+  position:relative; width:100%; height:320px; margin:auto;
+  border-radius:12px; background:#1b1b1b; box-shadow: 0 0 20px rgba(0,0,0,0.5);
   overflow:hidden;
-  touch-action: none; /* Laisse Three.js gérer le tactile */
 }
+#canvas2D{ position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; pointer-events: none; }
+#threejs-container{ position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; }
 
-/* LA CORRECTION MOBILE ICI */
-#canvas2D{
-  position:absolute; top:0; left:0; width:100%; height:100%; 
-  z-index:10; 
-  pointer-events: none; /* TES DOIGTS PASSENT À TRAVERS POUR CLIQUER LES BOUTONS */
-}
-
-#threejs-container{
-  position:absolute; top:0; left:0; width:100%; height:100%; 
-  z-index:5;
-}
-
-#definition{text-align:center;margin-top:15px;color:var(--accent);min-height:40px;font-size:14px;}
+#definition{ text-align:center; margin-top:10px; color:var(--accent); font-size:14px; min-height:40px; padding:5px;}
 </style>
 </head>
 <body>
 
-<header>
-  <h1>CalcPro Géo</h1>
-</header>
+<header><h1>CalcPro Géométrie</h1></header>
 
 <div id="controls">
-  <button onclick="drawShape2D('carré')">Carré</button>
-  <button onclick="drawShape2D('cercle')">Cercle</button>
-  <button onclick="drawShape2D('triangle')">Triangle</button>
-  <button onclick="draw3DShape('cube')">Cube 3D</button>
-  <button onclick="draw3DShape('sphere')">Sphère 3D</button>
-  <button onclick="draw3DShape('tore')">Tore 3D</button>
+  <button class="btn-clear" onclick="clearAll()">EFFACER TOUT</button>
+  
+  <div class="section-title">Figures 2D</div>
+  <button onclick="draw2D('carré')">Carré</button>
+  <button onclick="draw2D('rectangle')">Rect.</button>
+  <button onclick="draw2D('cercle')">Cercle</button>
+  <button onclick="draw2D('triangle')">Triangle</button>
+  <button onclick="draw2D('losange')">Losange</button>
+  <button onclick="draw2D('pentagone')">Pentagone</button>
+  <button onclick="draw2D('hexagone')">Hexagone</button>
+  <button onclick="draw2D('etoile')">Étoile</button>
+
+  <div class="section-title">Figures 3D</div>
+  <button onclick="draw3D('cube')">Cube</button>
+  <button onclick="draw3D('sphere')">Sphère</button>
+  <button onclick="draw3D('cylindre')">Cylindre</button>
+  <button onclick="draw3D('cone')">Cône</button>
+  <button onclick="draw3D('pyramide')">Pyramide</button>
+  <button onclick="draw3D('tore')">Tore</button>
+  <button onclick="draw3D('octaedre')">Octaèdre</button>
+  <button onclick="draw3D('dodécaèdre')">Dodécaèdre</button>
 </div>
 
 <div id="canvasContainer">
@@ -78,7 +82,7 @@ header h1{margin:0;font-size:1.5em;color:var(--accent);}
   <div id="threejs-container"></div>
 </div>
 
-<div id="definition">Clique sur un bouton pour commencer</div>
+<div id="definition">Prêt à dessiner !</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
@@ -87,58 +91,91 @@ const canvas2D = document.getElementById('canvas2D');
 const ctx = canvas2D.getContext('2d');
 const def = document.getElementById('definition');
 const container3D = document.getElementById('threejs-container');
+let scene, camera, renderer, controls3D, current3D = null;
+
+// INIT 3D
+function init() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1b1b1b);
+  camera = new THREE.PerspectiveCamera(75, container3D.clientWidth/container3D.clientHeight, 0.1, 1000);
+  camera.position.z = 5;
+  renderer = new THREE.WebGLRenderer({antialias:true});
+  container3D.appendChild(renderer.domElement);
+  scene.add(new THREE.AmbientLight(0x404040), new THREE.PointLight(0xffffff, 1));
+  controls3D = new THREE.OrbitControls(camera, renderer.domElement);
+  resize(); animate();
+}
 
 function resize(){
-  canvas2D.width = canvas2D.offsetWidth;
-  canvas2D.height = canvas2D.offsetHeight;
-  if(renderer){
-    camera.aspect = container3D.clientWidth / container3D.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container3D.clientWidth, container3D.clientHeight);
-  }
+  canvas2D.width = container3D.clientWidth;
+  canvas2D.height = container3D.clientHeight;
+  camera.aspect = canvas2D.width / canvas2D.height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(canvas2D.width, canvas2D.height);
 }
-window.addEventListener('resize', resize);
 
-// Setup 3D
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1b1b1b);
-const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-camera.position.z = 5;
-
-const renderer = new THREE.WebGLRenderer({antialias:true});
-container3D.appendChild(renderer.domElement);
-
-const light = new THREE.DirectionalLight(0xffffff,1);
-light.position.set(5,5,5);
-scene.add(light, new THREE.AmbientLight(0x404040));
-
-const controls3D = new THREE.OrbitControls(camera, renderer.domElement);
-let current3D = null;
-
-function clear(){
+function clearAll(){
   ctx.clearRect(0,0,canvas2D.width,canvas2D.height);
   if(current3D) { scene.remove(current3D); current3D = null; }
+  def.textContent = "Écran vidé.";
 }
 
-function drawShape2D(shape){
-  clear();
-  ctx.fillStyle="#00ffcc";
+// DESSIN 2D
+function draw2D(type){
+  clearAll();
+  ctx.fillStyle="#00ffcc"; ctx.strokeStyle="#00ffcc"; ctx.lineWidth=3;
   const x = canvas2D.width/2, y = canvas2D.height/2;
-  if(shape==='carré') ctx.fillRect(x-50,y-50,100,100);
-  if(shape==='cercle') { ctx.beginPath(); ctx.arc(x,y,50,0,Math.PI*2); ctx.fill(); }
-  if(shape==='triangle') { ctx.beginPath(); ctx.moveTo(x,y-50); ctx.lineTo(x-60,y+50); ctx.lineTo(x+60,y+50); ctx.fill(); }
-  def.textContent = "Figure 2D : " + shape;
+  
+  switch(type){
+    case 'carré': ctx.fillRect(x-60,y-60,120,120); break;
+    case 'rectangle': ctx.fillRect(x-80,y-50,160,100); break;
+    case 'cercle': ctx.beginPath(); ctx.arc(x,y,60,0,Math.PI*2); ctx.fill(); break;
+    case 'triangle': drawPoly(x, y, 60, 3); break;
+    case 'losange': 
+      ctx.beginPath(); ctx.moveTo(x,y-70); ctx.lineTo(x+50,y); ctx.lineTo(x,y+70); ctx.lineTo(x-50,y); ctx.closePath(); ctx.fill(); break;
+    case 'pentagone': drawPoly(x, y, 60, 5); break;
+    case 'hexagone': drawPoly(x, y, 60, 6); break;
+    case 'etoile': drawStar(x, y, 5, 60, 25); break;
+  }
+  def.textContent = "Figure 2D : " + type.toUpperCase();
 }
 
-function draw3DShape(shape){
-  clear();
+function drawPoly(x, y, r, sides) {
+  ctx.beginPath();
+  for(let i=0; i<sides; i++){
+    const ang = i * (Math.PI*2/sides) - Math.PI/2;
+    ctx.lineTo(x + r*Math.cos(ang), y + r*Math.sin(ang));
+  }
+  ctx.closePath(); ctx.fill();
+}
+
+function drawStar(x, y, p, rOut, rIn) {
+  ctx.beginPath();
+  for(let i=0; i<p*2; i++){
+    const r = i%2===0 ? rOut : rIn;
+    const ang = i * (Math.PI/p) - Math.PI/2;
+    ctx.lineTo(x + r*Math.cos(ang), y + r*Math.sin(ang));
+  }
+  ctx.closePath(); ctx.fill();
+}
+
+// DESSIN 3D
+function draw3D(type){
+  clearAll();
   let geo;
-  if(shape==='cube') geo = new THREE.BoxGeometry(2,2,2);
-  if(shape==='sphere') geo = new THREE.SphereGeometry(1.5,32,32);
-  if(shape==='tore') geo = new THREE.TorusGeometry(1,0.4,16,100);
-  current3D = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({color:0x00ffcc}));
+  switch(type){
+    case 'cube': geo = new THREE.BoxGeometry(2,2,2); break;
+    case 'sphere': geo = new THREE.SphereGeometry(1.5,32,32); break;
+    case 'cylindre': geo = new THREE.CylinderGeometry(1,1,2.5,32); break;
+    case 'cone': geo = new THREE.ConeGeometry(1.5,3,32); break;
+    case 'pyramide': geo = new THREE.ConeGeometry(1.5,2.5,4); break;
+    case 'tore': geo = new THREE.TorusGeometry(1,0.4,16,100); break;
+    case 'octaedre': geo = new THREE.OctahedronGeometry(1.8); break;
+    case 'dodécaèdre': geo = new THREE.DodecahedronGeometry(1.5); break;
+  }
+  current3D = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({color:0x00ffcc, flatShading:true}));
   scene.add(current3D);
-  def.textContent = "Figure 3D : " + shape + " (Fais glisser pour tourner)";
+  def.textContent = "Figure 3D : " + type.toUpperCase();
 }
 
 function animate(){
@@ -147,8 +184,9 @@ function animate(){
   controls3D.update();
   renderer.render(scene, camera);
 }
-resize();
-animate();
+
+window.addEventListener('resize', resize);
+init();
 </script>
 </body>
 </html>
