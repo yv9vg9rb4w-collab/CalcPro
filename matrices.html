@@ -2,127 +2,224 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro – Matrices ULTRA</title>
+<title>CalcPro - Calcul Matrices</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
-
 <style>
-body{margin:0;background:#121212;color:white;font-family:Arial,sans-serif;}
-header{text-align:center;padding:20px;font-size:24px;color:#60a5fa;font-weight:bold;}
-.container{max-width:700px;margin:auto;background:#1e1e2f;padding:20px;border-radius:15px;box-shadow:0 0 25px rgba(0,0,0,.6);}
-.matrix-box{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
-textarea{width:100%;height:120px;background:#0b0e1a;color:#60a5fa;border:none;border-radius:10px;padding:10px;font-size:15px;resize:none;}
-.buttons{display:grid;grid-template-columns:repeat(auto-fit, minmax(120px,1fr));gap:15px;margin-top:20px;}
-button{padding:15px;font-size:16px;border:none;border-radius:12px;cursor:pointer;background:#2563eb;color:white;font-weight:bold;transition:0.2s;}
-button:hover{background:#3b82f6;transform:scale(1.05);}
-.result{margin-top:15px;background:#0b0e1a;padding:15px;border-radius:10px;min-height:70px;white-space:pre-wrap;color:#60a5fa;font-size:16px;}
-footer{text-align:center;margin-top:20px;color:#aaa;font-size:13px;}
-table{border-collapse:collapse;}
-td{border:1px solid #60a5fa;padding:6px;text-align:center;}
+:root{
+  --accent:#00ffcc;
+  --bg:#0d0d0d;
+  --card:#1a1a1a;
+  --text:#ffffff;
+}
+body{
+  margin:0; padding:10px;
+  font-family:sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+h2{text-align:center;color:var(--accent);}
+.interface{
+  display:flex; flex-direction:column; gap:10px; max-width:800px; margin:auto;
+}
+input[type=number]{
+  width:50px; padding:4px; margin:2px;
+  border-radius:4px; border:1px solid #333; background:var(--card); color:var(--text);
+  text-align:center;
+}
+button{
+  padding:8px 12px;
+  margin:4px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  background:var(--card);
+  color:var(--text);
+}
+button:hover{background:var(--accent); color:black;}
+#result{
+  margin-top:10px;
+  padding:10px;
+  background:#111;
+  border-radius:8px;
+  min-height:60px;
+  white-space:pre-wrap;
+}
+.flex-row{display:flex; flex-wrap:wrap; gap:5px;}
+.matrix-container{
+  display:flex; flex-direction:column; gap:5px; margin-bottom:10px;
+}
+.matrix-row{display:flex; gap:5px;}
+.title-section{color:var(--accent); font-weight:bold; margin-top:10px; text-align:center;}
 </style>
 </head>
-
 <body>
-<header>🧮 Matrices ULTRA</header>
-<div class="container">
-  <div class="matrix-box">
-    <textarea id="A" placeholder="Matrice A&#10;Ex: 1 2&#10;3 4"></textarea>
-    <textarea id="B" placeholder="Matrice B&#10;Ex: 5 6&#10;7 8"></textarea>
+
+<h2>CalcPro - Calcul Matrices</h2>
+
+<div class="interface">
+
+  <div class="title-section">Matrice A</div>
+  <div id="matrixA" class="matrix-container"></div>
+
+  <div class="title-section">Matrice B</div>
+  <div id="matrixB" class="matrix-container"></div>
+
+  <div class="title-section">Actions</div>
+  <div class="flex-row">
+    <button onclick="addMatrices()">A + B</button>
+    <button onclick="subMatrices()">A - B</button>
+    <button onclick="mulMatrices()">A × B</button>
+    <button onclick="transposeMatrix('A')">Transpose A</button>
+    <button onclick="transposeMatrix('B')">Transpose B</button>
+    <button onclick="detMatrix('A')">Det A</button>
+    <button onclick="detMatrix('B')">Det B</button>
+    <button onclick="inverseMatrix('A')">Inverse A</button>
+    <button onclick="inverseMatrix('B')">Inverse B</button>
   </div>
 
-  <div class="buttons">
-    <button id="btnAdd">A + B</button>
-    <button id="btnSub">A − B</button>
-    <button id="btnMul">A × B</button>
-    <button id="btnDet">det(A)</button>
-    <button id="btnInv">A⁻¹</button>
-    <button id="btnTrans">Aᵀ</button>
+  <div class="title-section">Paramètres</div>
+  <div class="flex-row">
+    <label>Lignes: <input type="number" id="rows" value="2" min="1" max="5"></label>
+    <label>Colonnes: <input type="number" id="cols" value="2" min="1" max="5"></label>
+    <button onclick="generateMatrices()">Créer matrices</button>
   </div>
 
-  <div class="result" id="result">Résultat…</div>
+  <div id="result"></div>
+
 </div>
-<footer>CalcPro © Lebbar Yahya</footer>
 
 <script>
-// PARSE matrice (espaces, virgules, tabulations)
-function parseMatrix(text){
-  const rows = text.trim().split(/\n/);
-  const matrix = rows.map(row=>{
-    const nums = row.trim().split(/[\s,]+/).map(Number);
-    if(nums.some(isNaN)) throw "Format incorrect"; // validation
-    return nums;
-  });
+// 🌟 Variables globales
+let matrixA = [];
+let matrixB = [];
 
-  // Vérifier que toutes les lignes ont le même nombre de colonnes
-  const nCols = matrix[0].length;
-  if(!matrix.every(r=>r.length === nCols)) throw "Toutes les lignes doivent avoir le même nombre de colonnes";
-  return math.matrix(matrix);
+function generateMatrices(){
+  const rows = parseInt(document.getElementById("rows").value);
+  const cols = parseInt(document.getElementById("cols").value);
+  matrixA = createMatrixInputs("matrixA", rows, cols);
+  matrixB = createMatrixInputs("matrixB", rows, cols);
+  document.getElementById("result").textContent = "Matrices créées !";
 }
 
-// AFFICHER matrice en tableau HTML
-function showMatrix(mat){
-  if(typeof mat==="number") return mat;
-  const arr = mat._data || mat;
-  let html="<table>";
-  arr.forEach(r=>{
-    html+="<tr>";
-    r.forEach(c=>html+="<td>"+c+"</td>");
-    html+="</tr>";
-  });
-  html+="</table>";
-  return html;
+function createMatrixInputs(containerId, rows, cols){
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  const matrix = [];
+  for(let i=0;i<rows;i++){
+    const rowDiv = document.createElement("div");
+    rowDiv.className="matrix-row";
+    const row = [];
+    for(let j=0;j<cols;j++){
+      const input = document.createElement("input");
+      input.type="number"; input.value="0";
+      rowDiv.appendChild(input);
+      row.push(input);
+    }
+    container.appendChild(rowDiv);
+    matrix.push(row);
+  }
+  return matrix;
 }
 
-function display(result){document.getElementById("result").innerHTML=showMatrix(result);}
+// 🌟 Fonctions de calcul
+function readMatrix(matrix){
+  return matrix.map(row=>row.map(input=>parseFloat(input.value)));
+}
 
-// RÉCUPÉRATION DES ÉLÉMENTS
-const A = document.getElementById("A");
-const B = document.getElementById("B");
-const result = document.getElementById("result");
+function showResult(msg){
+  document.getElementById("result").textContent = msg;
+}
 
-// FONCTIONS DES BOUTONS
-document.getElementById("btnAdd").addEventListener("click",()=>{
-  try{
-    display(math.add(parseMatrix(A.value),parseMatrix(B.value)));
-  }catch(e){result.innerText="❌ "+e;}
-});
+// Addition
+function addMatrices(){
+  const A = readMatrix(matrixA);
+  const B = readMatrix(matrixB);
+  if(A.length!==B.length || A[0].length!==B[0].length){
+    showResult("Erreur : dimensions différentes !");
+    return;
+  }
+  const R = A.map((row,i)=>row.map((val,j)=>val+B[i][j]));
+  showResult(matrixToString(R));
+}
 
-document.getElementById("btnSub").addEventListener("click",()=>{
-  try{
-    display(math.subtract(parseMatrix(A.value),parseMatrix(B.value)));
-  }catch(e){result.innerText="❌ "+e;}
-});
+// Soustraction
+function subMatrices(){
+  const A = readMatrix(matrixA);
+  const B = readMatrix(matrixB);
+  if(A.length!==B.length || A[0].length!==B[0].length){
+    showResult("Erreur : dimensions différentes !");
+    return;
+  }
+  const R = A.map((row,i)=>row.map((val,j)=>val-B[i][j]));
+  showResult(matrixToString(R));
+}
 
-document.getElementById("btnMul").addEventListener("click",()=>{
-  try{
-    const MA = parseMatrix(A.value);
-    const MB = parseMatrix(B.value);
-    display(math.multiply(MA,MB));
-  }catch(e){result.innerText="❌ "+e;}
-});
+// Multiplication
+function mulMatrices(){
+  const A = readMatrix(matrixA);
+  const B = readMatrix(matrixB);
+  if(A[0].length!==B.length){
+    showResult("Erreur : colonnes de A ≠ lignes de B !");
+    return;
+  }
+  const R = [];
+  for(let i=0;i<A.length;i++){
+    R[i]=[];
+    for(let j=0;j<B[0].length;j++){
+      let sum=0;
+      for(let k=0;k<B.length;k++){
+        sum+=A[i][k]*B[k][j];
+      }
+      R[i][j]=sum;
+    }
+  }
+  showResult(matrixToString(R));
+}
 
-document.getElementById("btnDet").addEventListener("click",()=>{
-  try{
-    const MA = parseMatrix(A.value);
-    if(MA._size[0]!==MA._size[1]) throw "La matrice doit être carrée";
-    display(math.det(MA));
-  }catch(e){result.innerText="❌ "+e;}
-});
+// Transpose
+function transposeMatrix(name){
+  const M = name==="A"? readMatrix(matrixA) : readMatrix(matrixB);
+  const R = M[0].map((_,i)=>M.map(row=>row[i]));
+  showResult(matrixToString(R));
+}
 
-document.getElementById("btnInv").addEventListener("click",()=>{
-  try{
-    const MA = parseMatrix(A.value);
-    if(MA._size[0]!==MA._size[1]) throw "La matrice doit être carrée";
-    display(math.inv(MA));
-  }catch(e){result.innerText="❌ "+e;}
-});
+// Déterminant (seulement 2x2 ou 3x3)
+function detMatrix(name){
+  const M = name==="A"? readMatrix(matrixA) : readMatrix(matrixB);
+  if(M.length!==M[0].length){ showResult("Erreur : pas carré !"); return;}
+  let det;
+  if(M.length===2){
+    det = M[0][0]*M[1][1]-M[0][1]*M[1][0];
+  } else if(M.length===3){
+    det = M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])
+        - M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])
+        + M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
+  } else { showResult("Determinant seulement 2x2 ou 3x3"); return;}
+  showResult("det("+name+") = "+det);
+}
 
-document.getElementById("btnTrans").addEventListener("click",()=>{
-  try{
-    display(math.transpose(parseMatrix(A.value)));
-  }catch(e){result.innerText="❌ "+e;}
-});
+// Inverse (2x2 seulement)
+function inverseMatrix(name){
+  const M = name==="A"? readMatrix(matrixA) : readMatrix(matrixB);
+  if(M.length!==2 || M[0].length!==2){ showResult("Inverse seulement 2x2"); return;}
+  const det = M[0][0]*M[1][1]-M[0][1]*M[1][0];
+  if(det===0){ showResult("Erreur : determinant = 0, pas d'inverse"); return;}
+  const R = [
+    [ M[1][1]/det, -M[0][1]/det],
+    [-M[1][0]/det,  M[0][0]/det]
+  ];
+  showResult(matrixToString(R));
+}
+
+// 🌟 Helper
+function matrixToString(M){
+  return M.map(row=>row.join("\t")).join("\n");
+}
+
+// Générer au départ
+generateMatrices();
+
 </script>
 </body>
 </html>
