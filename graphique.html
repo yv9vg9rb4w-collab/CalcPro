@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro • Ultimate</title>
+<title>CalcPro • Graphique </title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,18 +14,32 @@ body{
     font-family: Arial,sans-serif;
     display:flex;
     justify-content:center;
-    align-items:flex-start;
-    min-height:100vh;
     padding:20px;
     color:white;
 }
+.container{
+    display:flex;
+    gap:20px;
+    width:100%;
+    max-width:1200px;
+}
 .box{
-    width:95%;
-    max-width:1100px;
+    flex:3;
     background:#020617;
     border-radius:20px;
     padding:25px;
     box-shadow:0 30px 60px rgba(0,0,0,.6);
+}
+.info{
+    flex:1;
+    background:#0f172a;
+    border-radius:20px;
+    padding:20px;
+    font-size:16px;
+    line-height:1.5;
+    color:#facc15;
+    max-height:600px;
+    overflow-y:auto;
 }
 .title{
     text-align:center;
@@ -34,10 +48,9 @@ body{
     color:#38bdf8;
     margin-bottom:15px;
 }
-textarea{
+input{
     width:100%;
-    height:60px;
-    padding:12px;
+    padding:14px;
     border-radius:12px;
     border:1px solid #334155;
     background:#0f172a;
@@ -74,10 +87,12 @@ button{
 </head>
 <body>
 
-<div class="box">
-<div class="title">📊 CalcPro • GeoGraph Ultimate</div>
+<div class="container">
 
-<textarea id="fxs" placeholder="Entrez plusieurs fonctions séparées par des virgules, ex: x^2-2*x+1, sin(x), 1/x"></textarea>
+<div class="box">
+<div class="title">📊 CalcPro • Graphique Avancé</div>
+
+<input id="fx" placeholder="">
 
 <div class="btns">
 <button class="zoomIn" onclick="zoom(0.5)">ZOOM +</button>
@@ -89,56 +104,88 @@ button{
 <canvas id="graph2D"></canvas>
 </div>
 
+<div class="info">
+<b>💡 Astuces pour entrer vos fonctions :</b><br>
+- Racine carrée : <code>sqrt(x)</code> ou <code>racin(x)</code><br>
+- Puissance : <code>x^2</code> ou <code>x^3</code><br>
+- Exponentielle : <code>e^x</code><br>
+- Pi : <code>π</code> ou <code>pi</code><br>
+- Valeur absolue : <code>abs(x)</code><br>
+- Sinus : <code>sin(x)</code> | Cosinus : <code>cos(x)</code> | Tangente : <code>tg(x)</code> ou <code>tan(x)</code><br>
+- Logarithmes : <code>ln(x)</code> ou <code>log(x)</code><br>
+- Fonctions linéaires / affines : <code>y = ax + b + c</code><br>
+- Fractions : <code>1/x</code><br>
+- Plusieurs fonctions : séparées par <code>,</code><br>
+- Exemple complet : <code>2*x^2-3*x+1, sin(x), 1/x</code>
+</div>
+
+</div>
+
 <script>
 let ctx = document.getElementById("graph2D");
 let chart;
 let scale = 10;
-let colors = ['#38bdf8','#f472b6','#22c55e','#facc15','#8b5cf6','#fb923c','#3b82f6','#ec4899'];
 
-// Parse fonction
 function parseFunction(f,x){
-    try{
-        return f.replace(/\^/g,"**")
-                .replace(/racin/gi,"Math.sqrt")
-                .replace(/sqrt/gi,"Math.sqrt")
-                .replace(/sin/gi,"Math.sin")
-                .replace(/cos/gi,"Math.cos")
-                .replace(/tg/gi,"Math.tan")
-                .replace(/tan/gi,"Math.tan")
-                .replace(/ln/gi,"Math.log")
-                .replace(/log/gi,"Math.log10")
-                .replace(/e/gi,"Math.E")
-                .replace(/π/gi,"Math.PI")
-                .replace(/abs/gi,"Math.abs")
-                .replace(/x/gi,`(${x})`);
-    } catch {
-        return "0";
+    return f.replace(/\^/g,"**")
+            .replace(/racin/gi,"Math.sqrt")
+            .replace(/sqrt/gi,"Math.sqrt")
+            .replace(/sin/gi,"Math.sin")
+            .replace(/cos/gi,"Math.cos")
+            .replace(/tg/gi,"Math.tan")
+            .replace(/tan/gi,"Math.tan")
+            .replace(/ln/gi,"Math.log")
+            .replace(/log/gi,"Math.log10")
+            .replace(/e/gi,"Math.E")
+            .replace(/π/gi,"Math.PI")
+            .replace(/abs/gi,"Math.abs")
+            .replace(/x/gi,`(${x})`);
+}
+
+function analyseEquation(f){
+    let fNorm = f.replace(/\s/g,'');
+    let eq="";
+    if(/x\*\*3|x\^3/.test(fNorm)){
+        eq="Cubique: y = ax³ + bx² + cx + d";
+    } else if(/x\*\*2|x\^2/.test(fNorm)){
+        eq="Quadratique: y = ax² + bx + c";
+    } else if(/x/.test(fNorm)){
+        eq="Affine/Linéaire: y = ax + b + c";
+    } else{
+        eq="Fonction spéciale ou constante";
     }
+    return eq;
 }
 
 function draw(){
-    let input = document.getElementById("fxs").value;
-    let res = document.getElementById("res");
-    if(!input) return;
+    const f = document.getElementById("fx").value;
+    const res = document.getElementById("res");
+    if(!f) return;
 
-    let funcs = input.split(',').map(f=>f.trim());
-    let xVals=[], datasets=[], intersections=[];
+    let funcs = f.split(',').map(fn=>fn.trim());
+    let xVals=[], datasets=[], sumYTotal=0;
 
     for(let i=0;i<funcs.length;i++){
-        let f = funcs[i];
-        let yVals=[], prevY=null;
-        for(let x=-scale; x<=scale; x+=0.1){
+        let fn=funcs[i];
+        let yVals=[], sumY=0;
+        for(let x=-scale;x<=scale;x+=0.1){
             let y=NaN;
-            try{ y = eval(parseFunction(f,x)); } catch{}
-            if(isFinite(y)) yVals.push(y);
-            else yVals.push(null);
-            if(prevY!==null && Math.abs(prevY-y)<0.1){
-                intersections.push({x:x.toFixed(2),y:y.toFixed(2)});
-            }
-            prevY=y;
-            if(i===0) xVals.push(x.toFixed(2));
+            try{ y=eval(parseFunction(fn,x)); }catch{}
+            if(isFinite(y)){
+                yVals.push(y);
+                sumY+=y;
+                if(i===0) xVals.push(x.toFixed(2));
+            } else yVals.push(null);
         }
-        datasets.push({label:f,data:yVals,borderColor:colors[i%colors.length],tension:0.3,pointRadius:0});
+        datasets.push({
+            label:"f(x)="+fn,
+            data:yVals,
+            borderColor:'#38bdf8',
+            tension:0.3,
+            pointRadius:4,
+            pointBackgroundColor:'#facc15'
+        });
+        sumYTotal+=sumY;
     }
 
     if(chart) chart.destroy();
@@ -155,25 +202,15 @@ function draw(){
         }
     });
 
-    if(intersections.length>0){
-        let txt = "🎯 Intersections: ";
-        intersections.forEach(p=>{txt+=`(${p.x},${p.y}) `;});
-        res.innerHTML = txt;
-    } else res.innerHTML = "Pas d'intersections détectées";
+    let eqTxt=funcs.map(fa=>analyseEquation(fa)).join(' | ');
+    res.innerHTML=`${eqTxt} | Σy ≈ ${sumYTotal.toFixed(2)} | Points affichés`;
 }
 
 // Zoom
 function zoom(factor){ scale*=factor; draw(); }
+function resetGraph(){ document.getElementById("fx").value=""; document.getElementById("res").innerHTML=""; if(chart) chart.destroy(); }
 
-// Reset
-function resetGraph(){
-    document.getElementById("fxs").value="";
-    document.getElementById("res").innerHTML="";
-    if(chart) chart.destroy();
-}
-
-// Event input
-document.getElementById("fxs").addEventListener("input",draw);
+document.getElementById("fx").addEventListener("input",draw);
 draw();
 </script>
 
