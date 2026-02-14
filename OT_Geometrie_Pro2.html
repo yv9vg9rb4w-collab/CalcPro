@@ -79,6 +79,7 @@ body {
 #canvas2D {
   width:100%;
   height:100%;
+  display:block;
 }
 #definition {
   text-align:center;
@@ -110,14 +111,9 @@ body {
     <button class="btn-shape" onclick="draw2D('pentagone')">Pentagone</button>
     <button class="btn-shape" onclick="draw2D('hexagone')">Hexagone</button>
     <button class="btn-shape" onclick="draw2D('octogone')">Octogone</button>
-    <button class="btn-shape" onclick="draw2D('spirale')">Spirale</button>
     <button class="btn-shape" onclick="draw2D('polygone12')">Dodécagone</button>
     <button class="btn-shape" onclick="draw2D('polygone20')">Icosagone</button>
-    <button class="btn-shape" onclick="draw2D('etoile')">Étoile</button>
-    <button class="btn-shape" onclick="draw2D('coeur')">Cœur</button>
-    <button class="btn-shape" onclick="draw2D('croix')">Croix</button>
-    <button class="btn-shape" onclick="draw2D('fleche')">Flèche</button>
-    <button class="btn-shape" onclick="draw2D('lune')">Lune</button>
+    <button class="btn-shape" onclick="draw2D('spirale')">Spirale</button>
 
   </div>
 </div>
@@ -129,11 +125,15 @@ body {
 <div id="definition">Choisissez une figure</div>
 
 <script>
-// 🌟 Variables
+// 🌟 Ajustement automatique du canvas
 const canvas = document.getElementById("canvas2D");
 const ctx = canvas.getContext("2d");
-canvas.width = canvas.clientWidth;
-canvas.height = canvas.clientHeight;
+function resizeCanvas(){
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
 const def = document.getElementById("definition");
 
 // 🌟 Réinitialiser
@@ -142,19 +142,22 @@ function resetAll(){
   def.textContent="Écran nettoyé";
 }
 
-// 🌟 Dessiner 2D
+// 🌟 Dessin 2D
 function draw2D(type){
   resetAll();
   ctx.fillStyle="#00ffcc";
-  ctx.beginPath();
+  ctx.strokeStyle="#00ffcc";
+  ctx.lineWidth=2;
   const x = canvas.width/2;
   const y = canvas.height/2;
 
-  // Figures classiques
+  ctx.beginPath();
+
+  // Figures de base
   if(type==="carre") ctx.fillRect(x-60,y-60,120,120);
   else if(type==="rect") ctx.fillRect(x-90,y-50,180,100);
-  else if(type==="cercle"){ctx.arc(x,y,70,0,Math.PI*2); ctx.fill();}
-  else if(type==="ellipse"){ctx.ellipse(x,y,90,50,0,0,Math.PI*2); ctx.fill();}
+  else if(type==="cercle") { ctx.arc(x,y,70,0,Math.PI*2); ctx.fill();}
+  else if(type==="ellipse"){ ctx.ellipse(x,y,90,50,0,0,Math.PI*2); ctx.fill();}
   else if(type==="losange"){ctx.moveTo(x,y-70);ctx.lineTo(x-90,y);ctx.lineTo(x,y+70);ctx.lineTo(x+90,y);ctx.closePath();ctx.fill();}
   else if(type==="trapeze"){ctx.moveTo(x-80,y+60);ctx.lineTo(x+80,y+60);ctx.lineTo(x+50,y-60);ctx.lineTo(x-50,y-60);ctx.closePath();ctx.fill();}
   else if(type==="para"){ctx.moveTo(x-80,y-60);ctx.lineTo(x+40,y-60);ctx.lineTo(x+80,y+60);ctx.lineTo(x-40,y+60);ctx.closePath();ctx.fill();}
@@ -181,7 +184,7 @@ function draw2D(type){
   else if(type==="spirale") drawSpiral();
 
   ctx.fill();
-  def.textContent=type.toUpperCase();
+  def.textContent = type.toUpperCase();
 }
 
 // 🌟 Polygone régulier
