@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro • GeoGraph Plus</title>
+<title>CalcPro • GeoGraph Max</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -21,10 +21,10 @@ body{
 }
 .box{
     width:95%;
-    max-width:900px;
+    max-width:1000px;
     background:#020617;
     border-radius:20px;
-    padding:20px;
+    padding:25px;
     box-shadow:0 30px 60px rgba(0,0,0,.6);
 }
 .title{
@@ -36,7 +36,7 @@ body{
 }
 input{
     width:100%;
-    padding:12px;
+    padding:14px;
     border-radius:12px;
     border:1px solid #334155;
     background:#0f172a;
@@ -50,7 +50,7 @@ canvas{
     background:#0f172a;
 }
 .result{
-    margin-top:10px;
+    margin-top:15px;
     color:#facc15;
 }
 .btns{
@@ -74,9 +74,9 @@ button{
 <body>
 
 <div class="box">
-<div class="title">📊 CalcPro • GeoGraph Plus</div>
+<div class="title">📊 CalcPro • GeoGraph Max</div>
 
-<input id="fx" placeholder="f(x) ex: x^2 - 4x + 3">
+<input id="fx" placeholder="Ex: x^2-3x+2, sin(x), ln(x), 1/x, racin(x), e^x">
 
 <div class="btns">
 <button class="zoomIn" onclick="zoom(0.5)">ZOOM +</button>
@@ -86,6 +86,7 @@ button{
 
 <div class="result" id="res"></div>
 <canvas id="graph2D"></canvas>
+
 </div>
 
 <script>
@@ -100,10 +101,13 @@ function parseFunction(f,x){
             .replace(/cos/gi,"Math.cos")
             .replace(/tg/gi,"Math.tan")
             .replace(/tan/gi,"Math.tan")
-            .replace(/log/gi,"Math.log10")
             .replace(/ln/gi,"Math.log")
+            .replace(/log/gi,"Math.log10")
+            .replace(/e/gi,"Math.E")
             .replace(/π/gi,"Math.PI")
-            .replace(/x/gi,`(${x})`);
+            .replace(/x/gi,`(${x})`)
+            .replace(/abs/gi,"Math.abs")
+            .replace(/sqrt/gi,"Math.sqrt");
 }
 
 function draw(){
@@ -113,7 +117,7 @@ function draw(){
 
     let xVals=[], yVals=[], sumY=0, points=[], axisSymmetry=null;
 
-    for(let x=-scale; x<=scale; x+=0.1){
+    for(let x=-scale;x<=scale;x+=0.1){
         try{
             let y = eval(parseFunction(f,x));
             if(isFinite(y)){
@@ -125,13 +129,13 @@ function draw(){
         }catch{}
     }
 
-    // Calcul axe de symétrie pour parabole ax^2+bx+c
+    // Axe de symétrie pour parabole ax^2+bx+c
     let fNorm = f.replace(/\s/g,'');
     let matchA = fNorm.match(/([+-]?\d*)x\^2/);
     let matchB = fNorm.match(/([+-]?\d*)x(?!\^)/);
     if(matchA){
-        let a = matchA[1]=="" || matchA[1]=="+" ? 1 : matchA[1]=="-" ? -1 : Number(matchA[1]);
-        let b = matchB ? (matchB[1]=="" || matchB[1]=="+" ? 1 : matchB[1]=="-" ? -1 : Number(matchB[1])) : 0;
+        let a = matchA[1]==""||matchA[1]=="+" ? 1 : matchA[1]=="-" ? -1 : Number(matchA[1]);
+        let b = matchB ? (matchB[1]==""||matchB[1]=="+" ? 1 : matchB[1]=="-" ? -1 : Number(matchB[1])) : 0;
         axisSymmetry = -b/(2*a);
     }
 
@@ -141,16 +145,14 @@ function draw(){
         type:'line',
         data:{
             labels:xVals,
-            datasets:[
-                {
-                    label:"f(x) = "+f,
-                    data:yVals,
-                    borderColor:'#38bdf8',
-                    tension:0.3,
-                    pointRadius:3,
-                    pointBackgroundColor:'#facc15'
-                }
-            ]
+            datasets:[{
+                label:"f(x) = "+f,
+                data:yVals,
+                borderColor:'#38bdf8',
+                tension:0.3,
+                pointRadius:4,
+                pointBackgroundColor:'#facc15'
+            }]
         },
         options:{
             responsive:true,
@@ -164,7 +166,7 @@ function draw(){
         }
     });
 
-    // Affichage des points, somme et axe de symétrie
+    // Affichage points, Σ, axe de symétrie
     let txt = `📍 Points: ${points.length} | Σy ≈ ${sumY.toFixed(2)}`;
     if(axisSymmetry!==null) txt += ` | Axe de symétrie: x=${axisSymmetry.toFixed(2)}`;
     res.innerHTML = txt;
