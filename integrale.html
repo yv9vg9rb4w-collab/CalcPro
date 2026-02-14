@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro - Intégrale Numérique</title>
+<title>CalcPro PRO - Intégrale Numérique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 :root{
@@ -19,7 +19,11 @@ body{
 }
 h2{text-align:center;color:var(--accent);}
 .interface{
-  display:flex; flex-direction:column; gap:10px; max-width:600px; margin:auto;
+  max-width:700px;
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 input[type=number], input[type=text]{
   width:80px; padding:5px; margin:2px;
@@ -39,16 +43,20 @@ button:hover{background:var(--accent); color:black;}
   padding:10px;
   background:#111;
   border-radius:8px;
-  min-height:50px;
   white-space:pre-wrap;
+  max-height:400px;
+  overflow:auto;
 }
 .flex-row{display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
 .title-section{color:var(--accent); font-weight:bold; margin-top:10px; text-align:center;}
+table{border-collapse:collapse; width:100%; margin-top:5px;}
+th, td{border:1px solid #333; padding:4px; text-align:center;}
+th{background:var(--card);}
 </style>
 </head>
 <body>
 
-<h2>CalcPro - Intégrale Numérique</h2>
+<h2>CalcPro PRO - Intégrale Numérique</h2>
 
 <div class="interface">
 
@@ -57,11 +65,11 @@ button:hover{background:var(--accent); color:black;}
     f(x) = <input type="text" id="func" value="x^2">
   </div>
 
-  <div class="title-section">Intervalle</div>
+  <div class="title-section">Intervalle et subdivisions</div>
   <div class="flex-row">
     a = <input type="number" id="a" value="0">
     b = <input type="number" id="b" value="1">
-    n (subdivisions) = <input type="number" id="n" value="100">
+    n = <input type="number" id="n" value="4">
   </div>
 
   <div class="title-section">Méthode</div>
@@ -78,7 +86,7 @@ button:hover{background:var(--accent); color:black;}
 <script>
 // 🌟 Fonction d’évaluation
 function evalFunc(fx, x){
-  fx = fx.replace(/\^/g, "**"); // convert ^ en puissance
+  fx = fx.replace(/\^/g,"**");
   try{
     return eval(fx);
   }catch(e){
@@ -86,45 +94,57 @@ function evalFunc(fx, x){
   }
 }
 
-// 🌟 Intégration numérique
+// 🌟 Fonction principale
 function computeIntegral(method){
   const fx = document.getElementById("func").value;
   const a = parseFloat(document.getElementById("a").value);
   const b = parseFloat(document.getElementById("b").value);
   let n = parseInt(document.getElementById("n").value);
-  if(n<=0) n=100;
+  if(n<=0) n=4;
   const h = (b-a)/n;
   let sum = 0;
+  let table = "<table><tr><th>i</th><th>x_i</th><th>f(x_i)</th></tr>";
 
   if(method==='rectangle'){
     for(let i=0;i<n;i++){
       const x = a + i*h;
-      sum += evalFunc(fx,x);
+      const y = evalFunc(fx,x);
+      sum += y;
+      table += `<tr><td>${i}</td><td>${x.toFixed(4)}</td><td>${y.toFixed(4)}</td></tr>`;
     }
     sum *= h;
+    table += "</table>";
   }
-
   else if(method==='trapeze'){
     for(let i=0;i<n;i++){
       const x0 = a + i*h;
       const x1 = x0 + h;
-      sum += (evalFunc(fx,x0)+evalFunc(fx,x1))/2 * h;
+      const y0 = evalFunc(fx,x0);
+      const y1 = evalFunc(fx,x1);
+      sum += (y0 + y1)/2*h;
+      table += `<tr><td>${i}</td><td>${x0.toFixed(4)}</td><td>${y0.toFixed(4)}</td></tr>`;
     }
+    table += "</table>";
   }
-
   else if(method==='simpson'){
-    if(n%2!==0) n+=1; // Simpson nécessite n pair
+    if(n%2!==0) n+=1;
     const h2 = (b-a)/n;
     let s = evalFunc(fx,a) + evalFunc(fx,b);
+    table += `<tr><td>0</td><td>${a.toFixed(4)}</td><td>${evalFunc(fx,a).toFixed(4)}</td></tr>`;
     for(let i=1;i<n;i++){
       const x = a + i*h2;
-      s += evalFunc(fx,x)*(i%2===0?2:4);
+      const y = evalFunc(fx,x);
+      s += y*(i%2===0?2:4);
+      table += `<tr><td>${i}</td><td>${x.toFixed(4)}</td><td>${y.toFixed(4)}</td></tr>`;
     }
     sum = s*h2/3;
+    table += `<tr><td>${n}</td><td>${b.toFixed(4)}</td><td>${evalFunc(fx,b).toFixed(4)}</td></tr>`;
+    table += "</table>";
   }
 
-  document.getElementById("result").textContent = `Méthode: ${method}\nRésultat ≈ ${sum}`;
+  document.getElementById("result").innerHTML = `<strong>Méthode:</strong> ${method}<br><strong>Résultat ≈</strong> ${sum.toFixed(6)}<br>${table}`;
 }
 </script>
+
 </body>
 </html>
