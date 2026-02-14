@@ -2,206 +2,164 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Géo | Correction Finale</title>
+<title>CalcPro Géo - Correction Strict</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-:root{
-  --bg:#0f0f0f; --card:#1b1b1b; --accent:#00ffcc;
-  --text:#ffffff; --muted:#aaaaaa; --danger:#ff4d4d;
-}
-body{
-  margin:0; padding:10px; font-family: sans-serif;
-  background:var(--bg); color:var(--text);
-  touch-action: manipulation;
-}
-header{text-align:center; margin-bottom:10px;}
-header h1{margin:0; font-size:1.4em; color:var(--accent);}
+    :root { --accent: #00ffcc; --bg: #0f0f0f; }
+    body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 10px; touch-action: manipulation; }
+    
+    /* Grille de boutons très claire */
+    .btn-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
+    button { 
+        background: #222; border: 1px solid #444; color: white; border-radius: 8px;
+        padding: 12px 5px; font-weight: bold; width: 22%; min-width: 80px; font-size: 11px;
+    }
+    button:active { background: var(--accent); color: black; }
+    .special { width: 100%; border-color: #ff4d4d; color: #ff4d4d; margin-bottom: 10px; }
 
-/* BOUTONS */
-.grid-btns {
-  display: grid; 
-  grid-template-columns: repeat(4, 1fr); 
-  gap: 5px; margin-bottom: 10px;
-}
-.section-title { 
-  grid-column: span 4; font-size: 11px; color: var(--muted); 
-  text-transform: uppercase; text-align: center; margin-top: 10px;
-}
-button {
-  background:var(--card); border:1px solid #444; border-radius:6px;
-  padding:10px 2px; color:var(--text); font-weight:bold;
-  font-size: 10px; cursor:pointer;
-}
-button:active { background: var(--accent); color: #000; }
-.btn-clear { grid-column: span 4; border-color: var(--danger); color: var(--danger); padding: 12px; font-size: 12px; }
-
-/* CANVAS */
-#canvasContainer{
-  position:relative; width:100%; height:300px; 
-  background:#111; border-radius:12px; overflow:hidden;
-  border: 1px solid #333;
-}
-#canvas2D{ position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; pointer-events: none; }
-#threejs-container{ position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
-
-#definition{ text-align:center; padding:10px; color:var(--accent); font-size:14px; min-height:40px; }
+    /* Zone d'affichage */
+    #ecran { 
+        position: relative; width: 100%; height: 350px; background: #000; 
+        border: 2px solid #333; border-radius: 15px; overflow: hidden; 
+    }
+    #leCanvas2D { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+    #leContainer3D { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+    
+    #info { text-align: center; padding: 15px; color: var(--accent); font-weight: bold; }
 </style>
 </head>
 <body>
 
-<header><h1>CalcPro Géo Fixed</h1></header>
-
-<div class="grid-btns">
-  <button class="btn-clear" onclick="effacerTout()">EFFACER TOUT</button>
-  
-  <div class="section-title">Figures 2D</div>
-  <button onclick="faire2D('carre')">Carré</button>
-  <button onclick="faire2D('rect')">Rect.</button>
-  <button onclick="faire2D('cercle')">Cercle</button>
-  <button onclick="faire2D('tri')">Triangle</button>
-  <button onclick="faire2D('penta')">Penta.</button>
-  <button onclick="faire2D('hexa')">Hexa.</button>
-  <button onclick="faire2D('losange')">Losange</button>
-  <button onclick="faire2D('etoile')">Étoile</button>
-
-  <div class="section-title">Figures 3D</div>
-  <button onclick="faire3D('cube')">Cube</button>
-  <button onclick="faire3D('sphere')">Sphère</button>
-  <button onclick="faire3D('cylindre')">Cylindre</button>
-  <button onclick="faire3D('cone')">Cône</button>
-  <button onclick="faire3D('pyramide')">Pyramide</button>
-  <button onclick="faire3D('tore')">Tore</button>
-  <button onclick="faire3D('octa')">Octaèdre</button>
-  <button onclick="faire3D('dode')">Dodeca.</button>
+<div class="btn-group">
+    <button class="special" onclick="toutEffacer()">EFFACER TOUT</button>
+    
+    <button onclick="btCarre()">CARRÉ</button>
+    <button onclick="btRect()">RECTANGLE</button>
+    <button onclick="btCercle()">CERCLE</button>
+    <button onclick="btTri()">TRIANGLE</button>
+    
+    <button onclick="btCube()">CUBE 3D</button>
+    <button onclick="btSphere()">SPHÈRE 3D</button>
+    <button onclick="btCylindre()">CYLINDRE 3D</button>
+    <button onclick="btTore()">TORE 3D</button>
 </div>
 
-<div id="canvasContainer">
-  <canvas id="canvas2D"></canvas>
-  <div id="threejs-container"></div>
+<div id="ecran">
+    <canvas id="leCanvas2D"></canvas>
+    <div id="leContainer3D"></div>
 </div>
 
-<div id="definition">Cliquez sur une figure</div>
+<div id="info">Choisissez une forme</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-const c2d = document.getElementById('canvas2D');
-const ctx = c2d.getContext('2d');
-const def = document.getElementById('definition');
-const container = document.getElementById('threejs-container');
+// Variables globales
+const canvas = document.getElementById('leCanvas2D');
+const ctx = canvas.getContext('2d');
+const info = document.getElementById('info');
+const container = document.getElementById('leContainer3D');
 
-let scene, camera, renderer, controls, objet3D = null;
+let scene, camera, renderer, controls, mesh3D = null;
 
-function init3D(){
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x111111);
-  camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
-  camera.position.z = 5;
-  renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  container.appendChild(renderer.domElement);
-  
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(2, 2, 5);
-  scene.add(light, new THREE.AmbientLight(0x404040));
-  
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+// Initialisation 3D
+function initApp() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(2, 2, 5);
+    scene.add(light, new THREE.AmbientLight(0x404040));
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    window.addEventListener('resize', () => {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+    
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    animate();
 }
 
-function resize(){
-  c2d.width = container.clientWidth;
-  c2d.height = container.clientHeight;
-  camera.aspect = c2d.width / c2d.height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(c2d.width, c2d.height);
+function toutEffacer() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (mesh3D) { scene.remove(mesh3D); mesh3D = null; }
+    info.textContent = "Écran vidé";
 }
 
-function effacerTout(){
-  ctx.clearRect(0,0,c2d.width,c2d.height);
-  if(objet3D) { scene.remove(objet3D); objet3D = null; }
-  def.textContent = "Écran vidé.";
+// FONCTIONS 2D - CORRIGÉES
+function btCarre() {
+    toutEffacer();
+    ctx.fillStyle = "#00ffcc";
+    // Un carré parfait : 100 par 100
+    ctx.fillRect(canvas.width/2 - 50, canvas.height/2 - 50, 100, 100);
+    info.textContent = "CARRÉ : 4 côtés égaux";
 }
 
-// CORRECTION DES FIGURES 2D
-function faire2D(nom){
-  effacerTout();
-  ctx.fillStyle = "#00ffcc";
-  const x = c2d.width/2;
-  const y = c2d.height/2;
+function btRect() {
+    toutEffacer();
+    ctx.fillStyle = "#00ffcc";
+    // Un rectangle : 160 par 80
+    ctx.fillRect(canvas.width/2 - 80, canvas.height/2 - 40, 160, 80);
+    info.textContent = "RECTANGLE : Longueur différente de la largeur";
+}
 
-  if(nom === 'carre'){
-    ctx.fillRect(x-50, y-50, 100, 100);
-    def.textContent = "Carré : 4 côtés égaux, 4 angles droits.";
-  } else if(nom === 'rect'){
-    ctx.fillRect(x-80, y-40, 160, 80);
-    def.textContent = "Rectangle : côtés opposés égaux, angles droits.";
-  } else if(nom === 'cercle'){
-    ctx.beginPath(); ctx.arc(x, y, 60, 0, Math.PI*2); ctx.fill();
-    def.textContent = "Cercle : tous les points sont à égale distance du centre.";
-  } else if(nom === 'tri'){
-    ctx.beginPath(); ctx.moveTo(x, y-60); ctx.lineTo(x-70, y+50); ctx.lineTo(x+70, y+50); ctx.closePath(); ctx.fill();
-    def.textContent = "Triangle : polygone à 3 côtés.";
-  } else if(nom === 'penta'){
-    dessinerPoly(x, y, 60, 5);
-    def.textContent = "Pentagone : polygone à 5 côtés.";
-  } else if(nom === 'hexa'){
-    dessinerPoly(x, y, 60, 6);
-    def.textContent = "Hexagone : polygone à 6 côtés.";
-  } else if(nom === 'losange'){
-    ctx.beginPath(); ctx.moveTo(x, y-70); ctx.lineTo(x+50, y); ctx.lineTo(x, y+70); ctx.lineTo(x-50, y); ctx.closePath(); ctx.fill();
-    def.textContent = "Losange : 4 côtés égaux, mais pas d'angles droits.";
-  } else if(nom === 'etoile'){
+function btCercle() {
+    toutEffacer();
     ctx.beginPath();
-    for(let i=0; i<10; i++){
-      let r = i%2===0 ? 60 : 25;
-      let a = i * Math.PI / 5 - Math.PI/2;
-      ctx.lineTo(x + r*Math.cos(a), y + r*Math.sin(a));
-    }
-    ctx.closePath(); ctx.fill();
-    def.textContent = "Étoile : figure à 5 branches.";
-  }
+    ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
+    ctx.fillStyle = "#00ffcc";
+    ctx.fill();
+    info.textContent = "CERCLE";
 }
 
-function dessinerPoly(x, y, r, cotes){
-  ctx.beginPath();
-  for(let i=0; i<cotes; i++){
-    let a = i * (Math.PI*2/cotes) - Math.PI/2;
-    ctx.lineTo(x + r*Math.cos(a), y + r*Math.sin(a));
-  }
-  ctx.closePath(); ctx.fill();
+function btTri() {
+    toutEffacer();
+    ctx.beginPath();
+    ctx.moveTo(canvas.width/2, canvas.height/2 - 60);
+    ctx.lineTo(canvas.width/2 - 70, canvas.height/2 + 50);
+    ctx.lineTo(canvas.width/2 + 70, canvas.height/2 + 50);
+    ctx.closePath();
+    ctx.fillStyle = "#00ffcc";
+    ctx.fill();
+    info.textContent = "TRIANGLE";
 }
 
-// CORRECTION DES FIGURES 3D
-function faire3D(nom){
-  effacerTout();
-  let g;
-  if(nom === 'cube') g = new THREE.BoxGeometry(2,2,2);
-  else if(nom === 'sphere') g = new THREE.SphereGeometry(1.5, 32, 32);
-  else if(nom === 'cylindre') g = new THREE.CylinderGeometry(1, 1, 3, 32);
-  else if(nom === 'cone') g = new THREE.ConeGeometry(1.5, 3, 32);
-  else if(nom === 'pyramide') g = new THREE.ConeGeometry(1.8, 2.5, 4);
-  else if(nom === 'tore') g = new THREE.TorusGeometry(1, 0.4, 16, 100);
-  else if(nom === 'octa') g = new THREE.OctahedronGeometry(1.8);
-  else if(nom === 'dode') g = new THREE.DodecahedronGeometry(1.5);
-
-  objet3D = new THREE.Mesh(g, new THREE.MeshPhongMaterial({color: 0x00ffcc, flatShading: true}));
-  scene.add(objet3D);
-  def.textContent = "3D : " + nom.toUpperCase() + " (Faites glisser pour tourner)";
+// FONCTIONS 3D - CORRIGÉES
+function lancer3D(geometrie, nom) {
+    toutEffacer();
+    const material = new THREE.MeshPhongMaterial({ color: 0x00ffcc, flatShading: true });
+    mesh3D = new THREE.Mesh(geometrie, material);
+    scene.add(mesh3D);
+    info.textContent = nom + " 3D (Faites tourner avec votre doigt)";
 }
 
-function animer(){
-  requestAnimationFrame(animer);
-  if(objet3D) objet3D.rotation.y += 0.01;
-  controls.update();
-  renderer.render(scene, camera);
+function btCube() { lancer3D(new THREE.BoxGeometry(2,2,2), "CUBE"); }
+function btSphere() { lancer3D(new THREE.SphereGeometry(1.5, 32, 32), "SPHÈRE"); }
+function btCylindre() { lancer3D(new THREE.CylinderGeometry(1, 1, 3, 32), "CYLINDRE"); }
+function btTore() { lancer3D(new THREE.TorusGeometry(1, 0.4, 16, 100), "TORE"); }
+
+function animate() {
+    requestAnimationFrame(animate);
+    if (mesh3D) mesh3D.rotation.y += 0.01;
+    controls.update();
+    renderer.render(scene, camera);
 }
 
-window.addEventListener('resize', resize);
-init3D();
-resize();
-animer();
+// Lancement au démarrage
+initApp();
 </script>
 </body>
 </html>
