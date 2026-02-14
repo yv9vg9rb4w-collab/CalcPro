@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro Géo - PRO MAX</title>
+<title>CalcPro Géo PRO MAX</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 :root{--accent:#00ffcc;--bg:#0d0d0d;--card:#1a1a1a;}
@@ -13,14 +13,26 @@ button{background:var(--card);border:1px solid #333;color:white;
 border-radius:8px;padding:10px;font-size:12px;font-weight:bold}
 button:active{background:var(--accent);color:black}
 .full{grid-column:span 2;border-color:#ff4d4d;color:#ff4d4d}
-.titre{grid-column:span 2;text-align:center;
-color:var(--accent);border-bottom:1px solid #333;margin-top:5px}
-#ecran{position:relative;height:330px;background:#000;
-border-radius:12px;margin-top:10px}
-#canvas2D,#container3D{position:absolute;width:100%;height:100%}
+.titre{grid-column:span 2;text-align:center;color:var(--accent);
+border-bottom:1px solid #333;margin-top:5px}
+#ecran{
+position:relative;
+height:70vh;   /* GRAND TABLEAU */
+width:100%;
+background:#000;
+border-radius:12px;
+margin-top:10px;
+}
+#canvas2D,#container3D{
+position:absolute;
+width:100%;
+height:100%;
+top:0;left:0;
+}
 #canvas2D{z-index:1}
 #container3D{z-index:2}
-#definition{text-align:center;color:var(--accent);margin-top:8px;font-size:13px}
+#definition{text-align:center;color:var(--accent);
+margin-top:8px;font-size:14px}
 </style>
 </head>
 <body>
@@ -59,7 +71,7 @@ border-radius:12px;margin-top:10px}
 <button onclick="draw3D('cylindre')">Cylindre</button>
 <button onclick="draw3D('cone')">Cône</button>
 <button onclick="draw3D('pyramide')">Pyramide</button>
-<button onclick="draw3D('prisme')">Prisme Triangulaire</button>
+<button onclick="draw3D('prisme')">Prisme</button>
 <button onclick="draw3D('tore')">Tore</button>
 
 </div>
@@ -72,70 +84,82 @@ border-radius:12px;margin-top:10px}
 
 <div id="definition">Choisissez une figure</div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
+<!-- THREE.JS MODULE VERSION STABLE -->
+<script type="module">
 
-<script>
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/controls/OrbitControls.js";
+
 const canvas=document.getElementById("canvas2D");
 const ctx=canvas.getContext("2d");
 const def=document.getElementById("definition");
 const container=document.getElementById("container3D");
 
-let scene,camera,renderer,controls,mesh=null;
-
-function init(){
-scene=new THREE.Scene();
-camera=new THREE.PerspectiveCamera(75,container.clientWidth/container.clientHeight,0.1,1000);
-camera.position.z=5;
-renderer=new THREE.WebGLRenderer({alpha:true});
-renderer.setSize(container.clientWidth,container.clientHeight);
-container.appendChild(renderer.domElement);
-scene.add(new THREE.AmbientLight(0xffffff,0.8));
-controls=new THREE.OrbitControls(camera,renderer.domElement);
 canvas.width=container.clientWidth;
 canvas.height=container.clientHeight;
-animate();
-}
+
+/* ---------- 3D SETUP ---------- */
+
+let scene=new THREE.Scene();
+let camera=new THREE.PerspectiveCamera(75,container.clientWidth/container.clientHeight,0.1,1000);
+camera.position.z=5;
+
+let renderer=new THREE.WebGLRenderer({alpha:true});
+renderer.setSize(container.clientWidth,container.clientHeight);
+container.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff,0.8));
+
+let controls=new OrbitControls(camera,renderer.domElement);
+
+let mesh=null;
+
 function animate(){
 requestAnimationFrame(animate);
 if(mesh) mesh.rotation.y+=0.01;
 controls.update();
 renderer.render(scene,camera);
 }
+animate();
 
-function resetAll(){
+/* ---------- RESET ---------- */
+
+window.resetAll=function(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 if(mesh){scene.remove(mesh);mesh=null;}
 def.textContent="Écran nettoyé.";
 }
 
-function draw2D(type){
+/* ---------- 2D ---------- */
+
+window.draw2D=function(type){
 resetAll();
 container.style.zIndex=1;
 canvas.style.zIndex=2;
+
 ctx.fillStyle="#00ffcc";
 const x=canvas.width/2;
 const y=canvas.height/2;
 ctx.beginPath();
 
-if(type==="carre"){ctx.fillRect(x-60,y-60,120,120);def.textContent="Carré : 4 côtés égaux.";}
-else if(type==="rect"){ctx.fillRect(x-90,y-50,180,100);def.textContent="Rectangle : 4 angles droits.";}
-else if(type==="losange"){ctx.moveTo(x,y-70);ctx.lineTo(x-90,y);ctx.lineTo(x,y+70);ctx.lineTo(x+90,y);ctx.closePath();ctx.fill();def.textContent="Losange : 4 côtés égaux.";}
-else if(type==="para"){ctx.moveTo(x-80,y-60);ctx.lineTo(x+40,y-60);ctx.lineTo(x+80,y+60);ctx.lineTo(x-40,y+60);ctx.closePath();ctx.fill();def.textContent="Parallélogramme : côtés opposés parallèles.";}
-else if(type==="trapeze"){ctx.moveTo(x-80,y+60);ctx.lineTo(x+80,y+60);ctx.lineTo(x+50,y-60);ctx.lineTo(x-50,y-60);ctx.closePath();ctx.fill();def.textContent="Trapèze : 1 paire de côtés parallèles.";}
-else if(type==="cercle"){ctx.arc(x,y,70,0,Math.PI*2);ctx.fill();def.textContent="Cercle : rayon constant.";}
+if(type==="carre"){ctx.fillRect(x-60,y-60,120,120);def.textContent="Carré";}
+else if(type==="rect"){ctx.fillRect(x-90,y-50,180,100);def.textContent="Rectangle";}
+else if(type==="losange"){ctx.moveTo(x,y-70);ctx.lineTo(x-90,y);ctx.lineTo(x,y+70);ctx.lineTo(x+90,y);ctx.closePath();ctx.fill();def.textContent="Losange";}
+else if(type==="para"){ctx.moveTo(x-80,y-60);ctx.lineTo(x+40,y-60);ctx.lineTo(x+80,y+60);ctx.lineTo(x-40,y+60);ctx.closePath();ctx.fill();def.textContent="Parallélogramme";}
+else if(type==="trapeze"){ctx.moveTo(x-80,y+60);ctx.lineTo(x+80,y+60);ctx.lineTo(x+50,y-60);ctx.lineTo(x-50,y-60);ctx.closePath();ctx.fill();def.textContent="Trapèze";}
+else if(type==="cercle"){ctx.arc(x,y,70,0,Math.PI*2);ctx.fill();def.textContent="Cercle";}
 
-else if(type==="equi"){const h=120*Math.sqrt(3)/2;ctx.moveTo(x,y-h/2);ctx.lineTo(x-60,y+h/2);ctx.lineTo(x+60,y+h/2);ctx.closePath();ctx.fill();def.textContent="Triangle équilatéral : 3 côtés égaux.";}
-else if(type==="iso"){ctx.moveTo(x,y-90);ctx.lineTo(x-70,y+60);ctx.lineTo(x+70,y+60);ctx.closePath();ctx.fill();def.textContent="Triangle isocèle : 2 côtés égaux.";}
-else if(type==="sca"){ctx.moveTo(x-40,y-80);ctx.lineTo(x-90,y+60);ctx.lineTo(x+100,y+20);ctx.closePath();ctx.fill();def.textContent="Triangle scalène : 3 côtés différents.";}
-else if(type==="rectTri"){ctx.moveTo(x-80,y+60);ctx.lineTo(x-80,y-60);ctx.lineTo(x+100,y+60);ctx.closePath();ctx.fill();def.textContent="Triangle rectangle : 1 angle 90°.";}
-else if(type==="aigu"){ctx.moveTo(x,y-90);ctx.lineTo(x-80,y+50);ctx.lineTo(x+80,y+50);ctx.closePath();ctx.fill();def.textContent="Triangle aigu : 3 angles < 90°.";}
-else if(type==="obtus"){ctx.moveTo(x-120,y+40);ctx.lineTo(x+120,y+40);ctx.lineTo(x-40,y-80);ctx.closePath();ctx.fill();def.textContent="Triangle obtus : 1 angle > 90°.";}
+else if(type==="equi"){const h=120*Math.sqrt(3)/2;ctx.moveTo(x,y-h/2);ctx.lineTo(x-60,y+h/2);ctx.lineTo(x+60,y+h/2);ctx.closePath();ctx.fill();def.textContent="Triangle équilatéral";}
+else if(type==="iso"){ctx.moveTo(x,y-90);ctx.lineTo(x-70,y+60);ctx.lineTo(x+70,y+60);ctx.closePath();ctx.fill();def.textContent="Triangle isocèle";}
+else if(type==="sca"){ctx.moveTo(x-40,y-80);ctx.lineTo(x-90,y+60);ctx.lineTo(x+100,y+20);ctx.closePath();ctx.fill();def.textContent="Triangle scalène";}
+else if(type==="rectTri"){ctx.moveTo(x-80,y+60);ctx.lineTo(x-80,y-60);ctx.lineTo(x+100,y+60);ctx.closePath();ctx.fill();def.textContent="Triangle rectangle";}
+else if(type==="aigu"){ctx.moveTo(x,y-90);ctx.lineTo(x-80,y+50);ctx.lineTo(x+80,y+50);ctx.closePath();ctx.fill();def.textContent="Triangle aigu";}
+else if(type==="obtus"){ctx.moveTo(x-120,y+40);ctx.lineTo(x+120,y+40);ctx.lineTo(x-40,y-80);ctx.closePath();ctx.fill();def.textContent="Triangle obtus";}
 
 else if(type==="pentagone"){drawPoly(5);}
 else if(type==="hexagone"){drawPoly(6);}
 else if(type==="octogone"){drawPoly(8);}
-else if(type==="ellipse"){ctx.ellipse(x,y,90,50,0,0,Math.PI*2);ctx.fill();def.textContent="Ellipse : cercle étiré.";}
+else if(type==="ellipse"){ctx.ellipse(x,y,90,50,0,0,Math.PI*2);ctx.fill();def.textContent="Ellipse";}
 }
 
 function drawPoly(n){
@@ -148,14 +172,18 @@ if(i===0) ctx.moveTo(px,py);
 else ctx.lineTo(px,py);
 }
 ctx.closePath();ctx.fill();
-def.textContent="Polygone régulier à "+n+" côtés.";
+def.textContent="Polygone à "+n+" côtés";
 }
 
-function draw3D(type){
+/* ---------- 3D ---------- */
+
+window.draw3D=function(type){
 resetAll();
 canvas.style.zIndex=1;
 container.style.zIndex=2;
+
 let geo;
+
 if(type==="cube") geo=new THREE.BoxGeometry(2,2,2);
 else if(type==="pave") geo=new THREE.BoxGeometry(3,1.5,2);
 else if(type==="sphere") geo=new THREE.SphereGeometry(1.5,32,32);
@@ -165,13 +193,12 @@ else if(type==="pyramide") geo=new THREE.ConeGeometry(1.8,2.5,4);
 else if(type==="prisme") geo=new THREE.CylinderGeometry(1.5,1.5,3,3);
 else if(type==="tore") geo=new THREE.TorusGeometry(1,0.4,16,100);
 
-const mat=new THREE.MeshNormalMaterial();
-mesh=new THREE.Mesh(geo,mat);
+mesh=new THREE.Mesh(geo,new THREE.MeshNormalMaterial());
 scene.add(mesh);
-def.textContent=type.toUpperCase()+" 3D - Faites pivoter.";
+
+def.textContent=type.toUpperCase()+" 3D";
 }
 
-init();
 </script>
 </body>
 </html>
