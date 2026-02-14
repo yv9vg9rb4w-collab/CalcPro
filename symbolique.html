@@ -2,231 +2,128 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Calcul Symbolique Supérieur</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.9.1/math.min.js"></script>
+<title>Calcul Symbolique Supérieur</title>
 <style>
-  body {
-    background-color: #121212;
-    color: white;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-  }
-
-  h1 {
-    text-align: center;
-    color: #00ffcc;
-    margin-bottom: 15px;
-  }
-
-  #expr {
-    width: 100%;
-    padding: 15px;
-    font-size: 18px;
-    border-radius: 10px;
-    border: none;
-    background: #1e1e1e;
-    color: #00ffcc;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-
-  .buttons, .quick-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-
-  button {
-    padding: 12px 18px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    color: #121212;
-    background: linear-gradient(45deg, #00ffcc, #00ccff);
-    transition: 0.2s;
-  }
-
-  button:hover {
-    transform: scale(1.05);
-  }
-
-  #result {
-    background: #1e1e1e;
-    padding: 15px;
-    border-radius: 12px;
-    min-height: 50px;
-    font-size: 18px;
-    color: #00ffcc;
-    word-wrap: break-word;
-  }
-
-  #history {
-    margin-top: 20px;
-    max-height: 200px;
-    overflow-y: auto;
-    background: #1a1a2a;
-    padding: 10px;
-    border-radius: 10px;
-  }
-
-  .history-item {
-    margin-bottom: 8px;
-    color: #00ffccaa;
-    font-size: 14px;
-  }
-
-  footer {
-    margin-top: 30px;
-    text-align: center;
-    font-size: 14px;
-    color: #aaa;
-  }
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        color: #333;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #4b0082;
+    }
+    h2 {
+        text-align: center;
+        color: #555;
+        font-weight: normal;
+        font-size: 18px;
+        margin-top: -5px;
+    }
+    .calculator {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+    }
+    input, select, button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+    button {
+        background-color: #4b0082;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+    button:hover {
+        background-color: #370066;
+    }
+    .result {
+        margin-top: 20px;
+        font-weight: bold;
+        text-align: center;
+        color: #4b0082;
+        word-wrap: break-word;
+    }
 </style>
 </head>
 <body>
 
 <h1>Calcul Symbolique Supérieur</h1>
-<input type="text" id="expr" placeholder="Entrez une expression, ex: x^3 + 3*x^2 + 2*x">
+<h2 id="subtitle">✏️ Factorisation, dérivées, intégrales… tout ici !</h2>
 
-<!-- Boutons fonctions rapides -->
-<div class="quick-buttons">
-  <button onclick="ajouterRacine()">√</button>
-  <button onclick="ajouter('^2')">x²</button>
-  <button onclick="ajouter('^3')">x³</button>
-  <button onclick="ajouter(' + ')">+</button>
-  <button onclick="ajouter(' - ')">-</button>
-  <button onclick="ajouterMultiplication()">×</button>
-  <button onclick="ajouter(' / ')">/</button>
+<div class="calculator">
+    <label for="calcType">Choisis le type de calcul :</label>
+    <select id="calcType">
+        <option value="">--Sélectionner--</option>
+        <option value="simplifier">Simplifier une expression</option>
+        <option value="factoriser">Factoriser</option>
+        <option value="derivee">Dérivée</option>
+        <option value="integrale">Intégrale</option>
+    </select>
+
+    <label>Entrez l’expression :</label>
+    <input type="text" id="expression" placeholder="Ex : x^2 + 2*x + 1">
+
+    <button onclick="calculer()">Calculer</button>
+
+    <div class="result" id="result"></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.12.0/math.min.js"></script>
 <script>
-function ajouter(val) {
-  const cursorPos = exprInput.selectionStart;
-  const text = exprInput.value;
-  exprInput.value = text.slice(0, cursorPos) + val + text.slice(cursorPos);
-  exprInput.focus();
-  exprInput.selectionEnd = cursorPos + val.length;
-}
+const subtitle = document.getElementById('subtitle');
 
-// Pour √()
-function ajouterRacine() {
-  const cursorPos = exprInput.selectionStart;
-  const text = exprInput.value;
-  exprInput.value = text.slice(0, cursorPos) + '√()' + text.slice(cursorPos);
-  exprInput.focus();
-  exprInput.selectionEnd = cursorPos + 2; // place le curseur entre les parenthèses
-}
+document.getElementById('calcType').addEventListener('change', function() {
+    const type = this.value;
+    if(type === 'simplifier') subtitle.innerText = "✏️ Simplifie ton expression facilement !";
+    else if(type === 'factoriser') subtitle.innerText = "🔧 Factorise tes polynômes rapidement !";
+    else if(type === 'derivee') subtitle.innerText = "📈 Calcule les dérivées !";
+    else if(type === 'integrale') subtitle.innerText = "∫ Calcule les intégrales !";
+    else subtitle.innerText = "✏️ Factorisation, dérivées, intégrales… tout ici !";
+});
 
-// Pour ×
-function ajouterMultiplication() {
-  ajouter(' × ');
-}
-</script>
-<!-- Boutons calcul symbolique -->
-<div class="buttons">
-  <button onclick="simplifier()">Simplifier</button>
-  <button onclick="derivee()">Dériver</button>
-  <button onclick="integrale()">Intégrer</button>
-  <button onclick="factoriser()">Factoriser</button>
-  <button onclick="developper()">Développer</button>
-  <button onclick="resoudre()">Résoudre =0</button>
-</div>
+function calculer(){
+    const type = document.getElementById('calcType').value;
+    const expr = document.getElementById('expression').value;
+    const resultDiv = document.getElementById('result');
+    
+    if(!expr){
+        resultDiv.innerText = "Erreur : entre une expression";
+        return;
+    }
 
-<div id="result">Résultat ici...</div>
-
-<h3>Historique :</h3>
-<div id="history"></div>
-
-<footer>
-<strong>CalcPro © Lebbar Yahya</strong>
-</footer>
-
-<script>
-const exprInput = document.getElementById('expr');
-const resultDiv = document.getElementById('result');
-const historyDiv = document.getElementById('history');
-
-function ajouter(val) {
-  const cursorPos = exprInput.selectionStart;
-  const text = exprInput.value;
-  exprInput.value = text.slice(0, cursorPos) + val + text.slice(cursorPos);
-  exprInput.focus();
-  exprInput.selectionEnd = cursorPos + val.length;
-}
-
-function ajouterHistorique(action, res) {
-  const div = document.createElement('div');
-  div.className = 'history-item';
-  div.textContent = `${action} → ${res}`;
-  historyDiv.prepend(div);
-}
-
-// Fonctions symboliques
-function simplifier() {
-  try {
-    const res = math.simplify(exprInput.value).toString();
-    resultDiv.innerHTML = "Simplifié : " + res;
-    ajouterHistorique('Simplifier', res);
-  } catch(e) {
-    resultDiv.innerHTML = "Erreur : " + e.message;
-  }
-}
-
-function derivee() {
-  try {
-    const res = math.derivative(exprInput.value, 'x').toString();
-    resultDiv.innerHTML = "Dérivée : " + res;
-    ajouterHistorique('Dériver', res);
-  } catch(e) {
-    resultDiv.innerHTML = "Erreur : " + e.message;
-  }
-}
-
-function integrale() {
-  try {
-    const res = math.integral(exprInput.value, 'x').toString();
-    resultDiv.innerHTML = "Intégrale : " + res + " + C";
-    ajouterHistorique('Intégrer', res + " + C");
-  } catch(e) {
-    resultDiv.innerHTML = "Erreur : " + e.message;
-  }
-}
-
-function factoriser() {
-  try {
-    const res = math.factor(exprInput.value).toString();
-    resultDiv.innerHTML = "Factorisé : " + res;
-    ajouterHistorique('Factoriser', res);
-  } catch(e) {
-    resultDiv.innerHTML = "Erreur : " + e.message;
-  }
-}
-
-function developper() {
-  try {
-    const res = math.expand(exprInput.value).toString();
-    resultDiv.innerHTML = "Développé : " + res;
-    ajouterHistorique('Développer', res);
-  } catch(e) {
-    resultDiv.innerHTML = "Erreur : " + e.message;
-  }
-}
-
-function resoudre() {
-  try {
-    const eq = math.parse(exprInput.value + "=0");
-    const solutions = math.solve(eq, 'x');
-    resultDiv.innerHTML = "Solutions : " + solutions.join(', ');
-    ajouterHistorique('Résoudre', solutions.join(', '));
-  } catch(e) {
-    resultDiv.innerHTML = "Erreur : " + e.message;
-  }
+    try{
+        let result = '';
+        if(type === 'simplifier'){
+            result = math.simplify(expr).toString();
+        } else if(type === 'factoriser'){
+            result = math.factor(expr).toString();
+        } else if(type === 'derivee'){
+            result = math.derivative(expr, 'x').toString();
+        } else if(type === 'integrale'){
+            result = math.integral(expr, 'x').toString();
+        } else {
+            result = "Sélectionne un type de calcul";
+        }
+        resultDiv.innerText = result;
+    } catch(e){
+        resultDiv.innerText = "Erreur : expression invalide";
+    }
 }
 </script>
 
