@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcul SVT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f8ff;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2e8b57;
+        }
+        .calculator {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2e8b57;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #246b45;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #2e8b57;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calcul SVT</h1>
+
+    <div class="calculator">
+        <label for="calcType">Choisis le type de calcul :</label>
+        <select id="calcType">
+            <option value="">--Sélectionner--</option>
+            <option value="pourcentage">Pourcentage</option>
+            <option value="imc">IMC (Indice Masse Corporelle)</option>
+            <option value="concentration">Concentration</option>
+            <option value="vitesse">Vitesse</option>
+            <option value="genetique">Fréquence génétique</option>
+        </select>
+
+        <div id="inputs"></div>
+
+        <button onclick="calculer()">Calculer</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const inputsDiv = document.getElementById('inputs');
+        const calcTypeSelect = document.getElementById('calcType');
+
+        calcTypeSelect.addEventListener('change', function() {
+            const type = this.value;
+            inputsDiv.innerHTML = ''; // Reset
+
+            if(type === 'pourcentage'){
+                inputsDiv.innerHTML = `
+                    <label>Valeur partielle :</label>
+                    <input type="number" id="valeurPartielle" placeholder="Ex: 25">
+                    <label>Valeur totale :</label>
+                    <input type="number" id="valeurTotale" placeholder="Ex: 200">
+                `;
+            } else if(type === 'imc'){
+                inputsDiv.innerHTML = `
+                    <label>Poids (kg) :</label>
+                    <input type="number" id="poids" placeholder="Ex: 70">
+                    <label>Taille (m) :</label>
+                    <input type="number" step="0.01" id="taille" placeholder="Ex: 1.75">
+                `;
+            } else if(type === 'concentration'){
+                inputsDiv.innerHTML = `
+                    <label>Masse du soluté (g) :</label>
+                    <input type="number" id="masse" placeholder="Ex: 5">
+                    <label>Volume de solution (L) :</label>
+                    <input type="number" step="0.01" id="volume" placeholder="Ex: 0.5">
+                `;
+            } else if(type === 'vitesse'){
+                inputsDiv.innerHTML = `
+                    <label>Distance ou quantité transformée :</label>
+                    <input type="number" id="deltaX" placeholder="Ex: 10">
+                    <label>Temps (s) :</label>
+                    <input type="number" id="deltaT" placeholder="Ex: 5">
+                `;
+            } else if(type === 'genetique'){
+                inputsDiv.innerHTML = `
+                    <label>Fréquence de l’allèle dominant (p) :</label>
+                    <input type="number" step="0.01" id="p" placeholder="Ex: 0.6">
+                `;
+            }
+        });
+
+        function calculer(){
+            const type = calcTypeSelect.value;
+            let result = '';
+
+            if(type === 'pourcentage'){
+                const part = parseFloat(document.getElementById('valeurPartielle').value);
+                const total = parseFloat(document.getElementById('valeurTotale').value);
+                if(total !== 0){
+                    result = `Pourcentage = ${(part/total*100).toFixed(2)} %`;
+                } else {
+                    result = "Erreur : la valeur totale ne peut pas être zéro";
+                }
+            } else if(type === 'imc'){
+                const poids = parseFloat(document.getElementById('poids').value);
+                const taille = parseFloat(document.getElementById('taille').value);
+                if(taille !== 0){
+                    const imc = (poids / (taille*taille)).toFixed(2);
+                    result = `IMC = ${imc}`;
+                } else {
+                    result = "Erreur : la taille ne peut pas être zéro";
+                }
+            } else if(type === 'concentration'){
+                const masse = parseFloat(document.getElementById('masse').value);
+                const volume = parseFloat(document.getElementById('volume').value);
+                if(volume !== 0){
+                    result = `Concentration = ${(masse/volume).toFixed(2)} g/L`;
+                } else {
+                    result = "Erreur : le volume ne peut pas être zéro";
+                }
+            } else if(type === 'vitesse'){
+                const deltaX = parseFloat(document.getElementById('deltaX').value);
+                const deltaT = parseFloat(document.getElementById('deltaT').value);
+                if(deltaT !== 0){
+                    result = `Vitesse = ${(deltaX/deltaT).toFixed(2)} unités/s`;
+                } else {
+                    result = "Erreur : le temps ne peut pas être zéro";
+                }
+            } else if(type === 'genetique'){
+                const p = parseFloat(document.getElementById('p').value);
+                if(p >=0 && p <=1){
+                    const q = 1 - p;
+                    const homoDominant = (p*p*100).toFixed(2);
+                    const hetero = (2*p*q*100).toFixed(2);
+                    const homoRecessif = (q*q*100).toFixed(2);
+                    result = `p² = ${homoDominant}% , 2pq = ${hetero}% , q² = ${homoRecessif}%`;
+                } else {
+                    result = "Erreur : p doit être entre 0 et 1";
+                }
+            } else {
+                result = "Sélectionne un type de calcul";
+            }
+
+            document.getElementById('result').innerText = result;
+        }
+    </script>
+
+</body>
+</html>
