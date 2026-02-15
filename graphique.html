@@ -131,6 +131,9 @@ function parseFunction(f,x){
     // Ajouter * automatiquement entre nombre et x (ex: 2x → 2*x)
     f = f.replace(/(\d)(x)/gi, "$1*$2");
 
+    // Transformer /expression/ en Math.abs(expression)
+    f = f.replace(/\/([^\/]+)\/+/g, "Math.abs($1)");
+
     return f.replace(/\^/g,"**")
             .replace(/racin/gi,"Math.sqrt")
             .replace(/sqrt/gi,"Math.sqrt")
