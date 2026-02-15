@@ -2,85 +2,45 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro • Graphique</title>
+<title>CalcPro • GeoGebra Style</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Plugin pour annotation (axes) -->
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+<!-- JSXGraph -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
 
 <style>
 body{
     margin:0;
     background: linear-gradient(135deg,#0f172a,#020617);
     font-family: Arial,sans-serif;
-    display:flex;
-    justify-content:center;
-    padding:20px;
     color:white;
 }
-.container{
-    display:flex;
-    gap:20px;
-    width:100%;
-    max-width:1200px;
+#box{
+    width:90vw;
+    height:80vh;
+    margin:20px auto;
+    border:2px solid #38bdf8;
+    border-radius:15px;
 }
-.box{
-    flex:3;
-    background:#020617;
-    border-radius:20px;
-    padding:25px;
-    box-shadow:0 30px 60px rgba(0,0,0,.6);
-}
-.info{
-    flex:1;
-    background:#0f172a;
-    border-radius:20px;
-    padding:20px;
-    font-size:16px;
-    line-height:1.5;
-    color:#facc15;
-    max-height:600px;
-    overflow-y:auto;
-}
-.title{
+.input-container{
     text-align:center;
-    font-size:24px;
-    font-weight:bold;
-    color:#38bdf8;
-    margin-bottom:15px;
+    margin-top:10px;
 }
 input{
-    width:100%;
-    padding:14px;
-    border-radius:12px;
-    border:1px solid #334155;
-    background:#0f172a;
-    color:#22c55e;
+    width:50%;
+    padding:10px;
     font-size:18px;
-    margin-bottom:10px;
-}
-canvas{
-    margin-top:15px;
-    border-radius:15px;
-    background:#0f172a;
-}
-.result{
-    margin-top:15px;
-    color:#facc15;
-}
-.btns{
-    display:flex;
-    gap:10px;
-    margin-bottom:10px;
+    border-radius:10px;
+    border:none;
+    text-align:center;
 }
 button{
-    flex:1;
-    padding:10px;
+    padding:10px 20px;
+    margin-left:10px;
     font-weight:bold;
-    border:none;
     border-radius:10px;
+    border:none;
     cursor:pointer;
 }
 .zoomIn{background:#22c55e;color:black;}
@@ -90,177 +50,65 @@ button{
 </head>
 <body>
 
-<div class="container">
+<div id="box"></div>
 
-<div class="box">
-<div class="title">📊 CalcPro • Graphique Avancé</div>
-
-<input id="fx" placeholder="Entrez vos fonctions ici">
-
-<div class="btns">
-<button class="zoomIn" onclick="zoom(0.5)">ZOOM +</button>
-<button class="zoomOut" onclick="zoom(2)">ZOOM -</button>
+<div class="input-container">
+<input id="fx" placeholder="Ex: 2x^2, /x-2/, sin(x)">
+<button class="zoomIn" onclick="board.zoomIn(1.2)">ZOOM +</button>
+<button class="zoomOut" onclick="board.zoomOut(1.2)">ZOOM -</button>
 <button class="clear" onclick="resetGraph()">RESET</button>
 </div>
 
-<div class="result" id="res"></div>
-<canvas id="graph2D"></canvas>
-</div>
-
-<div class="info">
-<b>💡 Astuces :</b><br>
-- Racine carrée : <code>racin(x)</code><br>
-- Puissance : <code>a^b</code><br>
-- Exponentielle : <code>e^x</code><br>
-- Pi : <code>π</code> ou <code>pi</code><br>
-- Valeur absolue : <code>/expression/</code><br>
-- Sin, Cos, Tan : <code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code><br>
-- Logarithmes : <code>ln(x)</code> ou <code>log(x)</code><br>
-- Fractions : <code>1/x</code><br>
-- Plusieurs fonctions : séparées par <code>,</code><br>
-- Exemple : <code>2x^2-3x+1, /x-2/, sin(x)</code>
-</div>
-
-</div>
-
 <script>
-let ctx = document.getElementById("graph2D");
-let chart;
-let scale = 10;
+const board = JXG.JSXGraph.initBoard('box', {
+    boundingbox: [-10,10,10,-10], // [xmin, ymax, xmax, ymin]
+    axis:true,
+    grid:true,
+    showCopyright:false,
+    showNavigation:true,
+    keepaspectratio:true,
+    showInlineCopyright:false
+});
 
-// Fonction pour transformer le texte en code JS
-function parseFunction(f,x){
-
-    // 2x → 2*x automatiquement
-    f = f.replace(/(\d)(x)/gi, "$1*$2");
-
-    // /expression/ → Math.abs(expression)
-    f = f.replace(/\/([^\/]+)\//g, "Math.abs($1)");
-
-    return f.replace(/\^/g,"**")
-            .replace(/racin/gi,"Math.sqrt")
-            .replace(/sqrt/gi,"Math.sqrt")
-            .replace(/sin/gi,"Math.sin")
-            .replace(/cos/gi,"Math.cos")
-            .replace(/tg/gi,"Math.tan")
-            .replace(/tan/gi,"Math.tan")
-            .replace(/ln/gi,"Math.log")
-            .replace(/log/gi,"Math.log10")
-            .replace(/e/gi,"Math.E")
-            .replace(/π/gi,"Math.PI")
-            .replace(/x/gi,`(${x})`);
+// Transformer 2x → 2*x et /.../ → Math.abs(...)
+function parseFunction(f){
+    f = f.replace(/(\d)(x)/gi, "$1*$2");          // 2x → 2*x
+    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); // /x-2/ → Math.abs(x-2)
+    f = f.replace(/\^/g,"**");                     // puissance
+    return f;
 }
 
-// Identifier le type de fonction
-function analyseEquation(f){
-    let fNorm = f.replace(/\s/g,'');
-    if(/x\*\*3/.test(fNorm)) return "Cubique: y = ax³ + bx² + cx + d";
-    else if(/x\*\*2/.test(fNorm)) return "Quadratique: y = ax² + bx + c";
-    else if(/x/.test(fNorm)) return "Affine/Linéaire: y = ax + b + c";
-    else return "Fonction spéciale ou constante";
-}
+let curves = [];
 
-// Dessiner le graphique
-function draw(){
-    const f = document.getElementById("fx").value;
-    const res = document.getElementById("res");
-    if(!f) return;
+function drawFunctions(){
+    const fx = document.getElementById('fx').value;
+    if(!fx) return;
+    
+    // Supprimer anciennes courbes
+    curves.forEach(c=>board.removeObject(c));
+    curves=[];
 
-    let funcs = f.split(',').map(fn=>fn.trim());
-    let xVals=[], datasets=[], sumYTotal=0;
+    let funcs = fx.split(',').map(fn=>fn.trim());
 
-    for(let i=0;i<funcs.length;i++){
-        let fn=funcs[i];
-        let yVals=[], sumY=0;
-        for(let x=-scale;x<=scale;x+=0.1){
-            let y=NaN;
-            try{ y=eval(parseFunction(fn,x)); }catch{}
-            if(isFinite(y)){
-                yVals.push(y);
-                sumY+=y;
-                if(i===0) xVals.push(x.toFixed(2));
-            } else yVals.push(null);
-        }
-        datasets.push({
-            label:"f(x)="+fn,
-            data:yVals,
-            borderColor:'#38bdf8',
-            tension:0.3,
-            pointRadius:4,
-            pointBackgroundColor:'#facc15'
-        });
-        sumYTotal+=sumY;
-    }
-
-    if(chart) chart.destroy();
-
-    chart = new Chart(ctx,{
-        type:'line',
-        data:{labels:xVals,datasets:datasets},
-        options:{
-            responsive:true,
-            animation:false,
-            plugins:{
-                legend:{labels:{color:'white'}},
-                annotation:{
-                    annotations:{
-                        xAxisLine:{
-                            type:'line',
-                            yMin:0,
-                            yMax:0,
-                            borderColor:'#facc15',
-                            borderWidth:2
-                        },
-                        yAxisLine:{
-                            type:'line',
-                            xMin:0,
-                            xMax:0,
-                            borderColor:'#facc15',
-                            borderWidth:2
-                        }
-                    }
-                }
-            },
-            scales:{
-                x:{
-                    min:-scale,
-                    max:scale,
-                    grid:{color:'#1e293b'},
-                    ticks:{color:'#22c55e'},
-                    title:{
-                        display:true,
-                        text:'Axe des abscisses (X)',
-                        color:'#38bdf8',
-                        font:{size:16}
-                    }
-                },
-                y:{
-                    min:-scale,
-                    max:scale,
-                    grid:{color:'#1e293b'},
-                    ticks:{color:'#22c55e'},
-                    title:{
-                        display:true,
-                        text:'Axe des ordonnées (Y)',
-                        color:'#38bdf8',
-                        font:{size:16}
-                    }
-                }
+    funcs.forEach(fn=>{
+        let f = parseFunction(fn);
+        let curve = board.create('functiongraph', [
+            function(x){ 
+                try{ return eval(f); }catch{return NaN;}
             }
-        }
+        ], {strokeColor:'#38bdf8', strokeWidth:2});
+        curves.push(curve);
     });
-
-    let eqTxt=funcs.map(fa=>analyseEquation(fa)).join(' | ');
-    res.innerHTML=`${eqTxt} | Σy ≈ ${sumYTotal.toFixed(2)} | Points affichés`;
 }
 
-// Zoom et reset
-function zoom(factor){ scale*=factor; draw(); }
-function resetGraph(){ document.getElementById("fx").value=""; document.getElementById("res").innerHTML=""; if(chart) chart.destroy(); }
+function resetGraph(){
+    document.getElementById('fx').value='';
+    curves.forEach(c=>board.removeObject(c));
+    curves=[];
+}
 
-// Événement pour redessiner automatiquement
-document.getElementById("fx").addEventListener("input",draw);
-draw();
+// Redessiner automatiquement à l'entrée
+document.getElementById('fx').addEventListener('input', drawFunctions);
 </script>
 
 </body>
