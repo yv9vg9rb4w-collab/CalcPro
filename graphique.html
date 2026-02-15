@@ -9,177 +9,190 @@
 <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
 
 <style>
-body{
-    margin:0;
-    background:white;
-    font-family:Arial;
-    color:black;
-}
-#box{
-    width:90vw;
-    height:70vh;
-    margin:20px auto;
-    border:2px solid #38bdf8;
-    border-radius:15px;
-}
-.input-container{
-    text-align:center;
-    margin-bottom:10px;
-}
-input{
-    width:40%;
-    padding:10px;
-    font-size:18px;
-    border-radius:10px;
-    border:1px solid #ccc;
-    text-align:center;
-    margin:2px;
-}
-button{
-    padding:10px 15px;
-    margin:3px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:bold;
-}
-#info{
-    max-width:90vw;
-    margin:10px auto;
-    padding:15px;
-    border-radius:15px;
-    background:#f3f4f6;
-    color:black;
-}
+    body {
+        margin: 0;
+        background: #ffffff;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        color: black;
+    }
+    #box {
+        width: 90vw;
+        height: 60vh;
+        margin: 20px auto;
+        border: 2px solid #38bdf8;
+        border-radius: 15px;
+        background-color: white;
+    }
+    .input-container {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    input {
+        width: 40%;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        text-align: center;
+        margin: 5px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+    input:focus { border-color: #38bdf8; }
+
+    /* --- STYLE DES BOUTONS DÉBLOQUÉS --- */
+    button {
+        padding: 12px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        color: white;
+        transition: transform 0.1s, filter 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    button:active { transform: scale(0.95); }
+    button:hover { filter: brightness(1.1); }
+
+    /* Couleurs spécifiques par fonction */
+    #btnTracer { background-color: #3b82f6; }       /* Bleu */
+    #btnDerivee { background-color: #10b981; }      /* Vert */
+    #btnIntersection { background-color: #f59e0b; } /* Orange */
+    #btnReset { background-color: #ef4444; }        /* Rouge */
+
+    #info {
+        max-width: 90vw;
+        margin: 10px auto;
+        padding: 15px;
+        border-radius: 15px;
+        background: #f3f4f6;
+        border-left: 5px solid #38bdf8;
+        min-height: 20px;
+    }
 </style>
 </head>
 <body>
 
-<div id="box"></div>
+<div id="box" class="jxgbox"></div>
 
 <div class="input-container">
-<input id="fx" placeholder="f(x)">
-<input id="gx" placeholder="g(x)">
-<br>
-<button id="btnTracer">Tracer</button>
-<button id="btnDerivee">Dérivée f'(x)</button>
-<button id="btnIntersection">Intersection</button>
-<button id="btnReset">RESET</button>
+    <input id="fx" placeholder="f(x) ex: x^2">
+    <input id="gx" placeholder="g(x) ex: 2*x + 1">
+    <br>
+    <button id="btnTracer">Tracer</button>
+    <button id="btnDerivee">Dérivée f'(x)</button>
+    <button id="btnIntersection">Intersection</button>
+    <button id="btnReset">RESET</button>
 </div>
 
-<div id="info"></div>
+<div id="info">Entrez une fonction et cliquez sur Tracer.</div>
 
 <script>
-// ===== INITIALISATION BOARD =====
-const board = JXG.JSXGraph.initBoard('box',{
-    boundingbox:[-10,10,10,-10],
-    axis:true,
-    grid:true
+// Initialisation du graphique
+const board = JXG.JSXGraph.initBoard('box', {
+    boundingbox: [-10, 10, 10, -10],
+    axis: true,
+    grid: true,
+    showCopyright: false
 });
 
-board.containerObj.style.backgroundColor = "white";
-board.defaultAxes.x.setAttribute({strokeColor:'black'});
-board.defaultAxes.y.setAttribute({strokeColor:'black'});
-board.defaultAxes.x.ticks.majorUnit = 1;
-board.defaultAxes.y.ticks.majorUnit = 1;
-board.defaultAxes.x.ticks.setAttribute({label:{color:'black'}});
-board.defaultAxes.y.ticks.setAttribute({label:{color:'black'}});
+let elements = []; // Stocke TOUS les objets tracés (courbes, points, etc.)
 
-let curves = [];
-
-// ===== PARSE FUNCTION =====
-function parseFunction(f){
-    f = f.replace(/(\d)x/g,"$1*x");
-    f = f.replace(/\^/g,"**");
-    f = f.replace(/racin/gi,"Math.sqrt");
-    f = f.replace(/π/gi,"Math.PI");
-    f = f.replace(/\be\b/gi,"Math.E");
-    f = f.replace(/ln/gi,"Math.log");
-    f = f.replace(/log/gi,"Math.log10");
-    f = f.replace(/exp/gi,"Math.exp");
-    f = f.replace(/sin/gi,"Math.sin");
-    f = f.replace(/cos/gi,"Math.cos");
-    f = f.replace(/tg/gi,"Math.tan");
-    f = f.replace(/arcsin/gi,"Math.asin");
-    f = f.replace(/arccos/gi,"Math.acos");
-    f = f.replace(/arctan/gi,"Math.atan");
-    f = f.replace(/abs/gi,"Math.abs");
-    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)");
-    f = f.replace(/(\d+)!/g,function(match,n){
-        let fact=1;
-        for(let i=1;i<=n;i++) fact*=i;
-        return fact;
-    });
+function parseFunction(f) {
+    if(!f) return "";
+    f = f.toLowerCase();
+    f = f.replace(/(\d)x/g, "$1*x");
+    f = f.replace(/\^/g, "**");
+    f = f.replace(/racine/gi, "Math.sqrt");
+    f = f.replace(/π/gi, "Math.PI");
+    f = f.replace(/\be\b/gi, "Math.E");
+    f = f.replace(/ln/gi, "Math.log");
+    f = f.replace(/exp/gi, "Math.exp");
+    f = f.replace(/sin/gi, "Math.sin");
+    f = f.replace(/cos/gi, "Math.cos");
+    f = f.replace(/tan/gi, "Math.tan");
     return f;
 }
 
-function buildFunction(expr){
-    let parsed = parseFunction(expr);
-    return new Function('x','return '+parsed);
+function buildFunction(expr) {
+    try {
+        let parsed = parseFunction(expr);
+        return new Function('x', 'return ' + parsed);
+    } catch(e) {
+        return null;
+    }
 }
 
-// ===== TRACER =====
-function drawFunctions(){
-    resetCurves();
+// Action : TRACER
+function drawFunctions() {
     let fInput = document.getElementById('fx').value;
     let gInput = document.getElementById('gx').value;
-
-    if(fInput){
+    
+    if(fInput) {
         let f = buildFunction(fInput);
-        let curve = board.create('functiongraph',[f],{strokeColor:'blue', strokeWidth:2});
-        curves.push({func:f, curve:curve});
+        let c = board.create('functiongraph', [f], {strokeColor: '#3b82f6', strokeWidth: 3});
+        elements.push(c);
     }
-    if(gInput){
+    if(gInput) {
         let g = buildFunction(gInput);
-        let curve = board.create('functiongraph',[g],{strokeColor:'red', strokeWidth:2});
-        curves.push({func:g, curve:curve});
+        let c = board.create('functiongraph', [g], {strokeColor: '#ef4444', strokeWidth: 3});
+        elements.push(c);
     }
-
-    document.getElementById('info').innerHTML="Fonctions tracées.";
+    document.getElementById('info').innerHTML = "Courbes dessinées.";
 }
 
-// ===== DERIVEE =====
-function calculateDerivative(){
-    if(curves.length===0) return;
-    let f = curves[0].func;
-    let derivative = function(x){let h=0.0001; return (f(x+h)-f(x-h))/(2*h);}
-    board.create('functiongraph',[derivative],{strokeColor:'green', strokeWidth:2});
-    document.getElementById('info').innerHTML="Dérivée affichée en vert.";
+// Action : DERIVEE
+function calculateDerivative() {
+    let fInput = document.getElementById('fx').value;
+    if(!fInput) {
+        document.getElementById('info').innerHTML = "Entrez f(x) pour calculer sa dérivée.";
+        return;
+    }
+    let f = buildFunction(fInput);
+    let deriv = function(x) { let h = 0.0001; return (f(x+h) - f(x-h)) / (2*h); };
+    let c = board.create('functiongraph', [deriv], {strokeColor: '#10b981', strokeWidth: 2, dash: 2});
+    elements.push(c);
+    document.getElementById('info').innerHTML = "Dérivée f'(x) tracée en vert (pointillés).";
 }
 
-// ===== INTERSECTION =====
-function findIntersection(){
-    if(curves.length<2){document.getElementById('info').innerHTML="Il faut deux fonctions."; return;}
-    let f = curves[0].func;
-    let g = curves[1].func;
-    for(let x=-10;x<=10;x+=0.05){
-        if(Math.abs(f(x)-g(x))<0.05){
-            board.create('point',[x,f(x)],{size:4,color:'orange'});
-            document.getElementById('info').innerHTML="Intersection trouvée.";
-            return;
+// Action : INTERSECTION
+function findIntersection() {
+    let fVal = document.getElementById('fx').value;
+    let gVal = document.getElementById('gx').value;
+    if(!fVal || !gVal) {
+        document.getElementById('info').innerHTML = "Il faut deux fonctions (f et g).";
+        return;
+    }
+    let f = buildFunction(fVal);
+    let g = buildFunction(gVal);
+    
+    let found = false;
+    for(let x = -10; x <= 10; x += 0.1) {
+        if(Math.abs(f(x) - g(x)) < 0.1) {
+            let p = board.create('point', [x, f(x)], {name: '', color: '#f59e0b', size: 3});
+            elements.push(p);
+            found = true;
         }
     }
-    document.getElementById('info').innerHTML="Pas d'intersection visible.";
+    document.getElementById('info').innerHTML = found ? "Intersections marquées en orange." : "Aucune intersection trouvée sur cet intervalle.";
 }
 
-// ===== RESET =====
-function resetCurves(){
-    curves.forEach(c=>board.removeObject(c.curve));
-    curves=[];
+// Action : RESET
+function resetGraph() {
+    elements.forEach(el => board.removeObject(el));
+    elements = [];
+    document.getElementById('fx').value = "";
+    document.getElementById('gx').value = "";
+    document.getElementById('info').innerHTML = "Graphique réinitialisé.";
 }
 
-function resetGraph(){
-    resetCurves();
-    document.getElementById('info').innerHTML="";
-}
-
-// ===== BIND BOUTONS =====
-document.getElementById('btnTracer').addEventListener('click', drawFunctions);
-document.getElementById('btnDerivee').addEventListener('click', calculateDerivative);
-document.getElementById('btnIntersection').addEventListener('click', findIntersection);
-document.getElementById('btnReset').addEventListener('click', resetGraph);
+// Liaison des événements
+document.getElementById('btnTracer').onclick = drawFunctions;
+document.getElementById('btnDerivee').onclick = calculateDerivative;
+document.getElementById('btnIntersection').onclick = findIntersection;
+document.getElementById('btnReset').onclick = resetGraph;
 
 </script>
-
 </body>
 </html>
