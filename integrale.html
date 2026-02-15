@@ -2,149 +2,133 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro PRO - Intégrale Numérique</title>
+<title>CalcPro PRO Ultime</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+
 <style>
-:root{
-  --accent:#00ffcc;
-  --bg:#0d0d0d;
-  --card:#1a1a1a;
-  --text:#ffffff;
-}
-body{
-  margin:0; padding:10px;
-  font-family:sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-h2{text-align:center;color:var(--accent);}
-.interface{
-  max-width:700px;
-  margin:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-input[type=number], input[type=text]{
-  width:80px; padding:5px; margin:2px;
-  border-radius:4px; border:1px solid #333;
-  background:var(--card); color:var(--text);
-  text-align:center;
-}
-button{
-  padding:8px 12px; margin:4px;
-  border-radius:8px; border:none; cursor:pointer;
-  font-weight:bold;
-  background:var(--card); color:var(--text);
-}
-button:hover{background:var(--accent); color:black;}
-#result{
-  margin-top:10px;
-  padding:10px;
-  background:#111;
-  border-radius:8px;
-  white-space:pre-wrap;
-  max-height:400px;
-  overflow:auto;
-}
-.flex-row{display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
-.title-section{color:var(--accent); font-weight:bold; margin-top:10px; text-align:center;}
-table{border-collapse:collapse; width:100%; margin-top:5px;}
-th, td{border:1px solid #333; padding:4px; text-align:center;}
-th{background:var(--card);}
+    body { margin: 0; background: white; font-family: Arial; color: black; }
+    #box { width: 90vw; height: 55vh; margin: 20px auto; border: 2px solid #38bdf8; border-radius: 15px; }
+    .input-container { text-align: center; margin-bottom: 10px; }
+    input { width: 40%; padding: 12px; font-size: 18px; border-radius: 10px; border: 1px solid #ccc; text-align: center; margin: 5px; }
+    
+    button { 
+        padding: 12px 18px; margin: 3px; border: none; border-radius: 10px; 
+        cursor: pointer; font-weight: bold; color: white; transition: 0.2s;
+    }
+    button:hover { opacity: 0.8; }
+    
+    #btnTracer { background: #38bdf8; }
+    #btnDerivee { background: #10b981; }
+    #btnIntegrale { background: #8b5cf6; }
+    #btnIntersection { background: #f59e0b; }
+    #btnReset { background: #ef4444; }
+
+    #info { 
+        max-width: 90vw; margin: 10px auto; padding: 15px; border-radius: 15px; 
+        background: #f3f4f6; border-left: 5px solid #38bdf8; min-height: 40px;
+    }
 </style>
 </head>
 <body>
 
-<h2>CalcPro PRO - Intégrale Numérique</h2>
+<div id="box" class="jxgbox"></div>
 
-<div class="interface">
+<div class="input-container">
+    <input id="fx" placeholder="">
+    <input id="gx" placeholder="">
+    <br>
+    <button id="btnTracer">Tracer</button>
+    <button id="btnDerivee">Dérivée f'(x)</button>
+    <button id="btnIntegrale">Calcul Intégrale</button>
+    <button id="btnIntersection">Intersection</button>
+    <button id="btnReset">RESET</button>
+</div>
 
-  <div class="title-section">Fonction à intégrer</div>
-  <div class="flex-row">
-    f(x) = <input type="text" id="func" value="x^2">
-  </div>
-
-  <div class="title-section">Intervalle et subdivisions</div>
-  <div class="flex-row">
-    a = <input type="number" id="a" value="0">
-    b = <input type="number" id="b" value="1">
-    n = <input type="number" id="n" value="4">
-  </div>
-
-  <div class="title-section">Méthode</div>
-  <div class="flex-row">
-    <button onclick="computeIntegral('rectangle')">Rectangle</button>
-    <button onclick="computeIntegral('trapeze')">Trapèze</button>
-    <button onclick="computeIntegral('simpson')">Simpson</button>
-  </div>
-
-  <div id="result"></div>
-
+<div id="info" class="help-text">
+    Utilisez <b>*</b> pour fois, <b>^</b> pour puissance, et <b>/x/</b> pour valeur absolue.
 </div>
 
 <script>
-// 🌟 Fonction d’évaluation
-function evalFunc(fx, x){
-  fx = fx.replace(/\^/g,"**");
-  try{
-    return eval(fx);
-  }catch(e){
-    return NaN;
-  }
+const board = JXG.JSXGraph.initBoard('box', {
+    boundingbox: [-10, 10, 10, -10],
+    axis: true,
+    grid: true,
+    showCopyright: false
+});
+
+let drawings = [];
+
+function parseFunction(f) {
+    if(!f) return "";
+    f = f.replace(/\/([^\/]+)\//g, "Math.abs($1)");
+    f = f.replace(/(\d)x/g, "$1*x");
+    f = f.replace(/\^/g, "**");
+    return f;
 }
 
-// 🌟 Fonction principale
-function computeIntegral(method){
-  const fx = document.getElementById("func").value;
-  const a = parseFloat(document.getElementById("a").value);
-  const b = parseFloat(document.getElementById("b").value);
-  let n = parseInt(document.getElementById("n").value);
-  if(n<=0) n=4;
-  const h = (b-a)/n;
-  let sum = 0;
-  let table = "<table><tr><th>i</th><th>x_i</th><th>f(x_i)</th></tr>";
-
-  if(method==='rectangle'){
-    for(let i=0;i<n;i++){
-      const x = a + i*h;
-      const y = evalFunc(fx,x);
-      sum += y;
-      table += `<tr><td>${i}</td><td>${x.toFixed(4)}</td><td>${y.toFixed(4)}</td></tr>`;
-    }
-    sum *= h;
-    table += "</table>";
-  }
-  else if(method==='trapeze'){
-    for(let i=0;i<n;i++){
-      const x0 = a + i*h;
-      const x1 = x0 + h;
-      const y0 = evalFunc(fx,x0);
-      const y1 = evalFunc(fx,x1);
-      sum += (y0 + y1)/2*h;
-      table += `<tr><td>${i}</td><td>${x0.toFixed(4)}</td><td>${y0.toFixed(4)}</td></tr>`;
-    }
-    table += "</table>";
-  }
-  else if(method==='simpson'){
-    if(n%2!==0) n+=1;
-    const h2 = (b-a)/n;
-    let s = evalFunc(fx,a) + evalFunc(fx,b);
-    table += `<tr><td>0</td><td>${a.toFixed(4)}</td><td>${evalFunc(fx,a).toFixed(4)}</td></tr>`;
-    for(let i=1;i<n;i++){
-      const x = a + i*h2;
-      const y = evalFunc(fx,x);
-      s += y*(i%2===0?2:4);
-      table += `<tr><td>${i}</td><td>${x.toFixed(4)}</td><td>${y.toFixed(4)}</td></tr>`;
-    }
-    sum = s*h2/3;
-    table += `<tr><td>${n}</td><td>${b.toFixed(4)}</td><td>${evalFunc(fx,b).toFixed(4)}</td></tr>`;
-    table += "</table>";
-  }
-
-  document.getElementById("result").innerHTML = `<strong>Méthode:</strong> ${method}<br><strong>Résultat ≈</strong> ${sum.toFixed(6)}<br>${table}`;
+function buildFunction(expr) {
+    try {
+        let parsed = parseFunction(expr);
+        return new Function('x', 'return ' + parsed);
+    } catch(e) { return null; }
 }
+
+function drawFunctions() {
+    let fVal = document.getElementById('fx').value;
+    let gVal = document.getElementById('gx').value;
+    if(fVal) drawings.push(board.create('functiongraph', [buildFunction(fVal)], {strokeColor:'blue', strokeWidth:3}));
+    if(gVal) drawings.push(board.create('functiongraph', [buildFunction(gVal)], {strokeColor:'red', strokeWidth:3}));
+}
+
+// --- CALCUL UNIQUEMENT ---
+function calculateIntegrale() {
+    let fVal = document.getElementById('fx').value;
+    if(!fVal) return;
+    let f = buildFunction(fVal);
+    let a = -2, b = 2; // Bornes par défaut
+    let n = 1000, h = (b - a) / n, somme = 0.5 * (f(a) + f(b));
+    for (let i = 1; i < n; i++) somme += f(a + i * h);
+    let res = somme * h;
+    document.getElementById('info').innerHTML = `Intégrale de f(x) entre ${a} et ${b} = <b>${res.toFixed(4)}</b>`;
+}
+
+function calculateDerivee() {
+    let fVal = document.getElementById('fx').value;
+    if(!fVal) return;
+    let f = buildFunction(fVal);
+    let d = function(x){ let h=0.0001; return (f(x+h)-f(x-h))/(2*h); };
+    drawings.push(board.create('functiongraph', [d], {strokeColor:'green', strokeWidth:2, dash:2}));
+    document.getElementById('info').innerHTML = "Dérivée f'(x) tracée en vert.";
+}
+
+function findIntersection() {
+    let fVal = document.getElementById('fx').value, gVal = document.getElementById('gx').value;
+    if(!fVal || !gVal) return;
+    let f = buildFunction(fVal), g = buildFunction(gVal);
+    for(let x=-10; x<=10; x+=0.1) {
+        if(Math.abs(f(x)-g(x)) < 0.1) {
+            drawings.push(board.create('point', [x, f(x)], {color:'orange', name:''}));
+        }
+    }
+    document.getElementById('info').innerHTML = "Points d'intersection marqués en orange.";
+}
+
+function resetGraph() {
+    drawings.forEach(el => board.removeObject(el));
+    drawings = [];
+    document.getElementById('fx').value = "";
+    document.getElementById('gx').value = "";
+    document.getElementById('info').innerHTML = "Utilisez <b>*</b> , <b>^</b> , et <b>/x/</b>";
+}
+
+document.getElementById('btnTracer').onclick = drawFunctions;
+document.getElementById('btnDerivee').onclick = calculateDerivee;
+document.getElementById('btnIntegrale').onclick = calculateIntegrale;
+document.getElementById('btnIntersection').onclick = findIntersection;
+document.getElementById('btnReset').onclick = resetGraph;
 </script>
-
 </body>
 </html>
