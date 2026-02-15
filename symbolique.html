@@ -2,130 +2,225 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>Calcul Sapolique Pro • Symbolique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calcul Symbolique Supérieur</title>
+
+<!-- JSXGraph -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+
+<!-- Math.js pour symbolique -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.9.0/math.min.js"></script>
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        color: #333;
-        padding: 20px;
-    }
-    h1 {
-        text-align: center;
-        color: #4b0082;
-    }
-    h2 {
-        text-align: center;
-        color: #555;
-        font-weight: normal;
-        font-size: 18px;
-        margin-top: -5px;
-    }
-    .calculator {
-        max-width: 600px;
-        margin: 30px auto;
-        padding: 20px;
-        border-radius: 10px;
-        background: #fff;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    label {
-        display: block;
-        margin-top: 15px;
-    }
-    input, select, button {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-    }
-    button {
-        background-color: #4b0082;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 20px;
-    }
-    button:hover {
-        background-color: #370066;
-    }
-    .result {
-        margin-top: 20px;
-        font-weight: bold;
-        text-align: center;
-        color: #4b0082;
-        word-wrap: break-word;
-    }
+body{
+    margin:0;
+    background:white;
+    font-family:Arial;
+    color:black;
+}
+#box{
+    width:90vw;
+    height:60vh;
+    margin:20px auto;
+    border:2px solid #38bdf8;
+    border-radius:15px;
+}
+.input-container{
+    text-align:center;
+    margin-bottom:10px;
+}
+input{
+    width:30%;
+    padding:10px;
+    font-size:18px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    text-align:center;
+    margin:2px;
+}
+button{
+    padding:10px 15px;
+    margin:3px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+#info{
+    max-width:90vw;
+    margin:10px auto;
+    padding:15px;
+    border-radius:15px;
+    background:#f3f4f6;
+    color:black;
+}
 </style>
 </head>
 <body>
 
-<h1>Calcul Symbolique Supérieur</h1>
-<h2 id="subtitle">✏️ Factorisation, dérivées, intégrales… tout ici !</h2>
+<div id="box"></div>
 
-<div class="calculator">
-    <label for="calcType">Choisis le type de calcul :</label>
-    <select id="calcType">
-        <option value="">--Sélectionner--</option>
-        <option value="simplifier">Simplifier une expression</option>
-        <option value="factoriser">Factoriser</option>
-        <option value="derivee">Dérivée</option>
-        <option value="integrale">Intégrale</option>
-    </select>
-
-    <label>Entrez l’expression :</label>
-    <input type="text" id="expression" placeholder="Ex : x^2 + 2*x + 1">
-
-    <button onclick="calculer()">Calculer</button>
-
-    <div class="result" id="result"></div>
+<div class="input-container">
+<input id="fx" placeholder="f(x)">
+<input id="gx" placeholder="g(x)">
+<br>
+<button id="btnTracer">Tracer</button>
+<button id="btnDerivee">Dérivée f'(x)</button>
+<button id="btnIntersection">Intersection</button>
+<button id="btnFactor">Factoriser</button>
+<button id="btnDevelop">Développer</button>
+<button id="btnSimplify">Simplifier</button>
+<button id="btnReset">RESET</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.12.0/math.min.js"></script>
+<div id="info">Info : Saisir f(x) et g(x), puis choisir une opération.</div>
+
 <script>
-const subtitle = document.getElementById('subtitle');
-
-document.getElementById('calcType').addEventListener('change', function() {
-    const type = this.value;
-    if(type === 'simplifier') subtitle.innerText = "✏️ Simplifie ton expression facilement !";
-    else if(type === 'factoriser') subtitle.innerText = "🔧 Factorise tes polynômes rapidement !";
-    else if(type === 'derivee') subtitle.innerText = "📈 Calcule les dérivées !";
-    else if(type === 'integrale') subtitle.innerText = "∫ Calcule les intégrales !";
-    else subtitle.innerText = "✏️ Factorisation, dérivées, intégrales… tout ici !";
+// ===== INITIALISATION BOARD =====
+const board = JXG.JSXGraph.initBoard('box',{
+    boundingbox:[-10,10,10,-10],
+    axis:true,
+    grid:true
 });
+board.containerObj.style.backgroundColor = "white";
+board.defaultAxes.x.setAttribute({strokeColor:'black'});
+board.defaultAxes.y.setAttribute({strokeColor:'black'});
+board.defaultAxes.x.ticks.majorUnit = 1;
+board.defaultAxes.y.ticks.majorUnit = 1;
+board.defaultAxes.x.ticks.setAttribute({label:{color:'black'}});
+board.defaultAxes.y.ticks.setAttribute({label:{color:'black'}});
 
-function calculer(){
-    const type = document.getElementById('calcType').value;
-    const expr = document.getElementById('expression').value;
-    const resultDiv = document.getElementById('result');
-    
-    if(!expr){
-        resultDiv.innerText = "Erreur : entre une expression";
-        return;
-    }
+let curves = [];
+let tangentPoint = null;
+let tangentLine = null;
 
-    try{
-        let result = '';
-        if(type === 'simplifier'){
-            result = math.simplify(expr).toString();
-        } else if(type === 'factoriser'){
-            result = math.factor(expr).toString();
-        } else if(type === 'derivee'){
-            result = math.derivative(expr, 'x').toString();
-        } else if(type === 'integrale'){
-            result = math.integral(expr, 'x').toString();
-        } else {
-            result = "Sélectionne un type de calcul";
-        }
-        resultDiv.innerText = result;
-    } catch(e){
-        resultDiv.innerText = "Erreur : expression invalide";
-    }
+// ===== PARSE FUNCTION POUR GRAPH =====
+function parseFunction(f){
+    f = f.replace(/(\d)x/g,"$1*x");
+    f = f.replace(/\^/g,"**");
+    f = f.replace(/racin/gi,"Math.sqrt");
+    f = f.replace(/π/gi,"Math.PI");
+    f = f.replace(/\be\b/gi,"Math.E");
+    f = f.replace(/ln/gi,"Math.log");
+    f = f.replace(/log/gi,"Math.log10");
+    f = f.replace(/exp/gi,"Math.exp");
+    f = f.replace(/sin/gi,"Math.sin");
+    f = f.replace(/cos/gi,"Math.cos");
+    f = f.replace(/tg/gi,"Math.tan");
+    f = f.replace(/abs/gi,"Math.abs");
+    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)");
+    f = f.replace(/(\d+)!/g,function(match,n){let fact=1;for(let i=1;i<=n;i++) fact*=i; return fact;});
+    return f;
 }
-</script>
 
+function buildFunction(expr){
+    let parsed = parseFunction(expr);
+    return new Function('x','return '+parsed);
+}
+
+// ===== TRACER =====
+function drawFunctions(){
+    resetCurves();
+    let fInput = document.getElementById('fx').value;
+    let gInput = document.getElementById('gx').value;
+
+    if(fInput){
+        let f = buildFunction(fInput);
+        let curve = board.create('functiongraph',[f],{strokeColor:'blue', strokeWidth:2});
+        curves.push({func:f, curve:curve});
+    }
+    if(gInput){
+        let g = buildFunction(gInput);
+        let curve = board.create('functiongraph',[g],{strokeColor:'red', strokeWidth:2});
+        curves.push({func:g, curve:curve});
+    }
+
+    // Tangente dynamique
+    if(curves.length>0){
+        if(tangentPoint) board.removeObject(tangentPoint);
+        if(tangentLine) board.removeObject(tangentLine);
+        tangentPoint = board.create('glider',[0,curves[0].func(0),curves[0].curve],{name:'T'});
+        tangentLine = board.create('tangent',[tangentPoint,curves[0].curve],{strokeColor:'green', strokeWidth:2});
+    }
+
+    document.getElementById('info').innerHTML="Fonctions tracées. Tangente verte active sur f(x).";
+}
+
+// ===== DERIVEE =====
+function calculateDerivative(){
+    if(curves.length===0) return;
+    let f = curves[0].func;
+    let derivative = function(x){let h=0.0001; return (f(x+h)-f(x-h))/(2*h);}
+    board.create('functiongraph',[derivative],{strokeColor:'purple', strokeWidth:2});
+    document.getElementById('info').innerHTML="Dérivée affichée en violet.";
+}
+
+// ===== INTERSECTION =====
+function findIntersection(){
+    if(curves.length<2){document.getElementById('info').innerHTML="Il faut deux fonctions."; return;}
+    let f = curves[0].func;
+    let g = curves[1].func;
+    let found=false;
+    for(let x=-10;x<=10;x+=0.01){
+        if(Math.abs(f(x)-g(x))<0.05){
+            board.create('point',[x,f(x)],{size:4,color:'orange'});
+            found=true;
+        }
+    }
+    document.getElementById('info').innerHTML=found?"Intersection(s) trouvée(s).":"Pas d'intersection visible.";
+}
+
+// ===== SYMBOLIQUE =====
+function factoriser(){
+    let fInput = document.getElementById('fx').value;
+    if(!fInput) return;
+    try{
+        let result = math.factor(fInput);
+        document.getElementById('info').innerHTML="Factorisé : "+result;
+    }catch(e){document.getElementById('info').innerHTML="Erreur factorisation";}
+}
+
+function developper(){
+    let fInput = document.getElementById('fx').value;
+    if(!fInput) return;
+    try{
+        let result = math.expand(fInput);
+        document.getElementById('info').innerHTML="Développé : "+result;
+    }catch(e){document.getElementById('info').innerHTML="Erreur développement";}
+}
+
+function simplifier(){
+    let fInput = document.getElementById('fx').value;
+    if(!fInput) return;
+    try{
+        let result = math.simplify(fInput);
+        document.getElementById('info').innerHTML="Simplifié : "+result;
+    }catch(e){document.getElementById('info').innerHTML="Erreur simplification";}
+}
+
+// ===== RESET =====
+function resetCurves(){
+    curves.forEach(c=>board.removeObject(c.curve));
+    curves=[];
+    if(tangentPoint){board.removeObject(tangentPoint); tangentPoint=null;}
+    if(tangentLine){board.removeObject(tangentLine); tangentLine=null;}
+}
+
+function resetGraph(){
+    resetCurves();
+    document.getElementById('info').innerHTML="Info : Saisir f(x) et g(x), puis choisir une opération.";
+}
+
+// ===== BIND BOUTONS =====
+document.getElementById('btnTracer').addEventListener('click', drawFunctions);
+document.getElementById('btnDerivee').addEventListener('click', calculateDerivative);
+document.getElementById('btnIntersection').addEventListener('click', findIntersection);
+document.getElementById('btnFactor').addEventListener('click', factoriser);
+document.getElementById('btnDevelop').addEventListener('click', developper);
+document.getElementById('btnSimplify').addEventListener('click', simplifier);
+document.getElementById('btnReset').addEventListener('click', resetGraph);
+
+</script>
 </body>
 </html>
