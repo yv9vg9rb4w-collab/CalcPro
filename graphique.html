@@ -61,10 +61,10 @@ button{
 <input id="fx" placeholder="f(x)">
 <input id="gx" placeholder="g(x)">
 <br>
-<button onclick="drawFunctions()">Tracer</button>
-<button onclick="calculateDerivative()">Dérivée f'(x)</button>
-<button onclick="findIntersection()">Intersection</button>
-<button onclick="resetGraph()">RESET</button>
+<button id="btnTracer">Tracer</button>
+<button id="btnDerivee">Dérivée f'(x)</button>
+<button id="btnIntersection">Intersection</button>
+<button id="btnReset">RESET</button>
 </div>
 
 <div id="info"></div>
@@ -121,7 +121,6 @@ function buildFunction(expr){
 // ===== TRACER =====
 function drawFunctions(){
     resetCurves();
-
     let fInput = document.getElementById('fx').value;
     let gInput = document.getElementById('gx').value;
 
@@ -173,6 +172,13 @@ function resetGraph(){
     resetCurves();
     document.getElementById('info').innerHTML="";
 }
+
+// ===== BIND BOUTONS =====
+document.getElementById('btnTracer').addEventListener('click', drawFunctions);
+document.getElementById('btnDerivee').addEventListener('click', calculateDerivative);
+document.getElementById('btnIntersection').addEventListener('click', findIntersection);
+document.getElementById('btnReset').addEventListener('click', resetGraph);
+
 </script>
 
 </body>
