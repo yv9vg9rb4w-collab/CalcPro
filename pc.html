@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CalcPro P.C Pro 💎</title>
+<title>CalcPro P.C </title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 <style>
 body {
@@ -68,14 +68,14 @@ button:hover {
 </head>
 <body>
 
-<h1>CalcPro P.C Pro 💎</h1>
+<h1>CalcPro P.C </h1>
 
 <div class="calculator">
     <label for="formula">Choisir la formule :</label>
     <select id="formula">
         <optgroup label="Électricité">
-            <option value="ohm">Loi d'Ohm (V = R × I)</option>
-            <option value="puissance">Puissance (P = V × I)</option>
+            <option value="ohm">Loi d'Ohm (U = R × I)</option>
+            <option value="puissance">Puissance (P = U × I)</option>
             <option value="energie_elec">Énergie électrique (E = P × t)</option>
         </optgroup>
         <optgroup label="Mécanique">
@@ -118,8 +118,8 @@ const inputsDiv = document.getElementById('inputs');
 
 // Définition des formules et variables
 const formulas = {
-    'ohm': ['V','R','I'],
-    'puissance': ['P','V','I'],
+    'ohm': ['U','R','I'],
+    'puissance': ['P','U','I'],
     'energie_elec': ['E','P','t'],
     'force': ['F','m','a'],
     'vitesse': ['v','d','t'],
@@ -177,14 +177,14 @@ function calculate(){
     let result;
     switch(f){
         case 'ohm':
-            if(toCalc==='V') result=vars['R']*vars['I'];
-            if(toCalc==='R') result=vars['V']/vars['I'];
-            if(toCalc==='I') result=vars['V']/vars['R'];
+            if(toCalc==='U') result=vars['R']*vars['I'];
+            if(toCalc==='R') result=vars['U']/vars['I'];
+            if(toCalc==='I') result=vars['U']/vars['R'];
             break;
         case 'puissance':
-            if(toCalc==='P') result=vars['V']*vars['I'];
-            if(toCalc==='V') result=vars['P']/vars['I'];
-            if(toCalc==='I') result=vars['P']/vars['V'];
+            if(toCalc==='P') result=vars['U']*vars['I'];
+            if(toCalc==='U') result=vars['P']/vars['I'];
+            if(toCalc==='I') result=vars['P']/vars['U'];
             break;
         case 'energie_elec':
             if(toCalc==='E') result=vars['P']*vars['t'];
