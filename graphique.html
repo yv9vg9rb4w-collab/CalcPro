@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro PRO</title>
+<title>CalcPro  Ultime</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
@@ -11,36 +11,33 @@
 <style>
 body{
     margin:0;
-    background:#0f172a;
-    font-family:Arial;
-    color:white;
-    transition:0.3s;
-}
-.light{
     background:white;
+    font-family:Arial;
     color:black;
 }
 #box{
     width:90vw;
-    height:70vh;
+    height:60vh;
     margin:20px auto;
     border:2px solid #38bdf8;
     border-radius:15px;
 }
 .input-container{
     text-align:center;
+    margin-bottom:10px;
 }
 input{
-    width:45%;
+    width:40%;
     padding:10px;
     font-size:18px;
     border-radius:10px;
-    border:none;
+    border:1px solid #ccc;
     text-align:center;
+    margin:2px;
 }
 button{
     padding:10px 15px;
-    margin:5px;
+    margin:3px;
     border:none;
     border-radius:10px;
     cursor:pointer;
@@ -51,12 +48,16 @@ button{
     margin:10px auto;
     padding:15px;
     border-radius:15px;
-    background:#111827;
-    color:#facc15;
-}
-.light #info{
-    background:#e5e7eb;
+    background:#f3f4f6;
     color:black;
+}
+.keyboard{
+    text-align:center;
+    margin-top:10px;
+}
+.keyboard button{
+    min-width:50px;
+    font-size:16px;
 }
 </style>
 </head>
@@ -71,33 +72,100 @@ button{
 <button onclick="drawFunctions()">Tracer</button>
 <button onclick="calculateDerivative()">Dérivée f'(x)</button>
 <button onclick="findIntersection()">Intersection</button>
-<button onclick="toggleMode()">🌗 Mode</button>
-<button onclick="resetGraph()">Reset</button>
+<button onclick="resetGraph()">RESET</button>
 </div>
 
 <div id="info"></div>
 
-<script>
+<!-- ===== CLAVIER AVEC SAMPLES ===== -->
+<div class="keyboard">
+    <div>
+        <button onclick="insert('7')">7</button>
+        <button onclick="insert('8')">8</button>
+        <button onclick="insert('9')">9</button>
+        <button onclick="insert('(')">(</button>
+        <button onclick="insert(')')">)</button>
+    </div>
+    <div>
+        <button onclick="insert('4')">4</button>
+        <button onclick="insert('5')">5</button>
+        <button onclick="insert('6')">6</button>
+        <button onclick="insert('+')">+</button>
+        <button onclick="insert('-')">-</button>
+    </div>
+    <div>
+        <button onclick="insert('1')">1</button>
+        <button onclick="insert('2')">2</button>
+        <button onclick="insert('3')">3</button>
+        <button onclick="insert('*')">*</button>
+        <button onclick="insert('/')">/</button>
+    </div>
+    <div>
+        <button onclick="insert('0')">0</button>
+        <button onclick="insert('.')">.</button>
+        <button onclick="insert('^')">^</button>
+        <button onclick="insert('racin(x)')">√</button>
+        <button onclick="insert('/x/')">abs</button>
+    </div>
+    <div>
+        <button onclick="insert('sin(x)')">sin</button>
+        <button onclick="insert('cos(x)')">cos</button>
+        <button onclick="insert('tg(x)')">tg</button>
+        <button onclick="insert('ln(x)')">ln</button>
+        <button onclick="insert('log(x)')">log</button>
+        <button onclick="insert('exp(x)')">exp</button>
+        <button onclick="insert('π')">π</button>
+        <button onclick="insert('e')">e</button>
+        <button onclick="insert('5!')">!</button>
+    </div>
+    <div>
+        <button onclick="deleteLast()">←</button>
+        <button onclick="drawFunctions()">Tracer</button>
+        <button onclick="resetGraph()">RESET</button>
+    </div>
+</div>
 
+<script>
+// ===== INITIALISATION BOARD =====
 const board = JXG.JSXGraph.initBoard('box',{
     boundingbox:[-10,10,10,-10],
     axis:true,
     grid:true
 });
 
+board.containerObj.style.backgroundColor = "white";
+board.defaultAxes.x.setAttribute({strokeColor:'black'});
+board.defaultAxes.y.setAttribute({strokeColor:'black'});
 board.defaultAxes.x.ticks.majorUnit = 1;
 board.defaultAxes.y.ticks.majorUnit = 1;
+board.defaultAxes.x.ticks.setAttribute({label:{color:'black'}});
+board.defaultAxes.y.ticks.setAttribute({label:{color:'black'}});
 
 let curves = [];
 
+// ===== PARSE FUNCTION =====
 function parseFunction(f){
     f = f.replace(/(\d)x/g,"$1*x");
     f = f.replace(/\^/g,"**");
     f = f.replace(/racin/gi,"Math.sqrt");
+    f = f.replace(/π/gi,"Math.PI");
+    f = f.replace(/\be\b/gi,"Math.E");
+    f = f.replace(/ln/gi,"Math.log");
+    f = f.replace(/log/gi,"Math.log10");
+    f = f.replace(/exp/gi,"Math.exp");
     f = f.replace(/sin/gi,"Math.sin");
     f = f.replace(/cos/gi,"Math.cos");
     f = f.replace(/tg/gi,"Math.tan");
-    f = f.replace(/tan/gi,"Math.tan");
+    f = f.replace(/arcsin/gi,"Math.asin");
+    f = f.replace(/arccos/gi,"Math.acos");
+    f = f.replace(/arctan/gi,"Math.atan");
+    f = f.replace(/abs/gi,"Math.abs");
+    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); // /x/ -> abs
+    f = f.replace(/(\d+)!/g,function(match,n){
+        let fact=1;
+        for(let i=1;i<=n;i++) fact*=i;
+        return fact;
+    });
     return f;
 }
 
@@ -106,6 +174,7 @@ function buildFunction(expr){
     return new Function('x','return '+parsed);
 }
 
+// ===== TRACER =====
 function drawFunctions(){
     resetCurves();
 
@@ -114,59 +183,43 @@ function drawFunctions(){
 
     if(fInput){
         let f = buildFunction(fInput);
-        let curve = board.create('functiongraph',[f],{strokeColor:'blue'});
+        let curve = board.create('functiongraph',[f],{strokeColor:'blue', strokeWidth:2});
         curves.push({func:f, curve:curve});
     }
-
     if(gInput){
         let g = buildFunction(gInput);
-        let curve = board.create('functiongraph',[g],{strokeColor:'red'});
+        let curve = board.create('functiongraph',[g],{strokeColor:'red', strokeWidth:2});
         curves.push({func:g, curve:curve});
     }
 
     document.getElementById('info').innerHTML="Fonctions tracées.";
 }
 
+// ===== DERIVEE =====
 function calculateDerivative(){
-
     if(curves.length===0) return;
-
     let f = curves[0].func;
-
-    let derivative = function(x){
-        let h = 0.0001;
-        return (f(x+h)-f(x-h))/(2*h);
-    };
-
-    board.create('functiongraph',[derivative],{strokeColor:'green'});
-    document.getElementById('info').innerHTML="Dérivée numérique affichée en vert.";
+    let derivative = function(x){let h=0.0001; return (f(x+h)-f(x-h))/(2*h);}
+    board.create('functiongraph',[derivative],{strokeColor:'green', strokeWidth:2});
+    document.getElementById('info').innerHTML="Dérivée affichée en vert.";
 }
 
+// ===== INTERSECTION =====
 function findIntersection(){
-
-    if(curves.length<2){
-        document.getElementById('info').innerHTML="Il faut deux fonctions.";
-        return;
-    }
-
+    if(curves.length<2){document.getElementById('info').innerHTML="Il faut deux fonctions."; return;}
     let f = curves[0].func;
     let g = curves[1].func;
-
-    for(let x=-10; x<=10; x+=0.1){
-        if(Math.abs(f(x)-g(x))<0.1){
-            board.create('point',[x,f(x)],{size:4,color:'yellow'});
+    for(let x=-10;x<=10;x+=0.05){
+        if(Math.abs(f(x)-g(x))<0.05){
+            board.create('point',[x,f(x)],{size:4,color:'orange'});
             document.getElementById('info').innerHTML="Intersection trouvée.";
             return;
         }
     }
-
     document.getElementById('info').innerHTML="Pas d'intersection visible.";
 }
 
-function toggleMode(){
-    document.body.classList.toggle('light');
-}
-
+// ===== RESET =====
 function resetCurves(){
     curves.forEach(c=>board.removeObject(c.curve));
     curves=[];
@@ -174,10 +227,26 @@ function resetCurves(){
 
 function resetGraph(){
     resetCurves();
-    board.removeObject(board.objectsList.filter(o=>o.elType==='point'));
     document.getElementById('info').innerHTML="";
 }
 
+// ===== CLAVIER =====
+function insert(val){
+    const input = document.getElementById('fx');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    input.value = input.value.substring(0,start) + val + input.value.substring(end);
+    input.focus();
+    input.selectionStart = input.selectionEnd = start + val.length;
+}
+function deleteLast(){
+    const input = document.getElementById('fx');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    if(start===end && start>0){input.value=input.value.substring(0,start-1)+input.value.substring(end); input.selectionStart=input.selectionEnd=start-1;}
+    else {input.value=input.value.substring(0,start)+input.value.substring(end); input.selectionStart=input.selectionEnd=start;}
+    input.focus();
+}
 </script>
 
 </body>
