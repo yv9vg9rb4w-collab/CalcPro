@@ -2,34 +2,93 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Calcul Intégrale Numérique</title>
+<title>Calcul Intégrale Numérique • Stylé</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body{font-family:Arial;margin:20px;}
-input{padding:8px;margin:5px;width:100px;}
-button{padding:8px;margin:5px;}
-#result{margin-top:10px;font-weight:bold;}
+body{
+    font-family: 'Arial', sans-serif;
+    margin:0;
+    padding:0;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color:white;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+}
+h2{
+    margin-top:30px;
+    color:#facc15;
+    text-shadow: 1px 1px 2px black;
+}
+.input-container{
+    margin:20px 0;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+}
+input{
+    padding:10px;
+    font-size:16px;
+    border-radius:10px;
+    border:none;
+    width:120px;
+    text-align:center;
+    outline:none;
+}
+input::placeholder{
+    color:#94a3b8;
+}
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+button:hover{
+    transform: scale(1.05);
+}
+#btnCalc{background:#22c55e;color:black;}
+#btnReset{background:#ef4444;color:white;}
+#result{
+    margin-top:20px;
+    padding:15px;
+    border-radius:15px;
+    background: rgba(0,0,0,0.4);
+    min-width:250px;
+    text-align:center;
+    font-size:18px;
+    color:#facc15;
+    box-shadow: 0 0 10px #38bdf8;
+}
 </style>
 </head>
 <body>
 
 <h2>Intégrale numérique ∫ f(x) dx</h2>
 
+<div class="input-container">
 <input id="fx" placeholder="f(x)">
 <input id="a" placeholder="a">
 <input id="b" placeholder="b">
-<button onclick="calculIntegrale()">Calculer ∫ f(x) dx</button>
+<button id="btnCalc">Calculer ∫ f(x) dx</button>
+<button id="btnReset">RESET</button>
+</div>
 
 <div id="result">Résultat : </div>
 
 <script>
-// Fonction pour parser f(x) simple
+// Fonction pour parser f(x) avec π et e
 function parseFunction(f){
-    f = f.replace(/(\d)x/g,"$1*x");    // 2x → 2*x
-    f = f.replace(/\^/g,"**");          // x^2 → x**2
-    f = f.replace(/racin/gi,"Math.sqrt");
-    f = f.replace(/π/gi,"Math.PI");
-    f = f.replace(/e/gi,"Math.E");
+    f = f.replace(/(\d)x/g,"$1*x");        // 2x → 2*x
+    f = f.replace(/\^/g,"**");             // x^2 → x**2
+    f = f.replace(/racin/gi,"Math.sqrt");  // racin(x) → Math.sqrt(x)
+    f = f.replace(/π/gi,"Math.PI");        // π → Math.PI
+    f = f.replace(/\be\b/gi,"Math.E");     // e → Math.E
     f = f.replace(/sin/gi,"Math.sin");
     f = f.replace(/cos/gi,"Math.cos");
     f = f.replace(/tg|tan/gi,"Math.tan");
@@ -52,7 +111,7 @@ function calculIntegrale(){
         return;
     }
     let f = buildFunction(fx);
-    let n = 1000; // nombre de trapèzes
+    let n = 1000;
     let h = (b-a)/n;
     let sum = 0;
     for(let i=0;i<n;i++){
@@ -62,6 +121,18 @@ function calculIntegrale(){
     }
     document.getElementById('result').innerText = "Résultat ∫ f(x) dx ≈ " + sum.toFixed(5);
 }
+
+// RESET
+function reset(){
+    document.getElementById('fx').value='';
+    document.getElementById('a').value='';
+    document.getElementById('b').value='';
+    document.getElementById('result').innerText="Résultat : ";
+}
+
+// BOUTONS
+document.getElementById('btnCalc').addEventListener('click', calculIntegrale);
+document.getElementById('btnReset').addEventListener('click', reset);
 </script>
 
 </body>
