@@ -79,17 +79,24 @@ const board = JXG.JSXGraph.initBoard('box', {
     keepaspectratio:true
 });
 
-// Axes : ticks et labels en blanc
-board.defaultAxes.x.ticks.style = {strokeColor:'#22c55e', label:{color:'white'}};
-board.defaultAxes.y.ticks.style = {strokeColor:'#22c55e', label:{color:'white'}};
+// Forcer la couleur des ticks et labels en blanc
+board.defaultAxes.x.ticks.strokeColor = '#22c55e';
+board.defaultAxes.y.ticks.strokeColor = '#22c55e';
+board.defaultAxes.x.ticks.label.attrs.color = 'white';
+board.defaultAxes.y.ticks.label.attrs.color = 'white';
+board.defaultAxes.x.label.attrs.color = 'white';
+board.defaultAxes.y.label.attrs.color = 'white';
 
-// Transformer l’entrée en code JS
+// Fonction pour transformer le texte en code JS
 function parseFunction(f){
     f = f.replace(/(\d)(x)/gi, "$1*$2");          // 2x → 2*x
     f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); // /x-2/ → Math.abs(x-2)
     f = f.replace(/\^/g,"**");                     // puissance
 
-    // Fonctions trigonométriques
+    // Racine
+    f = f.replace(/racin/gi,"Math.sqrt");
+
+    // Trigonométrie
     f = f.replace(/sin/gi,"Math.sin");
     f = f.replace(/cos/gi,"Math.cos");
     f = f.replace(/tg/gi,"Math.tan");
@@ -110,23 +117,18 @@ function drawFunctions(){
     curves=[];
 
     let funcs = fx.split(',').map(fn=>fn.trim());
-    let totalY = 0;
 
     funcs.forEach(fn=>{
         let f = parseFunction(fn);
         let curve = board.create('functiongraph', [
             function(x){ 
-                try{ 
-                    let y = eval(f);
-                    if(!isNaN(y)) totalY+=y;
-                    return y; 
-                }catch{return NaN;}
+                try{ return eval(f); }catch{return NaN;}
             }
         ], {strokeColor:'#38bdf8', strokeWidth:2, name:fn});
         curves.push(curve);
     });
 
-    // Afficher info box avec les équations
+    // Afficher info box
     infoBox.innerHTML = "Fonctions tracées: " + funcs.join(' | ');
 }
 
