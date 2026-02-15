@@ -2,133 +2,67 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro PRO Ultime</title>
+<title>Calcul Intégrale Numérique</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
-<script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
-
 <style>
-    body { margin: 0; background: white; font-family: Arial; color: black; }
-    #box { width: 90vw; height: 55vh; margin: 20px auto; border: 2px solid #38bdf8; border-radius: 15px; }
-    .input-container { text-align: center; margin-bottom: 10px; }
-    input { width: 40%; padding: 12px; font-size: 18px; border-radius: 10px; border: 1px solid #ccc; text-align: center; margin: 5px; }
-    
-    button { 
-        padding: 12px 18px; margin: 3px; border: none; border-radius: 10px; 
-        cursor: pointer; font-weight: bold; color: white; transition: 0.2s;
-    }
-    button:hover { opacity: 0.8; }
-    
-    #btnTracer { background: #38bdf8; }
-    #btnDerivee { background: #10b981; }
-    #btnIntegrale { background: #8b5cf6; }
-    #btnIntersection { background: #f59e0b; }
-    #btnReset { background: #ef4444; }
-
-    #info { 
-        max-width: 90vw; margin: 10px auto; padding: 15px; border-radius: 15px; 
-        background: #f3f4f6; border-left: 5px solid #38bdf8; min-height: 40px;
-    }
+body{font-family:Arial;margin:20px;}
+input{padding:8px;margin:5px;width:100px;}
+button{padding:8px;margin:5px;}
+#result{margin-top:10px;font-weight:bold;}
 </style>
 </head>
 <body>
 
-<div id="box" class="jxgbox"></div>
+<h2>Intégrale numérique ∫ f(x) dx</h2>
 
-<div class="input-container">
-    <input id="fx" placeholder="">
-    <input id="gx" placeholder="">
-    <br>
-    <button id="btnTracer">Tracer</button>
-    <button id="btnDerivee">Dérivée f'(x)</button>
-    <button id="btnIntegrale">Calcul Intégrale</button>
-    <button id="btnIntersection">Intersection</button>
-    <button id="btnReset">RESET</button>
-</div>
+<input id="fx" placeholder="f(x)">
+<input id="a" placeholder="a">
+<input id="b" placeholder="b">
+<button onclick="calculIntegrale()">Calculer ∫ f(x) dx</button>
 
-<div id="info" class="help-text">
-    Utilisez <b>*</b> pour fois, <b>^</b> pour puissance, et <b>/x/</b> pour valeur absolue.
-</div>
+<div id="result">Résultat : </div>
 
 <script>
-const board = JXG.JSXGraph.initBoard('box', {
-    boundingbox: [-10, 10, 10, -10],
-    axis: true,
-    grid: true,
-    showCopyright: false
-});
-
-let drawings = [];
-
-function parseFunction(f) {
-    if(!f) return "";
-    f = f.replace(/\/([^\/]+)\//g, "Math.abs($1)");
-    f = f.replace(/(\d)x/g, "$1*x");
-    f = f.replace(/\^/g, "**");
+// Fonction pour parser f(x) simple
+function parseFunction(f){
+    f = f.replace(/(\d)x/g,"$1*x");    // 2x → 2*x
+    f = f.replace(/\^/g,"**");          // x^2 → x**2
+    f = f.replace(/racin/gi,"Math.sqrt");
+    f = f.replace(/π/gi,"Math.PI");
+    f = f.replace(/e/gi,"Math.E");
+    f = f.replace(/sin/gi,"Math.sin");
+    f = f.replace(/cos/gi,"Math.cos");
+    f = f.replace(/tg|tan/gi,"Math.tan");
+    f = f.replace(/abs/gi,"Math.abs");
     return f;
 }
 
-function buildFunction(expr) {
-    try {
-        let parsed = parseFunction(expr);
-        return new Function('x', 'return ' + parsed);
-    } catch(e) { return null; }
+function buildFunction(expr){
+    let parsed = parseFunction(expr);
+    return new Function('x','return '+parsed);
 }
 
-function drawFunctions() {
-    let fVal = document.getElementById('fx').value;
-    let gVal = document.getElementById('gx').value;
-    if(fVal) drawings.push(board.create('functiongraph', [buildFunction(fVal)], {strokeColor:'blue', strokeWidth:3}));
-    if(gVal) drawings.push(board.create('functiongraph', [buildFunction(gVal)], {strokeColor:'red', strokeWidth:3}));
-}
-
-// --- CALCUL UNIQUEMENT ---
-function calculateIntegrale() {
-    let fVal = document.getElementById('fx').value;
-    if(!fVal) return;
-    let f = buildFunction(fVal);
-    let a = -2, b = 2; // Bornes par défaut
-    let n = 1000, h = (b - a) / n, somme = 0.5 * (f(a) + f(b));
-    for (let i = 1; i < n; i++) somme += f(a + i * h);
-    let res = somme * h;
-    document.getElementById('info').innerHTML = `Intégrale de f(x) entre ${a} et ${b} = <b>${res.toFixed(4)}</b>`;
-}
-
-function calculateDerivee() {
-    let fVal = document.getElementById('fx').value;
-    if(!fVal) return;
-    let f = buildFunction(fVal);
-    let d = function(x){ let h=0.0001; return (f(x+h)-f(x-h))/(2*h); };
-    drawings.push(board.create('functiongraph', [d], {strokeColor:'green', strokeWidth:2, dash:2}));
-    document.getElementById('info').innerHTML = "Dérivée f'(x) tracée en vert.";
-}
-
-function findIntersection() {
-    let fVal = document.getElementById('fx').value, gVal = document.getElementById('gx').value;
-    if(!fVal || !gVal) return;
-    let f = buildFunction(fVal), g = buildFunction(gVal);
-    for(let x=-10; x<=10; x+=0.1) {
-        if(Math.abs(f(x)-g(x)) < 0.1) {
-            drawings.push(board.create('point', [x, f(x)], {color:'orange', name:''}));
-        }
+// Calcul intégrale numérique (méthode des trapèzes)
+function calculIntegrale(){
+    let fx = document.getElementById('fx').value;
+    let a = parseFloat(document.getElementById('a').value);
+    let b = parseFloat(document.getElementById('b').value);
+    if(!fx || isNaN(a) || isNaN(b)){
+        document.getElementById('result').innerText = "Veuillez saisir f(x) et bornes correctes.";
+        return;
     }
-    document.getElementById('info').innerHTML = "Points d'intersection marqués en orange.";
+    let f = buildFunction(fx);
+    let n = 1000; // nombre de trapèzes
+    let h = (b-a)/n;
+    let sum = 0;
+    for(let i=0;i<n;i++){
+        let x0 = a + i*h;
+        let x1 = a + (i+1)*h;
+        sum += 0.5*(f(x0)+f(x1))*h;
+    }
+    document.getElementById('result').innerText = "Résultat ∫ f(x) dx ≈ " + sum.toFixed(5);
 }
-
-function resetGraph() {
-    drawings.forEach(el => board.removeObject(el));
-    drawings = [];
-    document.getElementById('fx').value = "";
-    document.getElementById('gx').value = "";
-    document.getElementById('info').innerHTML = "Utilisez <b>*</b> , <b>^</b> , et <b>/x/</b>";
-}
-
-document.getElementById('btnTracer').onclick = drawFunctions;
-document.getElementById('btnDerivee').onclick = calculateDerivee;
-document.getElementById('btnIntegrale').onclick = calculateIntegrale;
-document.getElementById('btnIntersection').onclick = findIntersection;
-document.getElementById('btnReset').onclick = resetGraph;
 </script>
+
 </body>
 </html>
