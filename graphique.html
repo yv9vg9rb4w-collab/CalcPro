@@ -117,7 +117,6 @@ button{
 - Fractions : <code>1/x</code><br>
 - Plusieurs fonctions : séparées par <code>,</code><br>
 - Exemple complet : <code>2*x^2-3*x+1, sin(x), 1/x</code><br>
-- × : <code>Pour multiplier appuie sur la touche *</code><br>
 </div>
 
 </div>
@@ -128,6 +127,10 @@ let chart;
 let scale = 10;
 
 function parseFunction(f,x){
+
+    // Ajouter * automatiquement entre nombre et x (ex: 2x → 2*x)
+    f = f.replace(/(\d)(x)/gi, "$1*$2");
+
     return f.replace(/\^/g,"**")
             .replace(/racin/gi,"Math.sqrt")
             .replace(/sqrt/gi,"Math.sqrt")
