@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro  Ultime</title>
+<title>CalcPro PRO Ultime</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
@@ -17,7 +17,7 @@ body{
 }
 #box{
     width:90vw;
-    height:60vh;
+    height:70vh;
     margin:20px auto;
     border:2px solid #38bdf8;
     border-radius:15px;
@@ -51,14 +51,6 @@ button{
     background:#f3f4f6;
     color:black;
 }
-.keyboard{
-    text-align:center;
-    margin-top:10px;
-}
-.keyboard button{
-    min-width:50px;
-    font-size:16px;
-}
 </style>
 </head>
 <body>
@@ -76,54 +68,6 @@ button{
 </div>
 
 <div id="info"></div>
-
-<!-- ===== CLAVIER AVEC SAMPLES ===== -->
-<div class="keyboard">
-    <div>
-        <button onclick="insert('7')">7</button>
-        <button onclick="insert('8')">8</button>
-        <button onclick="insert('9')">9</button>
-        <button onclick="insert('(')">(</button>
-        <button onclick="insert(')')">)</button>
-    </div>
-    <div>
-        <button onclick="insert('4')">4</button>
-        <button onclick="insert('5')">5</button>
-        <button onclick="insert('6')">6</button>
-        <button onclick="insert('+')">+</button>
-        <button onclick="insert('-')">-</button>
-    </div>
-    <div>
-        <button onclick="insert('1')">1</button>
-        <button onclick="insert('2')">2</button>
-        <button onclick="insert('3')">3</button>
-        <button onclick="insert('*')">*</button>
-        <button onclick="insert('/')">/</button>
-    </div>
-    <div>
-        <button onclick="insert('0')">0</button>
-        <button onclick="insert('.')">.</button>
-        <button onclick="insert('^')">^</button>
-        <button onclick="insert('racin(x)')">√</button>
-        <button onclick="insert('/x/')">abs</button>
-    </div>
-    <div>
-        <button onclick="insert('sin(x)')">sin</button>
-        <button onclick="insert('cos(x)')">cos</button>
-        <button onclick="insert('tg(x)')">tg</button>
-        <button onclick="insert('ln(x)')">ln</button>
-        <button onclick="insert('log(x)')">log</button>
-        <button onclick="insert('exp(x)')">exp</button>
-        <button onclick="insert('π')">π</button>
-        <button onclick="insert('e')">e</button>
-        <button onclick="insert('5!')">!</button>
-    </div>
-    <div>
-        <button onclick="deleteLast()">←</button>
-        <button onclick="drawFunctions()">Tracer</button>
-        <button onclick="resetGraph()">RESET</button>
-    </div>
-</div>
 
 <script>
 // ===== INITIALISATION BOARD =====
@@ -160,7 +104,7 @@ function parseFunction(f){
     f = f.replace(/arccos/gi,"Math.acos");
     f = f.replace(/arctan/gi,"Math.atan");
     f = f.replace(/abs/gi,"Math.abs");
-    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); // /x/ -> abs
+    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)");
     f = f.replace(/(\d+)!/g,function(match,n){
         let fact=1;
         for(let i=1;i<=n;i++) fact*=i;
@@ -228,24 +172,6 @@ function resetCurves(){
 function resetGraph(){
     resetCurves();
     document.getElementById('info').innerHTML="";
-}
-
-// ===== CLAVIER =====
-function insert(val){
-    const input = document.getElementById('fx');
-    const start = input.selectionStart;
-    const end = input.selectionEnd;
-    input.value = input.value.substring(0,start) + val + input.value.substring(end);
-    input.focus();
-    input.selectionStart = input.selectionEnd = start + val.length;
-}
-function deleteLast(){
-    const input = document.getElementById('fx');
-    const start = input.selectionStart;
-    const end = input.selectionEnd;
-    if(start===end && start>0){input.value=input.value.substring(0,start-1)+input.value.substring(end); input.selectionStart=input.selectionEnd=start-1;}
-    else {input.value=input.value.substring(0,start)+input.value.substring(end); input.selectionStart=input.selectionEnd=start;}
-    input.focus();
 }
 </script>
 
