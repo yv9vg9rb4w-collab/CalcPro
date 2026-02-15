@@ -46,7 +46,7 @@ button{
 .zoomIn{background:#22c55e;color:black;}
 .zoomOut{background:#ef4444;color:white;}
 .clear{background:#38bdf8;color:black;}
-#info{
+#info, #guide{
     max-width:90vw;
     margin:10px auto;
     background:#0f172a;
@@ -62,15 +62,23 @@ button{
 <div id="box"></div>
 
 <div class="input-container">
-<input id="fx" placeholder="">
+<input id="fx" placeholder="Ex: 2x+1, racin(x), /x-2/">
 <button class="zoomIn" onclick="board.zoomIn(1.2)">ZOOM +</button>
 <button class="zoomOut" onclick="board.zoomOut(1.2)">ZOOM -</button>
 <button class="clear" onclick="resetGraph()">RESET</button>
 </div>
 
 <div id="info"></div>
+<div id="guide">
+<strong>Comment écrire :</strong><br>
+• `^` → puissance (ex: x^2)<br>
+• `racin(x)` → racine carrée<br>
+• `/x-2/` → valeur absolue<br>
+• Trigonométrie : sin(x), cos(x), tg(x)
+</div>
 
 <script>
+// Initialiser le board
 const board = JXG.JSXGraph.initBoard('box', {
     boundingbox: [-10,10,10,-10],
     axis:true,
@@ -79,34 +87,39 @@ const board = JXG.JSXGraph.initBoard('box', {
     keepaspectratio:true
 });
 
-// Forcer la couleur des ticks et labels en blanc
-board.defaultAxes.x.ticks.strokeColor = '#22c55e';
-board.defaultAxes.y.ticks.strokeColor = '#22c55e';
-board.defaultAxes.x.ticks.label.attrs.color = 'white';
-board.defaultAxes.y.ticks.label.attrs.color = 'white';
+// Couleur blanche pour ticks et labels, et ticks entiers seulement
+function createIntegerTicks(axis){
+    axis.ticks = {
+        drawZero:true,
+        majorUnit:1,
+        label:{offset: axis.id === 'xaxis' ? [0,-15] : [-10,0], color:'white'},
+        minorTicks:0
+    };
+}
+
+// Appliquer pour X et Y
+createIntegerTicks(board.defaultAxes.x);
+createIntegerTicks(board.defaultAxes.y);
+
 board.defaultAxes.x.label.attrs.color = 'white';
 board.defaultAxes.y.label.attrs.color = 'white';
 
-// Fonction pour transformer le texte en code JS
+// Fonction pour convertir le texte en code JS
 function parseFunction(f){
     f = f.replace(/(\d)(x)/gi, "$1*$2");          // 2x → 2*x
     f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); // /x-2/ → Math.abs(x-2)
     f = f.replace(/\^/g,"**");                     // puissance
-
-    // Racine
-    f = f.replace(/racin/gi,"Math.sqrt");
-
-    // Trigonométrie
+    f = f.replace(/racin/gi,"Math.sqrt");          // racine
     f = f.replace(/sin/gi,"Math.sin");
     f = f.replace(/cos/gi,"Math.cos");
     f = f.replace(/tg/gi,"Math.tan");
     f = f.replace(/tan/gi,"Math.tan");
-
     return f;
 }
 
 let curves = [];
 
+// Fonction pour tracer les fonctions
 function drawFunctions(){
     const fx = document.getElementById('fx').value;
     const infoBox = document.getElementById('info');
@@ -132,6 +145,7 @@ function drawFunctions(){
     infoBox.innerHTML = "Fonctions tracées: " + funcs.join(' | ');
 }
 
+// Reset graphique
 function resetGraph(){
     document.getElementById('fx').value='';
     curves.forEach(c=>board.removeObject(c));
