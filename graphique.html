@@ -18,7 +18,7 @@ body{
 }
 #box{
     width:90vw;
-    height:80vh;
+    height:70vh;
     margin:20px auto;
     border:2px solid #38bdf8;
     border-radius:15px;
@@ -46,6 +46,15 @@ button{
 .zoomIn{background:#22c55e;color:black;}
 .zoomOut{background:#ef4444;color:white;}
 .clear{background:#38bdf8;color:black;}
+#info{
+    max-width:90vw;
+    margin:10px auto;
+    background:#0f172a;
+    padding:15px;
+    border-radius:15px;
+    color:#facc15;
+    font-size:16px;
+}
 </style>
 </head>
 <body>
@@ -53,58 +62,96 @@ button{
 <div id="box"></div>
 
 <div class="input-container">
-<input id="fx" placeholder="Ex: 2x^2, /x-2/, sin(x)">
+<input id="fx" placeholder=
 <button class="zoomIn" onclick="board.zoomIn(1.2)">ZOOM +</button>
 <button class="zoomOut" onclick="board.zoomOut(1.2)">ZOOM -</button>
 <button class="clear" onclick="resetGraph()">RESET</button>
 </div>
 
+<div id="info"></div>
+
 <script>
 const board = JXG.JSXGraph.initBoard('box', {
-    boundingbox: [-10,10,10,-10], // [xmin, ymax, xmax, ymin]
+    boundingbox: [-10,10,10,-10],
     axis:true,
     grid:true,
     showCopyright:false,
     showNavigation:true,
-    keepaspectratio:true,
-    showInlineCopyright:false
+    keepaspectratio:true
 });
 
-// Transformer 2x → 2*x et /.../ → Math.abs(...)
+// Ticks en blanc
+board.defaultAxes.x.ticks.style = {strokeColor:'#22c55e', label:{color:'white'}};
+board.defaultAxes.y.ticks.style = {strokeColor:'#22c55e', label:{color:'white'}};
+
+// Transformer le texte en code JS
 function parseFunction(f){
-    f = f.replace(/(\d)(x)/gi, "$1*$2");          // 2x → 2*x
+    f = f.replace(/(\d)(x)/gi, "$1*$2");        // 2x → 2*x
     f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); // /x-2/ → Math.abs(x-2)
-    f = f.replace(/\^/g,"**");                     // puissance
+    f = f.replace(/\^/g,"**");                  // puissance
+
+    // Fonctions mathématiques
+    f = f.replace(/sin/gi,"Math.sin");
+    f = f.replace(/cos/gi,"Math.cos");
+    f = f.replace(/tg/gi,"Math.tan");
+    f= f.replace(/tan/gi, "Math.tan");
+    f = f.replace(/tan/gi,"Math.tan");
+    f = f.replace(/e/gi,"Math.E");
+    f = f.replace(/π/gi,"Math.PI");
+    f = f.replace(/pi/gi,"Math.PI");
+
     return f;
+}
+
+// Identifier type de fonction
+function analyseEquation(f){
+    let fNorm = f.replace(/\s/g,'');
+    if(/x\*\*3/.test(fNorm)) return "Cubique";
+    else if(/x\*\*2/.test(fNorm)) return "Quadratique";
+    else if(/x/.test(fNorm)) return "Affine/Linéaire";
+    else if(/sin|cos|tan|tg/.test(fNorm)) return "Trigonométrique";
+    else if(/Math\.E|Math\.PI/.test(fNorm)) return "Exponentielle/Constante";
+    else return "Fonction spéciale ou constante";
 }
 
 let curves = [];
 
 function drawFunctions(){
     const fx = document.getElementById('fx').value;
-    if(!fx) return;
+    const infoBox = document.getElementById('info');
+    if(!fx) { infoBox.innerHTML=""; return; }
     
     // Supprimer anciennes courbes
     curves.forEach(c=>board.removeObject(c));
     curves=[];
 
     let funcs = fx.split(',').map(fn=>fn.trim());
+    let totalY = 0;
 
     funcs.forEach(fn=>{
         let f = parseFunction(fn);
         let curve = board.create('functiongraph', [
             function(x){ 
-                try{ return eval(f); }catch{return NaN;}
+                try{ 
+                    let y = eval(f);
+                    if(!isNaN(y)) totalY+=y;
+                    return y; 
+                }catch{return NaN;}
             }
         ], {strokeColor:'#38bdf8', strokeWidth:2});
         curves.push(curve);
     });
+
+    // Affichage info
+    let types = funcs.map(fa=>analyseEquation(fa)).join(' | ');
+    infoBox.innerHTML=`Type: ${types} | Σy ≈ ${totalY.toFixed(2)} | Points affichés`;
 }
 
 function resetGraph(){
     document.getElementById('fx').value='';
     curves.forEach(c=>board.removeObject(c));
     curves=[];
+    document.getElementById('info').innerHTML='';
 }
 
 // Redessiner automatiquement à l'entrée
