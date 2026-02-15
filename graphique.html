@@ -62,7 +62,7 @@ button{
 <div id="box"></div>
 
 <div class="input-container">
-<input id="fx" placeholder="Ex: 2x+1, racin(x), /x-2/">
+<input id="fx" placeholder="">
 <button class="zoomIn" onclick="board.zoomIn(1.2)">ZOOM +</button>
 <button class="zoomOut" onclick="board.zoomOut(1.2)">ZOOM -</button>
 <button class="clear" onclick="resetGraph()">RESET</button>
@@ -70,7 +70,7 @@ button{
 
 <div id="info"></div>
 <div id="guide">
-<strong>Comment écrire :</strong><br>
+<strong>🖊Comment écrire :</strong><br>
 • `^` → puissance (ex: x^2)<br>
 • `racin(x)` → racine carrée<br>
 • `/x-2/` → valeur absolue<br>
@@ -87,13 +87,13 @@ const board = JXG.JSXGraph.initBoard('box', {
     keepaspectratio:true
 });
 
-// Couleur blanche pour ticks et labels, et ticks entiers seulement
+// Fonction pour créer ticks entiers et labels blancs
 function createIntegerTicks(axis){
     axis.ticks = {
         drawZero:true,
         majorUnit:1,
-        label:{offset: axis.id === 'xaxis' ? [0,-15] : [-10,0], color:'white'},
-        minorTicks:0
+        minorTicks:0,
+        label:{offset: axis.id === 'xaxis' ? [0,-15] : [-10,0], color:'white'}
     };
 }
 
@@ -101,15 +101,22 @@ function createIntegerTicks(axis){
 createIntegerTicks(board.defaultAxes.x);
 createIntegerTicks(board.defaultAxes.y);
 
+// Forcer couleur des axes et labels en blanc
 board.defaultAxes.x.label.attrs.color = 'white';
 board.defaultAxes.y.label.attrs.color = 'white';
 
+// Afficher coordonnées en blanc
+board.on('move', function() {
+    let coords = document.querySelectorAll('.jxgtext');
+    coords.forEach(c=>c.setAttribute('fill','white'));
+});
+
 // Fonction pour convertir le texte en code JS
 function parseFunction(f){
-    f = f.replace(/(\d)(x)/gi, "$1*$2");          // 2x → 2*x
-    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); // /x-2/ → Math.abs(x-2)
-    f = f.replace(/\^/g,"**");                     // puissance
-    f = f.replace(/racin/gi,"Math.sqrt");          // racine
+    f = f.replace(/(\d)(x)/gi, "$1*$2");          
+    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); 
+    f = f.replace(/\^/g,"**");                     
+    f = f.replace(/racin/gi,"Math.sqrt");          
     f = f.replace(/sin/gi,"Math.sin");
     f = f.replace(/cos/gi,"Math.cos");
     f = f.replace(/tg/gi,"Math.tan");
@@ -125,7 +132,6 @@ function drawFunctions(){
     const infoBox = document.getElementById('info');
     if(!fx) { infoBox.innerHTML=""; return; }
     
-    // Supprimer anciennes courbes
     curves.forEach(c=>board.removeObject(c));
     curves=[];
 
@@ -141,7 +147,6 @@ function drawFunctions(){
         curves.push(curve);
     });
 
-    // Afficher info box
     infoBox.innerHTML = "Fonctions tracées: " + funcs.join(' | ');
 }
 
