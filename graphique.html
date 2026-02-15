@@ -2,19 +2,23 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro • GeoGebra Style</title>
+<title>CalcPro PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- JSXGraph -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
 <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
 
 <style>
 body{
     margin:0;
-    background: linear-gradient(135deg,#0f172a,#020617);
-    font-family: Arial,sans-serif;
+    background:#0f172a;
+    font-family:Arial;
     color:white;
+    transition:0.3s;
+}
+.light{
+    background:white;
+    color:black;
 }
 #box{
     width:90vw;
@@ -25,10 +29,9 @@ body{
 }
 .input-container{
     text-align:center;
-    margin-top:10px;
 }
 input{
-    width:50%;
+    width:45%;
     padding:10px;
     font-size:18px;
     border-radius:10px;
@@ -36,24 +39,24 @@ input{
     text-align:center;
 }
 button{
-    padding:10px 20px;
-    margin-left:10px;
-    font-weight:bold;
-    border-radius:10px;
+    padding:10px 15px;
+    margin:5px;
     border:none;
+    border-radius:10px;
     cursor:pointer;
+    font-weight:bold;
 }
-.zoomIn{background:#22c55e;color:black;}
-.zoomOut{background:#ef4444;color:white;}
-.clear{background:#38bdf8;color:black;}
-#info, #guide{
+#info{
     max-width:90vw;
     margin:10px auto;
-    background:#0f172a;
     padding:15px;
     border-radius:15px;
+    background:#111827;
     color:#facc15;
-    font-size:16px;
+}
+.light #info{
+    background:#e5e7eb;
+    color:black;
 }
 </style>
 </head>
@@ -62,61 +65,35 @@ button{
 <div id="box"></div>
 
 <div class="input-container">
-<input id="fx" placeholder="">
-<button class="zoomIn" onclick="board.zoomIn(1.2)">ZOOM +</button>
-<button class="zoomOut" onclick="board.zoomOut(1.2)">ZOOM -</button>
-<button class="clear" onclick="resetGraph()">RESET</button>
+<input id="fx" placeholder="f(x)">
+<input id="gx" placeholder="g(x)">
+<br>
+<button onclick="drawFunctions()">Tracer</button>
+<button onclick="calculateDerivative()">Dérivée f'(x)</button>
+<button onclick="findIntersection()">Intersection</button>
+<button onclick="toggleMode()">🌗 Mode</button>
+<button onclick="resetGraph()">Reset</button>
 </div>
 
 <div id="info"></div>
-<div id="guide">
-<strong>🖊Comment écrire :</strong><br>
-• `^` → puissance (ex: x^2)<br>
-• `racin(x)` → racine carrée<br>
-• `/x-2/` → valeur absolue<br>
-• Trigonométrie : sin(x), cos(x), tg(x)
-</div>
 
 <script>
-// Initialiser le board
-const board = JXG.JSXGraph.initBoard('box', {
-    boundingbox: [-10,10,10,-10],
+
+const board = JXG.JSXGraph.initBoard('box',{
+    boundingbox:[-10,10,10,-10],
     axis:true,
-    grid:true,
-    showNavigation:true,
-    keepaspectratio:true
+    grid:true
 });
 
-// Fonction pour créer ticks entiers et labels blancs
-function createIntegerTicks(axis){
-    axis.ticks = {
-        drawZero:true,
-        majorUnit:1,
-        minorTicks:0,
-        label:{offset: axis.id === 'xaxis' ? [0,-15] : [-10,0], color:'white'}
-    };
-}
+board.defaultAxes.x.ticks.majorUnit = 1;
+board.defaultAxes.y.ticks.majorUnit = 1;
 
-// Appliquer pour X et Y
-createIntegerTicks(board.defaultAxes.x);
-createIntegerTicks(board.defaultAxes.y);
+let curves = [];
 
-// Forcer couleur des axes et labels en blanc
-board.defaultAxes.x.label.attrs.color = 'white';
-board.defaultAxes.y.label.attrs.color = 'white';
-
-// Afficher coordonnées en blanc
-board.on('move', function() {
-    let coords = document.querySelectorAll('.jxgtext');
-    coords.forEach(c=>c.setAttribute('fill','white'));
-});
-
-// Fonction pour convertir le texte en code JS
 function parseFunction(f){
-    f = f.replace(/(\d)(x)/gi, "$1*$2");          
-    f = f.replace(/\/([^\/]+)\//g,"Math.abs($1)"); 
-    f = f.replace(/\^/g,"**");                     
-    f = f.replace(/racin/gi,"Math.sqrt");          
+    f = f.replace(/(\d)x/g,"$1*x");
+    f = f.replace(/\^/g,"**");
+    f = f.replace(/racin/gi,"Math.sqrt");
     f = f.replace(/sin/gi,"Math.sin");
     f = f.replace(/cos/gi,"Math.cos");
     f = f.replace(/tg/gi,"Math.tan");
@@ -124,42 +101,83 @@ function parseFunction(f){
     return f;
 }
 
-let curves = [];
+function buildFunction(expr){
+    let parsed = parseFunction(expr);
+    return new Function('x','return '+parsed);
+}
 
-// Fonction pour tracer les fonctions
 function drawFunctions(){
-    const fx = document.getElementById('fx').value;
-    const infoBox = document.getElementById('info');
-    if(!fx) { infoBox.innerHTML=""; return; }
-    
-    curves.forEach(c=>board.removeObject(c));
-    curves=[];
+    resetCurves();
 
-    let funcs = fx.split(',').map(fn=>fn.trim());
+    let fInput = document.getElementById('fx').value;
+    let gInput = document.getElementById('gx').value;
 
-    funcs.forEach(fn=>{
-        let f = parseFunction(fn);
-        let curve = board.create('functiongraph', [
-            function(x){ 
-                try{ return eval(f); }catch{return NaN;}
-            }
-        ], {strokeColor:'#38bdf8', strokeWidth:2, name:fn});
-        curves.push(curve);
-    });
+    if(fInput){
+        let f = buildFunction(fInput);
+        let curve = board.create('functiongraph',[f],{strokeColor:'blue'});
+        curves.push({func:f, curve:curve});
+    }
 
-    infoBox.innerHTML = "Fonctions tracées: " + funcs.join(' | ');
+    if(gInput){
+        let g = buildFunction(gInput);
+        let curve = board.create('functiongraph',[g],{strokeColor:'red'});
+        curves.push({func:g, curve:curve});
+    }
+
+    document.getElementById('info').innerHTML="Fonctions tracées.";
 }
 
-// Reset graphique
+function calculateDerivative(){
+
+    if(curves.length===0) return;
+
+    let f = curves[0].func;
+
+    let derivative = function(x){
+        let h = 0.0001;
+        return (f(x+h)-f(x-h))/(2*h);
+    };
+
+    board.create('functiongraph',[derivative],{strokeColor:'green'});
+    document.getElementById('info').innerHTML="Dérivée numérique affichée en vert.";
+}
+
+function findIntersection(){
+
+    if(curves.length<2){
+        document.getElementById('info').innerHTML="Il faut deux fonctions.";
+        return;
+    }
+
+    let f = curves[0].func;
+    let g = curves[1].func;
+
+    for(let x=-10; x<=10; x+=0.1){
+        if(Math.abs(f(x)-g(x))<0.1){
+            board.create('point',[x,f(x)],{size:4,color:'yellow'});
+            document.getElementById('info').innerHTML="Intersection trouvée.";
+            return;
+        }
+    }
+
+    document.getElementById('info').innerHTML="Pas d'intersection visible.";
+}
+
+function toggleMode(){
+    document.body.classList.toggle('light');
+}
+
+function resetCurves(){
+    curves.forEach(c=>board.removeObject(c.curve));
+    curves=[];
+}
+
 function resetGraph(){
-    document.getElementById('fx').value='';
-    curves.forEach(c=>board.removeObject(c));
-    curves=[];
-    document.getElementById('info').innerHTML='';
+    resetCurves();
+    board.removeObject(board.objectsList.filter(o=>o.elType==='point'));
+    document.getElementById('info').innerHTML="";
 }
 
-// Redessiner automatiquement à l'entrée
-document.getElementById('fx').addEventListener('input', drawFunctions);
 </script>
 
 </body>
