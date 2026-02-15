@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calcul Physique-Chimie Stylé</title>
+<title>Calcul P.C Luxe</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 <style>
     body {
@@ -23,12 +23,12 @@
         background: rgba(255,255,255,0.05);
         padding: 25px;
         border-radius: 20px;
-        max-width: 500px;
+        max-width: 600px;
         margin: auto;
         box-shadow: 0 0 30px rgba(0,0,0,0.5);
         backdrop-filter: blur(10px);
     }
-    select, input {
+    input {
         width: 100%;
         padding: 12px;
         margin: 12px 0;
@@ -36,193 +36,101 @@
         border: none;
         font-size: 1em;
     }
-    button {
-        width: 100%;
+    .formula {
+        background: rgba(255,255,255,0.1);
+        margin: 15px 0;
         padding: 15px;
-        margin-top: 15px;
-        border-radius: 12px;
-        border: none;
-        background: #ff5f6d;
-        background: linear-gradient(90deg, #ff5f6d, #ffc371);
-        color: #fff;
-        font-weight: bold;
-        font-size: 1.2em;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    button:hover {
-        transform: scale(1.05);
-        background: linear-gradient(90deg, #ffc371, #ff5f6d);
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
     }
     .result {
-        margin-top: 20px;
+        margin-top: 10px;
         padding: 15px;
         background: rgba(255,255,255,0.1);
         border-radius: 12px;
         text-align: center;
-        font-size: 1.5em;
+        font-size: 1.2em;
         font-weight: bold;
         color: #ffeb3b;
         box-shadow: 0 0 15px #ffeb3b;
     }
+    label { font-weight: bold; }
 </style>
 </head>
 <body>
 
-<h1>Calcul Physique-Chimie 💡</h1>
+<h1>Calcul P.C Luxe 💎</h1>
 <div class="calculator">
-    <label for="formula">Choisir une formule :</label>
-    <select id="formula">
-        <optgroup label="Électricité">
-            <option value="ohm">V = R × I (Loi d'Ohm)</option>
-            <option value="puissance">P = V × I (Puissance électrique)</option>
-            <option value="energie_elec">E = P × t (Énergie électrique)</option>
-        </optgroup>
-        <optgroup label="Mécanique">
-            <option value="force">F = m × a (Force)</option>
-            <option value="acceleration">a = F / m (Accélération)</option>
-            <option value="vitesse">v = d / t (Vitesse)</option>
-            <option value="ec">Ec = 0.5 × m × v² (Énergie cinétique)</option>
-            <option value="ep">Ep = m × g × h (Énergie potentielle)</option>
-        </optgroup>
-        <optgroup label="Thermique / Calorimétrie">
-            <option value="chaleur">Q = m × c × ΔT</option>
-            <option value="fusion">Q = m × Lf (Fusion)</option>
-            <option value="vaporisation">Q = m × Lv (Vaporisation)</option>
-        </optgroup>
-        <optgroup label="Pression / Gaz">
-            <option value="pression">P = F / S</option>
-            <option value="gaz">P × V = n × R × T</option>
-        </optgroup>
-        <optgroup label="Chimie">
-            <option value="concentration">C = n / V</option>
-            <option value="densite">ρ = m / V</option>
-            <option value="quantite_matiere">n = m / M</option>
-        </optgroup>
-        <optgroup label="Relativité">
-            <option value="einstein">E = m × c²</option>
-        </optgroup>
-    </select>
 
-    <div id="inputs"></div>
-    <button onclick="calculate()">Calculer</button>
-    <div class="result" id="result">Résultat ici</div>
+    <div class="formula">
+        <label>Loi d’Ohm (U = R × I)</label>
+        <input type="number" id="ohm_U" placeholder="U (Laisser vide si inconnu)">
+        <input type="number" id="ohm_R" placeholder="R (Ω)">
+        <input type="number" id="ohm_I" placeholder="I (A)">
+        <div class="result" id="ohm_result">Résultat ici</div>
+    </div>
+
+    <div class="formula">
+        <label>Puissance électrique (P = V × I)</label>
+        <input type="number" id="p_P" placeholder="P (W)">
+        <input type="number" id="p_V" placeholder="V (V)">
+        <input type="number" id="p_I" placeholder="I (A)">
+        <div class="result" id="p_result">Résultat ici</div>
+    </div>
+
+    <div class="formula">
+        <label>E = m × c²</label>
+        <input type="number" id="e_m" placeholder="Masse m (kg)">
+        <input type="number" id="e_c" placeholder="Vitesse lumière c (m/s, ex: 3e8)">
+        <input type="number" id="e_E" placeholder="Énergie E (J)">
+        <div class="result" id="e_result">Résultat ici</div>
+    </div>
+
 </div>
 
 <script>
-const inputsDiv = document.getElementById('inputs');
-const formulaSelect = document.getElementById('formula');
-
-function updateInputs() {
-    let html = '';
-    switch(formulaSelect.value) {
-        case 'ohm':
-            html = `<input type="number" id="R" placeholder="Résistance R (Ω)">
-                    <input type="number" id="I" placeholder="Intensité I (A)">`;
-            break;
-        case 'puissance':
-            html = `<input type="number" id="V" placeholder="Tension V (V)">
-                    <input type="number" id="I" placeholder="Intensité I (A)">`;
-            break;
-        case 'energie_elec':
-            html = `<input type="number" id="P" placeholder="Puissance P (W)">
-                    <input type="number" id="t" placeholder="Temps t (s)">`;
-            break;
-        case 'force':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="a" placeholder="Accélération a (m/s²)">`;
-            break;
-        case 'acceleration':
-            html = `<input type="number" id="F" placeholder="Force F (N)">
-                    <input type="number" id="m" placeholder="Masse m (kg)">`;
-            break;
-        case 'vitesse':
-            html = `<input type="number" id="d" placeholder="Distance d (m)">
-                    <input type="number" id="t" placeholder="Temps t (s)">`;
-            break;
-        case 'ec':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="v" placeholder="Vitesse v (m/s)">`;
-            break;
-        case 'ep':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="h" placeholder="Hauteur h (m)">
-                    <input type="number" id="g" placeholder="Gravité g (m/s²)">`;
-            break;
-        case 'chaleur':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="c" placeholder="Capacité calorifique c (J/kg°C)">
-                    <input type="number" id="dT" placeholder="ΔT (°C)">`;
-            break;
-        case 'fusion':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="Lf" placeholder="Chaleur de fusion Lf (J/kg)">`;
-            break;
-        case 'vaporisation':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="Lv" placeholder="Chaleur de vaporisation Lv (J/kg)">`;
-            break;
-        case 'pression':
-            html = `<input type="number" id="F" placeholder="Force F (N)">
-                    <input type="number" id="S" placeholder="Surface S (m²)">`;
-            break;
-        case 'gaz':
-            html = `<input type="number" id="n" placeholder="Quantité de matière n (mol)">
-                    <input type="number" id="R" placeholder="Constante gaz R (J/mol·K)">
-                    <input type="number" id="T" placeholder="Température T (K)">
-                    <input type="number" id="V" placeholder="Volume V (m³)">`;
-            break;
-        case 'concentration':
-            html = `<input type="number" id="n" placeholder="Quantité de matière n (mol)">
-                    <input type="number" id="V" placeholder="Volume V (L)">`;
-            break;
-        case 'densite':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="V" placeholder="Volume V (m³)">`;
-            break;
-        case 'quantite_matiere':
-            html = `<input type="number" id="m" placeholder="Masse m (g)">
-                    <input type="number" id="M" placeholder="Masse molaire M (g/mol)">`;
-            break;
-        case 'einstein':
-            html = `<input type="number" id="m" placeholder="Masse m (kg)">
-                    <input type="number" id="c" placeholder="Vitesse de la lumière c (m/s)">
-                    <small>Ex: c = 3e8 m/s</small>`;
-            break;
-    }
-    inputsDiv.innerHTML = html;
+function calculateOhm() {
+    let V = parseFloat(document.getElementById('ohm_V').value);
+    let R = parseFloat(document.getElementById('ohm_R').value);
+    let I = parseFloat(document.getElementById('ohm_I').value);
+    let res = '';
+    if(!V) V = R * I;
+    else if(!R) R = V / I;
+    else if(!I) I = V / R;
+    res = `V = ${V || '...'} V | R = ${R || '...'} Ω | I = ${I || '...'} A`;
+    document.getElementById('ohm_result').innerText = res;
 }
 
-formulaSelect.addEventListener('change', updateInputs);
-updateInputs();
-
-function calculate() {
-    let result = '';
-    try {
-        switch(formulaSelect.value) {
-            case 'ohm': result = parseFloat(document.getElementById('R').value) * parseFloat(document.getElementById('I').value) + ' V'; break;
-            case 'puissance': result = parseFloat(document.getElementById('V').value) * parseFloat(document.getElementById('I').value) + ' W'; break;
-            case 'energie_elec': result = parseFloat(document.getElementById('P').value) * parseFloat(document.getElementById('t').value) + ' J'; break;
-            case 'force': result = parseFloat(document.getElementById('m').value) * parseFloat(document.getElementById('a').value) + ' N'; break;
-            case 'acceleration': result = parseFloat(document.getElementById('F').value) / parseFloat(document.getElementById('m').value) + ' m/s²'; break;
-            case 'vitesse': result = parseFloat(document.getElementById('d').value) / parseFloat(document.getElementById('t').value) + ' m/s'; break;
-            case 'ec': let m_ec = parseFloat(document.getElementById('m').value); let v_ec = parseFloat(document.getElementById('v').value); result = 0.5 * m_ec * v_ec * v_ec + ' J'; break;
-            case 'ep': result = parseFloat(document.getElementById('m').value) * parseFloat(document.getElementById('g').value) * parseFloat(document.getElementById('h').value) + ' J'; break;
-            case 'chaleur': result = parseFloat(document.getElementById('m').value) * parseFloat(document.getElementById('c').value) * parseFloat(document.getElementById('dT').value) + ' J'; break;
-            case 'fusion': result = parseFloat(document.getElementById('m').value) * parseFloat(document.getElementById('Lf').value) + ' J'; break;
-            case 'vaporisation': result = parseFloat(document.getElementById('m').value) * parseFloat(document.getElementById('Lv').value) + ' J'; break;
-            case 'pression': result = parseFloat(document.getElementById('F').value) / parseFloat(document.getElementById('S').value) + ' Pa'; break;
-            case 'gaz': result = (parseFloat(document.getElementById('n').value) * parseFloat(document.getElementById('R').value) * parseFloat(document.getElementById('T').value)) / parseFloat(document.getElementById('V').value) + ' Pa'; break;
-            case 'concentration': result = parseFloat(document.getElementById('n').value) / parseFloat(document.getElementById('V').value) + ' mol/L'; break;
-            case 'densite': result = parseFloat(document.getElementById('m').value) / parseFloat(document.getElementById('V').value) + ' kg/m³'; break;
-            case 'quantite_matiere': result = parseFloat(document.getElementById('m').value) / parseFloat(document.getElementById('M').value) + ' mol'; break;
-            case 'einstein': result = parseFloat(document.getElementById('m').value) * Math.pow(parseFloat(document.getElementById('c').value),2) + ' J'; break;
-        }
-    } catch(e) {
-        result = 'Erreur, vérifier les valeurs';
-    }
-    document.getElementById('result').innerText = result;
+function calculatePuissance() {
+    let P = parseFloat(document.getElementById('p_P').value);
+    let V = parseFloat(document.getElementById('p_V').value);
+    let I = parseFloat(document.getElementById('p_I').value);
+    let res = '';
+    if(!P) P = V * I;
+    else if(!V) V = P / I;
+    else if(!I) I = P / V;
+    res = `P = ${P || '...'} W | V = ${V || '...'} V | I = ${I || '...'} A`;
+    document.getElementById('p_result').innerText = res;
 }
+
+function calculateEinstein() {
+    let E = parseFloat(document.getElementById('e_E').value);
+    let m = parseFloat(document.getElementById('e_m').value);
+    let c = parseFloat(document.getElementById('e_c').value);
+    let res = '';
+    if(!E) E = m * Math.pow(c,2);
+    else if(!m) m = E / Math.pow(c,2);
+    else if(!c) c = Math.sqrt(E / m);
+    res = `E = ${E || '...'} J | m = ${m || '...'} kg | c = ${c || '...'} m/s`;
+    document.getElementById('e_result').innerText = res;
+}
+
+setInterval(()=>{
+    calculateOhm();
+    calculatePuissance();
+    calculateEinstein();
+},500);
+
 </script>
 
 </body>
