@@ -58,13 +58,11 @@ header{
   text-align:center;
   margin-bottom:40px;
 }
-
 header h1{
   margin:0;
   font-size:2.5em;
   color:var(--accent);
 }
-
 header p{
   margin-top:10px;
   color:var(--muted);
@@ -79,7 +77,6 @@ header p{
   max-width:1100px;
   margin:auto;
 }
-
 .tool{
   background:var(--card);
   border-radius:16px;
@@ -143,10 +140,6 @@ footer{
   font-size:14px;
   color:var(--muted);
 }
-
-/* USER SECTION */
-#userSection input{width:200px;margin:5px;padding:8px;border-radius:6px;border:none;}
-#userSection button{margin:5px;padding:8px 15px;border:none;border-radius:6px;background:var(--accent);cursor:pointer;font-weight:bold;}
 </style>
 </head>
 
@@ -178,61 +171,51 @@ footer{
     <h3>Calculatrice graphique</h3>
     <span>Tracer des fonctions</span>
   </div>
-
   <div class="tool" onclick="location.href='scientifique.html'">
     <div class="icon">🧠</div>
     <h3>Calculatrice scientifique</h3>
     <span>Mode iPhone, fonctions avancées</span>
   </div>
-
   <div class="tool" onclick="location.href='matrices.html'">
     <div class="icon">📊</div>
     <h3>Calculatrice matrices</h3>
     <span>Déterminant, inverse</span>
   </div>
-
   <div class="tool" onclick="location.href='geometrie.html'">
     <div class="icon">📐</div>
     <h3>Outil géométrie</h3>
     <span>Figures et mesures</span>
   </div>
-
   <div class="tool" onclick="location.href='3d.html'">
     <div class="icon">🪩</div>
     <h3>Algorithme 3D</h3>
     <span>Visualisation spatiale</span>
   </div>
-
   <div class="tool" onclick="location.href='pc.html'">
     <div class="icon">⚡️</div>
     <h3>Calculatrice P.C</h3>
     <span>Physique & chimie</span>
   </div>
-
   <div class="tool" onclick="location.href='symbolique.html'">
     <div class="icon">🧮</div>
     <h3>Calculatrice symbolique</h3>
     <span>Factoriser, développer</span>
   </div>
-
   <div class="tool" onclick="location.href='integrale.html'">
     <div class="icon">∫</div>
     <h3>Intégrale numérique</h3>
     <span>Méthode des trapèzes</span>
   </div>
-
   <div class="tool" onclick="location.href='svt.html'">
     <div class="icon">🧬</div>
     <h3>SVT</h3>
     <span>Effectue rapidement tous tes calculs SVT</span>
   </div>
-
   <div class="tool" onclick="location.href='conversion_binaire.html'">
     <div class="icon">🖥</div>
     <h3>Conversion Binaire / Décimal</h3>
     <span>Comprendre le code des ordinateurs</span>
   </div>
-
 </section>
 
 <section class="contact">
@@ -253,48 +236,62 @@ footer{
 
 <script>
 // ===================
-// LOGIN / UTILISATEUR
+// LOGIN / INSCRIPTION AVANCÉE
 // ===================
 function register(){
-  let user = document.getElementById("username").value;
-  let pass = document.getElementById("password").value;
+    let user = document.getElementById("username").value.trim();
+    let pass = document.getElementById("password").value.trim();
 
-  if(user && pass){
+    if(!user || !pass){
+        document.getElementById("loginMsg").innerText = "Remplis tous les champs !";
+        return;
+    }
+
+    // Vérifie si le compte existe déjà
+    let savedUser = localStorage.getItem("calcpro_user");
+    if(savedUser === user){
+        document.getElementById("loginMsg").innerText = "Ce compte existe déjà !";
+        return;
+    }
+
+    // Crée le compte
     localStorage.setItem("calcpro_user", user);
     localStorage.setItem("calcpro_pass", pass);
     document.getElementById("loginMsg").innerText = "Compte créé ! Connectez-vous.";
-  }else{
-    document.getElementById("loginMsg").innerText = "Remplis tous les champs !";
-  }
 }
 
 function login(){
-  let user = document.getElementById("username").value;
-  let pass = document.getElementById("password").value;
+    let user = document.getElementById("username").value.trim();
+    let pass = document.getElementById("password").value.trim();
 
-  let savedUser = localStorage.getItem("calcpro_user");
-  let savedPass = localStorage.getItem("calcpro_pass");
+    let savedUser = localStorage.getItem("calcpro_user");
+    let savedPass = localStorage.getItem("calcpro_pass");
 
-  if(user === savedUser && pass === savedPass){
-    localStorage.setItem("loggedIn", "true");
-    showCalcPro();
-  }else{
-    document.getElementById("loginMsg").innerText = "Identifiants incorrects !";
-  }
+    if(!savedUser){
+        document.getElementById("loginMsg").innerText = "Aucun compte trouvé. Veuillez vous inscrire.";
+        return;
+    }
+
+    if(user === savedUser && pass === savedPass){
+        localStorage.setItem("loggedIn", "true");
+        showCalcPro();
+    } else {
+        document.getElementById("loginMsg").innerText = "Identifiants incorrects !";
+    }
 }
 
 function showCalcPro(){
-  document.getElementById("loginScreen").style.display="none";
-  document.getElementById("mainContent").style.display="block";
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("mainContent").style.display="block";
 }
 
+// Si déjà connecté
 window.onload = function(){
-  if(localStorage.getItem("loggedIn")==="true"){
-    showCalcPro();
-  }
+    if(localStorage.getItem("loggedIn")==="true"){
+        showCalcPro();
+    }
 }
 </script>
 
 </body>
 </html>
-
