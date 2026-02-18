@@ -1,11 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalcPro - Mode Informatique</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f0f0f;
+    color: white;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 20px;
+    font-size: 40px;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 0 15px rgba(0,255,255,0.2);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px cyan;
+}
+
+input, select {
+    width: 90%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    padding: 8px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    background: cyan;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: white;
+}
+
+p {
+    margin-top: 10px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>💻 CalcPro Informatique</h1>
+
+<div class="container">
+
+<!-- Conversion -->
 <div class="card">
-  <h2>Conversion Binaire / Décimal</h2>
+<h2>Conversion</h2>
 
-  <input type="text" id="binaryInput" placeholder="Entrer nombre binaire">
-  <button onclick="binaryToDecimal()">Binaire ➜ Décimal</button>
+<input type="text" id="binaryInput" placeholder="Nombre binaire">
+<button onclick="binaryToDecimal()">Binaire ➜ Décimal</button>
 
-  <input type="number" id="decimalInput" placeholder="Entrer nombre décimal">
-  <button onclick="decimalToBinary()">Décimal ➜ Binaire</button>
+<input type="number" id="decimalInput" placeholder="Nombre décimal">
+<button onclick="decimalToBinary()">Décimal ➜ Binaire</button>
 
-  <p id="conversionResult"></p>
+<p id="conversionResult"></p>
 </div>
+
+<!-- Logique -->
+<div class="card">
+<h2>Logique Booléenne</h2>
+
+<input type="number" id="logicA" placeholder="0 ou 1">
+<input type="number" id="logicB" placeholder="0 ou 1">
+
+<button onclick="logicAND()">AND</button>
+<button onclick="logicOR()">OR</button>
+<button onclick="logicNOT()">NOT A</button>
+
+<p id="logicResult"></p>
+</div>
+
+<!-- Complexité -->
+<div class="card">
+<h2>Complexité</h2>
+
+<select id="complexity" onchange="explainComplexity()">
+<option value="">Choisir</option>
+<option value="1">O(1)</option>
+<option value="log">O(log n)</option>
+<option value="n">O(n)</option>
+<option value="n2">O(n²)</option>
+</select>
+
+<p id="complexityExplain"></p>
+</div>
+
+</div>
+
+<script>
+function binaryToDecimal() {
+    let bin = document.getElementById("binaryInput").value;
+    let result = parseInt(bin, 2);
+    document.getElementById("conversionResult").innerText =
+        "Résultat : " + result;
+}
+
+function decimalToBinary() {
+    let dec = document.getElementById("decimalInput").value;
+    let result = parseInt(dec).toString(2);
+    document.getElementById("conversionResult").innerText =
+        "Résultat : " + result;
+}
+
+function logicAND() {
+    let a = Number(document.getElementById("logicA").value);
+    let b = Number(document.getElementById("logicB").value);
+    document.getElementById("logicResult").innerText =
+        "Résultat : " + (a & b);
+}
+
+function logicOR() {
+    let a = Number(document.getElementById("logicA").value);
+    let b = Number(document.getElementById("logicB").value);
+    document.getElementById("logicResult").innerText =
+        "Résultat : " + (a | b);
+}
+
+function logicNOT() {
+    let a = Number(document.getElementById("logicA").value);
+    document.getElementById("logicResult").innerText =
+        "Résultat : " + (a ? 0 : 1);
+}
+
+function explainComplexity() {
+    let value = document.getElementById("complexity").value;
+    let text = "";
+
+    if (value === "1") text = "Temps constant (très rapide).";
+    if (value === "log") text = "Temps logarithmique (rapide).";
+    if (value === "n") text = "Temps linéaire (moyen).";
+    if (value === "n2") text = "Temps quadratique (lent).";
+
+    document.getElementById("complexityExplain").innerText = text;
+}
+</script>
+
+</body>
+</html>
