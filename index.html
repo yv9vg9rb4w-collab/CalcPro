@@ -14,67 +14,44 @@
   --muted:#aaaaaa;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
   margin:0;
-  padding:20px;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
   background:var(--bg);
   color:var(--text);
 }
 
-  <script>
-
-function register(){
-  let user = document.getElementById("username").value;
-  let pass = document.getElementById("password").value;
-
-  if(user && pass){
-    localStorage.setItem("calcpro_user", user);
-    localStorage.setItem("calcpro_pass", pass);
-    alert("Compte créé !");
-  }else{
-    alert("Remplis tous les champs !");
-  }
+/* LOGIN SCREEN */
+#loginScreen{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
 }
-
-function login(){
-  let user = document.getElementById("username").value;
-  let pass = document.getElementById("password").value;
-
-  let savedUser = localStorage.getItem("calcpro_user");
-  let savedPass = localStorage.getItem("calcpro_pass");
-
-  if(user === savedUser && pass === savedPass){
-    localStorage.setItem("loggedIn", "true");
-    showUser(user);
-  }else{
-    alert("Identifiants incorrects !");
-  }
+#loginScreen input{
+  margin:10px;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:250px;
 }
-
-function logout(){
-  localStorage.removeItem("loggedIn");
-  location.reload();
+#loginScreen button{
+  margin:5px;
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  background:var(--accent);
+  font-weight:bold;
+  cursor:pointer;
 }
-
-function showUser(user){
-  document.getElementById("authForms").style.display="none";
-  document.getElementById("welcomeUser").style.display="block";
-  document.getElementById("displayUser").innerText=user;
-}
-
-window.onload = function(){
-  if(localStorage.getItem("loggedIn")==="true"){
-    let user = localStorage.getItem("calcpro_user");
-    showUser(user);
-  }
-}
-
-</script>
+#loginMsg{color:#ff5555;margin-top:10px;}
 
 /* HEADER */
 header{
@@ -112,22 +89,18 @@ header p{
   transition:0.25s ease;
   box-shadow:0 0 15px rgba(0,255,204,0.15);
 }
-
 .tool:hover{
   transform:translateY(-6px) scale(1.03);
   box-shadow:0 0 25px rgba(0,255,204,0.35);
 }
-
 .icon{
   font-size:42px;
   margin-bottom:12px;
 }
-
 .tool h3{
   margin:10px 0 6px;
   font-size:18px;
 }
-
 .tool span{
   font-size:14px;
   color:var(--muted);
@@ -143,18 +116,15 @@ header p{
   text-align:center;
   box-shadow:0 0 20px rgba(0,255,204,0.25);
 }
-
 .contact h2{
   color:var(--accent);
   margin-bottom:10px;
 }
-
 .contact p{
   color:var(--muted);
   margin-bottom:25px;
   line-height:1.6;
 }
-
 .contact a{
   display:inline-block;
   padding:15px 30px;
@@ -173,10 +143,29 @@ footer{
   font-size:14px;
   color:var(--muted);
 }
+
+/* USER SECTION */
+#userSection input{width:200px;margin:5px;padding:8px;border-radius:6px;border:none;}
+#userSection button{margin:5px;padding:8px 15px;border:none;border-radius:6px;background:var(--accent);cursor:pointer;font-weight:bold;}
 </style>
 </head>
 
 <body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <h1>Bienvenue sur CalcPro 👋</h1>
+  <input type="text" id="username" placeholder="Nom d'utilisateur">
+  <input type="password" id="password" placeholder="Mot de passe">
+  <div>
+    <button onclick="register()">S'inscrire</button>
+    <button onclick="login()">Se connecter</button>
+  </div>
+  <p id="loginMsg"></p>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent" style="display:none;">
 
 <header>
   <h1>CalcPro</h1>
@@ -184,7 +173,6 @@ footer{
 </header>
 
 <section class="tool-list">
-
   <div class="tool" onclick="location.href='graphique.html'">
     <div class="icon">📈</div>
     <h3>Calculatrice graphique</h3>
@@ -230,64 +218,83 @@ footer{
   <div class="tool" onclick="location.href='integrale.html'">
     <div class="icon">∫</div>
     <h3>Intégrale numérique</h3>
-    <span>intégrale numérique avec la méthode des trapèzes.</span>
-  </div>
-  
-  <div class="tool" onclick="location.href='OT_Geometrie_Pro2.html'">
-    <div class="icon">✨</div>
-    <h3>Geometrie</h3>
-    <span>Explore toues les figures et solides facilement .</span>
+    <span>Méthode des trapèzes</span>
   </div>
 
   <div class="tool" onclick="location.href='svt.html'">
     <div class="icon">🧬</div>
     <h3>SVT</h3>
-    <span>Effectue rapidement tous tes calculs SVT ici ! .</span>
+    <span>Effectue rapidement tous tes calculs SVT</span>
   </div>
 
   <div class="tool" onclick="location.href='conversion_binaire.html'">
     <div class="icon">🖥</div>
-    <h3>Conversion Binaire/ Décimal</h3>
-    <span>Comprendre le code des ordinateurs .</span>
+    <h3>Conversion Binaire / Décimal</h3>
+    <span>Comprendre le code des ordinateurs</span>
   </div>
 
- </section>
+</section>
 
 <section class="contact">
-  <h2>📚 Cours de soutien </h2>
+  <h2>📚 Cours de soutien</h2>
   <p>
     Cours professionnels en P.C.<br>
     Pour collégiens, lycéens et préparation de concours.<br>
     <strong>Cours payants – contact direct Prof Lebbar Rachid</strong>
   </p>
-
-  <!-- 🔴 REMPLACE LE NUMÉRO CI-DESSOUS -->
-  <a href="tel:+2120670892506">
-    📞 Appeler : +212 06 70 89 25 06 
-  </a>
+  <a href="tel:+2120670892506">📞 Appeler : +212 06 70 89 25 06</a>
 </section>
 
 <footer>
   Développeur : <strong>Lebbar Yahya</strong>
 </footer>
 
-  <section class="contact" id="userSection">
-  <h2>👤 Compte Utilisateur</h2>
+</div>
 
-  <div id="authForms">
-    <input type="text" id="username" placeholder="Nom d'utilisateur">
-    <input type="password" id="password" placeholder="Mot de passe">
-    <br><br>
-    <button onclick="register()">S'inscrire</button>
-    <button onclick="login()">Se connecter</button>
-  </div>
+<script>
+// ===================
+// LOGIN / UTILISATEUR
+// ===================
+function register(){
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
 
-  <div id="welcomeUser" style="display:none;">
-    <p>Bienvenue <strong id="displayUser"></strong> 👋</p>
-    <button onclick="logout()">Se déconnecter</button>
-  </div>
-</section>
+  if(user && pass){
+    localStorage.setItem("calcpro_user", user);
+    localStorage.setItem("calcpro_pass", pass);
+    document.getElementById("loginMsg").innerText = "Compte créé ! Connectez-vous.";
+  }else{
+    document.getElementById("loginMsg").innerText = "Remplis tous les champs !";
+  }
+}
 
+function login(){
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+
+  let savedUser = localStorage.getItem("calcpro_user");
+  let savedPass = localStorage.getItem("calcpro_pass");
+
+  if(user === savedUser && pass === savedPass){
+    localStorage.setItem("loggedIn", "true");
+    showCalcPro();
+  }else{
+    document.getElementById("loginMsg").innerText = "Identifiants incorrects !";
+  }
+}
+
+function showCalcPro(){
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("mainContent").style.display="block";
+}
+
+window.onload = function(){
+  if(localStorage.getItem("loggedIn")==="true"){
+    showCalcPro();
+  }
+}
+</script>
 
 </body>
 </html>
+
