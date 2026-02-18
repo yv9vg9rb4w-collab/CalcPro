@@ -14,6 +14,7 @@
   --muted:#aaaaaa;
 }
 
+/* RESET */
 *{box-sizing:border-box;}
 body{
   margin:0;
@@ -76,13 +77,34 @@ header p{
   right:20px; 
   width:60px; 
   height:60px; 
-  background:var(--accent); 
+  background:#ffffff; /* Cercle blanc */
   border-radius:50%; 
   display:flex; 
   justify-content:center; 
   align-items:center; 
   font-weight:bold;
   cursor:pointer;
+}
+#userCircleName{
+  color:#000000; /* Nom en noir */
+  font-weight:bold;
+}
+
+/* Menu déconnexion */
+#userMenu{
+  position:absolute;
+  top:80px;
+  right:20px;
+  background:var(--card);
+  border-radius:12px;
+  padding:10px 20px;
+  display:none;
+  box-shadow:0 0 15px rgba(0,255,204,0.3);
+  cursor:pointer;
+  z-index:2000;
+}
+#userMenu:hover{
+  background:rgba(0,255,204,0.2);
 }
 
 /* TOOLS */
@@ -192,6 +214,7 @@ footer{
   <h1>CalcPro</h1>
   <p>Calculatrices avancées & cours de soutien</p>
   <div id="userCircle"><span id="userCircleName"></span></div>
+  <div id="userMenu" onclick="logout()">Déconnexion</div>
 </header>
 
 <section class="tool-list">
@@ -297,10 +320,47 @@ function showCalcPro(){
     document.getElementById("loginScreen").style.display="none";
     document.getElementById("mainContent").style.display="block";
     document.getElementById("userCircleName").innerText = localStorage.getItem("calcpro_user");
+    displayHistory();
+}
+
+// HISTORIQUE
+function addToHistory(calc){
+    let history=JSON.parse(localStorage.getItem("calcHistory")||"[]");
+    history.push(calc);
+    localStorage.setItem("calcHistory",JSON.stringify(history));
+    displayHistory();
+}
+
+function displayHistory(){
+    let history=JSON.parse(localStorage.getItem("calcHistory")||"[]");
+    let ul=document.getElementById("calcHistory");
+    ul.innerHTML="";
+    history.slice().reverse().forEach(h=>{
+        let li=document.createElement("li");
+        li.textContent=h;
+        ul.appendChild(li);
+    });
+}
+
+// CERCLE UTILISATEUR / MENU
+document.getElementById("userCircle").onclick = function(){
+    let menu = document.getElementById("userMenu");
+    menu.style.display = (menu.style.display==="block") ? "none" : "block";
+};
+
+// DÉCONNEXION
+function logout(){
+    localStorage.removeItem("loggedIn");
+    document.getElementById("userMenu").style.display="none";
+    location.reload(); // Retour écran login
 }
 
 // AUTO LOGIN
-window.onload=function(){if(localStorage.getItem("loggedIn")==="true"){showCalcPro();}}
+window.onload=function(){
+    if(localStorage.getItem("loggedIn")==="true"){
+        showCalcPro();
+    }
+}
 </script>
 
 </body>
