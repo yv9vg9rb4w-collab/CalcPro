@@ -26,6 +26,56 @@ body{
   color:var(--text);
 }
 
+  <script>
+
+function register(){
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+
+  if(user && pass){
+    localStorage.setItem("calcpro_user", user);
+    localStorage.setItem("calcpro_pass", pass);
+    alert("Compte créé !");
+  }else{
+    alert("Remplis tous les champs !");
+  }
+}
+
+function login(){
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+
+  let savedUser = localStorage.getItem("calcpro_user");
+  let savedPass = localStorage.getItem("calcpro_pass");
+
+  if(user === savedUser && pass === savedPass){
+    localStorage.setItem("loggedIn", "true");
+    showUser(user);
+  }else{
+    alert("Identifiants incorrects !");
+  }
+}
+
+function logout(){
+  localStorage.removeItem("loggedIn");
+  location.reload();
+}
+
+function showUser(user){
+  document.getElementById("authForms").style.display="none";
+  document.getElementById("welcomeUser").style.display="block";
+  document.getElementById("displayUser").innerText=user;
+}
+
+window.onload = function(){
+  if(localStorage.getItem("loggedIn")==="true"){
+    let user = localStorage.getItem("calcpro_user");
+    showUser(user);
+  }
+}
+
+</script>
+
 /* HEADER */
 header{
   text-align:center;
@@ -220,6 +270,24 @@ footer{
 <footer>
   Développeur : <strong>Lebbar Yahya</strong>
 </footer>
+
+  <section class="contact" id="userSection">
+  <h2>👤 Compte Utilisateur</h2>
+
+  <div id="authForms">
+    <input type="text" id="username" placeholder="Nom d'utilisateur">
+    <input type="password" id="password" placeholder="Mot de passe">
+    <br><br>
+    <button onclick="register()">S'inscrire</button>
+    <button onclick="login()">Se connecter</button>
+  </div>
+
+  <div id="welcomeUser" style="display:none;">
+    <p>Bienvenue <strong id="displayUser"></strong> 👋</p>
+    <button onclick="logout()">Se déconnecter</button>
+  </div>
+</section>
+
 
 </body>
 </html>
