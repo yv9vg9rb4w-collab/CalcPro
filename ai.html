@@ -2,121 +2,57 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IA CalcPro - Pro Max</title>
+<title>CalcPro IA</title>
 <style>
-  body {
-    background-color: #121212;
-    color: #fff;
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  header {
-    background: linear-gradient(90deg, #00ffcc, #0077ff);
-    padding: 20px;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-  }
-
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-  }
-
-  input[type="text"] {
-    width: 80%;
-    max-width: 500px;
-    padding: 15px;
-    font-size: 1.2rem;
-    border-radius: 10px;
-    border: none;
-    margin-bottom: 20px;
-  }
-
-  button {
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 10px;
-    background: #00ffcc;
-    color: #121212;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-
-  button:hover {
-    transform: scale(1.05);
-  }
-
-  #answer {
-    margin-top: 30px;
-    width: 80%;
-    max-width: 600px;
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #00ffcc55;
-    font-size: 1.2rem;
-    white-space: pre-wrap;
-  }
-
-  footer {
-    text-align: center;
-    padding: 15px;
-    background: #1e1e1e;
-    color: #aaa;
-    font-size: 14px;
-  }
+  body { background: #111; color: #fff; font-family: Arial, sans-serif; display:flex; flex-direction:column; align-items:center; padding:50px; }
+  #question { width: 400px; padding:10px; font-size:18px; }
+  #reply { margin-top:20px; font-size:20px; color:#0f0; white-space:pre-line; }
+  #suggestions { margin-top:10px; color:#0ff; }
 </style>
 </head>
 <body>
-
-<header>🤖 IA CalcPro - Pro Max</header>
-
-<main>
-  <input type="text" id="question" placeholder="Pose ta question ici...">
-  <button onclick="ask()">Poser la question</button>
-  <div id="answer">La réponse apparaîtra ici...</div>
-</main>
-
-<footer>Dévloppeur : <strong>Lebbar Yahya</strong></footer>
+<h1>CalcPro IA</h1>
+<input type="text" id="question" placeholder="Écris ton équation..." autofocus />
+<div id="reply"></div>
+<div id="suggestions"></div>
 
 <script>
-async function ask() {
-  const question = document.getElementById('question').value;
-  if(!question){
-    alert("Tape une question avant !");
-    return;
-  }
+const input = document.getElementById("question");
+const reply = document.getElementById("reply");
+const suggestions = document.getElementById("suggestions");
+let timeout;
 
-  document.getElementById('answer').innerText = "⏳ Patiente un instant...";
-
+// Fonction pour appeler le serveur
+async function askAI(question) {
   try {
-    const res = await fetch('http://localhost:3000/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("http://localhost:3000/ask-ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question })
     });
-
     const data = await res.json();
-    document.getElementById('answer').innerText = data.answer;
+    reply.textContent = data.reply;
+
+    // Suggestions basiques (offline)
+    suggestions.textContent = "";
+    if(question.includes("x")) {
+      suggestions.textContent = "💡 Suggestions : Factoriser | Développer | Résoudre | Dériver | Intégrer";
+    }
 
   } catch (err) {
-    console.error("Erreur fetch:", err);
-    document.getElementById('answer').innerText = "❌ Impossible de contacter le serveur. Vérifie si server.js est lancé.";
+    reply.textContent = "Erreur serveur IA.";
   }
 }
-</script>
 
+// Détecte en continu pendant que l’utilisateur tape
+input.addEventListener("input", () => {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    const q = input.value.trim();
+    if(q) askAI(q);
+    else { reply.textContent=""; suggestions.textContent=""; }
+  }, 300); // 300ms après la dernière frappe
+});
+</script>
 </body>
 </html>
