@@ -21,97 +21,37 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
   background:var(--bg);
   color:var(--text);
-  overflow-x:hidden;
 }
 
-/* TRANSITIONS FLUIDES */
-#loginScreen, #mainContent{
-  transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s ease;
-}
-.hidden{
-  opacity:0;
-  visibility:hidden;
-  transform: translateY(-50px);
-}
-
-/* LOGIN SCREEN PREMIUM */
+/* LOGIN SCREEN */
 #loginScreen{
   position:fixed;
   top:0; left:0;
   width:100%; height:100%;
+  background:var(--bg);
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
   z-index:1000;
-  opacity:0;
-  transform: translateY(50px);
-  animation: loginAppear 0.8s forwards;
-  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-  backdrop-filter: blur(5px);
-  text-align:center;
-}
-@keyframes loginAppear{
-  to{opacity:1; transform: translateY(0);}
-}
-#loginScreen h1{
-  font-size:2.5em;
-  color:var(--accent);
-  margin-bottom:20px;
-  text-shadow: 0 0 20px rgba(0,255,204,0.5);
-  animation: titlePulse 1.5s ease-in-out infinite alternate;
-}
-@keyframes titlePulse{
-  0%{text-shadow: 0 0 10px rgba(0,255,204,0.4);}
-  100%{text-shadow: 0 0 25px rgba(0,255,204,0.8);}
 }
 #loginScreen input{
-  margin:12px;
-  padding:15px 20px;
-  border-radius:12px;
-  border: 2px solid rgba(0,255,204,0.3);
-  background: rgba(255,255,255,0.05);
-  color:#fff;
-  width:280px;
-  font-size:16px;
-  transition: 0.3s all ease;
-}
-#loginScreen input:focus{
-  border-color: var(--accent);
-  box-shadow: 0 0 15px rgba(0,255,204,0.5);
-  outline:none;
+  margin:10px;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:250px;
 }
 #loginScreen button{
-  margin:10px 5px;
-  padding:12px 25px;
+  margin:5px;
+  padding:10px 20px;
   border:none;
-  border-radius:50px;
-  background: linear-gradient(45deg, #00ffcc, #00cca5);
+  border-radius:8px;
+  background:var(--accent);
   font-weight:bold;
-  font-size:16px;
   cursor:pointer;
-  color:#000;
-  transition: 0.3s all ease;
-  box-shadow: 0 4px 15px rgba(0,255,204,0.4);
 }
-#loginScreen button:hover{
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 25px rgba(0,255,204,0.6);
-}
-#loginMsg{
-  color:#ff5555;
-  margin-top:15px;
-  font-weight:bold;
-  text-shadow: 0 0 5px #ff5555;
-}
-
-/* MAIN CONTENT */
-#mainContent{
-  display:none;
-  opacity:1;
-  transform: translateY(0);
-  padding: 20px;
-}
+#loginMsg{color:#ff5555;margin-top:10px;}
 
 /* HEADER */
 header{
@@ -137,7 +77,7 @@ header p{
   right:20px; 
   width:60px; 
   height:60px; 
-  background:#ffffff;
+  background:#ffffff; /* Cercle blanc */
   border-radius:50%; 
   display:flex; 
   justify-content:center; 
@@ -146,7 +86,7 @@ header p{
   cursor:pointer;
 }
 #userCircleName{
-  color:#000000;
+  color:#000000; /* Nom en noir */
   font-weight:bold;
 }
 
@@ -250,13 +190,6 @@ footer{
   font-size:14px;
   color:var(--muted);
 }
-
-/* RESPONSIVE */
-@media (max-width:480px){
-  #loginScreen h1{font-size:2em;}
-  #loginScreen input{width:90%; padding:12px 15px; font-size:15px;}
-  #loginScreen button{width:45%; font-size:15px; padding:10px 0;}
-}
 </style>
 </head>
 
@@ -275,7 +208,7 @@ footer{
 </div>
 
 <!-- MAIN CONTENT -->
-<div id="mainContent" class="hidden">
+<div id="mainContent" style="display:none;">
 
 <header>
   <h1>CalcPro</h1>
@@ -285,19 +218,64 @@ footer{
 </header>
 
 <section class="tool-list">
-  <div class="tool" onclick="location.href='graphique.html'"><div class="icon">📈</div><h3>Calculatrice graphique</h3><span>Tracer des fonctions</span></div>
-  <div class="tool" onclick="location.href='scientifique.html'"><div class="icon">🧠</div><h3>Calculatrice scientifique</h3><span>Fonctions avancées</span></div>
-  <div class="tool" onclick="location.href='matrices.html'"><div class="icon">📊</div><h3>Calculatrice matrices</h3><span>Déterminant, inverse</span></div>
-  <div class="tool" onclick="location.href='geometrie.html'"><div class="icon">📐</div><h3>Outil géométrie</h3><span>Figures et mesures</span></div>
-  <div class="tool" onclick="location.href='3d.html'"><div class="icon">🪩</div><h3>Algorithme 3D</h3><span>Visualisation spatiale</span></div>
-  <div class="tool" onclick="location.href='pc.html'"><div class="icon">⚡️</div><h3>Calculatrice P.C</h3><span>Physique & chimie</span></div>
-  <div class="tool" onclick="location.href='symbolique.html'"><div class="icon">🧮</div><h3>Calculatrice symbolique</h3><span>Factoriser, développer</span></div>
-  <div class="tool" onclick="location.href='integrale.html'"><div class="icon">∫</div><h3>Intégrale numérique</h3><span>Méthode des trapèzes</span></div>
-  <div class="tool" onclick="location.href='OT_Geometrie_Pro2.html'"><div class="icon">✨</div><h3>Geometrie</h3><span>Figures 2D & 3D</span></div>
-  <div class="tool" onclick="location.href='svt.html'"><div class="icon">🧬</div><h3>SVT</h3><span>Calculs rapides SVT</span></div>
-  <div class="tool" onclick="location.href='conversion_binaire.html'"><div class="icon">🖥</div><h3>Conversion Binaire / Décimal</h3><span>Comprendre le code des ordinateurs</span></div>
+  <div class="tool" onclick="location.href='graphique.html'">
+    <div class="icon">📈</div>
+    <h3>Calculatrice graphique</h3>
+    <span>Tracer des fonctions</span>
+  </div>
+  <div class="tool" onclick="location.href='scientifique.html'">
+    <div class="icon">🧠</div>
+    <h3>Calculatrice scientifique</h3>
+    <span>Mode iPhone, fonctions avancées</span>
+  </div>
+  <div class="tool" onclick="location.href='matrices.html'">
+    <div class="icon">📊</div>
+    <h3>Calculatrice matrices</h3>
+    <span>Déterminant, inverse</span>
+  </div>
+  <div class="tool" onclick="location.href='geometrie.html'">
+    <div class="icon">📐</div>
+    <h3>Outil géométrie</h3>
+    <span>Figures et mesures</span>
+  </div>
+  <div class="tool" onclick="location.href='3d.html'">
+    <div class="icon">🪩</div>
+    <h3>Algorithme 3D</h3>
+    <span>Visualisation spatiale</span>
+  </div>
+  <div class="tool" onclick="location.href='pc.html'">
+    <div class="icon">⚡️</div>
+    <h3>Calculatrice P.C</h3>
+    <span>Physique & chimie</span>
+  </div>
+  <div class="tool" onclick="location.href='symbolique.html'">
+    <div class="icon">🧮</div>
+    <h3>Calculatrice symbolique</h3>
+    <span>Factoriser, développer</span>
+  </div>
+  <div class="tool" onclick="location.href='integrale.html'">
+    <div class="icon">∫</div>
+    <h3>Intégrale numérique</h3>
+    <span>Méthode des trapèzes</span>
+  </div>
+   <div class="tool" onclick="location.href='OT_Geometrie_Pro2.html'">
+    <div class="icon">✨</div>
+    <h3>Géométrie</h3>
+    <span>Les figures 2D & 3D</span>
+  </div>
+ <div class="tool" onclick="location.href='svt.html'">
+    <div class="icon">🧬</div>
+    <h3>SVT</h3>
+    <span>Calculs rapides SVT</span>
+  </div>
+  <div class="tool" onclick="location.href='conversion_binaire.html'">
+    <div class="icon">🖥</div>
+    <h3>Conversion Binaire / Décimal</h3>
+    <span>Comprendre le code des ordinateurs</span>
+  </div>
 </section>
 
+<!-- Historique -->
 <section id="historySection">
   <h2>📝 Historique des calculs</h2>
   <ul id="calcHistory"></ul>
@@ -343,19 +321,11 @@ function login(){
     } else {document.getElementById("loginMsg").innerText="Identifiants incorrects !";}
 }
 
-// TRANSITION LOGIN → MAIN
 function showCalcPro(){
-    const login = document.getElementById("loginScreen");
-    const main = document.getElementById("mainContent");
-
-    login.classList.add("hidden");
-
-    setTimeout(() => {
-        main.style.display="block";
-        main.classList.remove("hidden");
-        document.getElementById("userCircleName").innerText = localStorage.getItem("calcpro_user");
-        displayHistory();
-    }, 600);
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("mainContent").style.display="block";
+    document.getElementById("userCircleName").innerText = localStorage.getItem("calcpro_user");
+    displayHistory();
 }
 
 // HISTORIQUE
@@ -365,6 +335,7 @@ function addToHistory(calc){
     localStorage.setItem("calcHistory",JSON.stringify(history));
     displayHistory();
 }
+
 function displayHistory(){
     let history=JSON.parse(localStorage.getItem("calcHistory")||"[]");
     let ul=document.getElementById("calcHistory");
@@ -382,11 +353,11 @@ document.getElementById("userCircle").onclick = function(){
     menu.style.display = (menu.style.display==="block") ? "none" : "block";
 };
 
-// DÉCONNEXION
+// DÉCONNECTÉ
 function logout(){
     localStorage.removeItem("loggedIn");
     document.getElementById("userMenu").style.display="none";
-    location.reload();
+    location.reload(); // Retour écran login
 }
 
 // AUTO LOGIN
