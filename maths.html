@@ -5,70 +5,100 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CalcPro – Maths Complet 1er & 2ème Semestre</title>
 <style>
-    body { font-family: Arial, sans-serif; background: #f0f4f8; color: #222; margin:0; padding:20px; line-height:1.6; }
-    h1, h2, h3 { color: #0d6efd; }
-    h1 { text-align:center; }
-    .section { background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:1000px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
-    .exercise { background:#e8f0fe; padding:15px; margin:10px 0; border-left:5px solid #0d6efd; border-radius:5px; }
-    .solution { background:#d1e7dd; padding:10px; margin:5px 0 15px 0; border-left:5px solid #198754; border-radius:5px; display:none; }
-    button { padding:5px 10px; border:none; background:#0d6efd; color:white; border-radius:5px; cursor:pointer; }
-    button:hover { background:#0b5ed7; }
-    .whatsapp { display:inline-block; margin-top:20px; padding:15px 25px; background:#25D366; color:white; text-decoration:none; font-weight:bold; border-radius:10px; }
-    .whatsapp:hover { background:#1ebe5d; }
+body { font-family: Arial, sans-serif; background:#f0f4f8; color:#222; margin:0; padding:20px; line-height:1.6; }
+h1,h2,h3 { color:#0d6efd; }
+h1 { text-align:center; }
+.section { background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:1000px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+.exercise { background:#e8f0fe; padding:15px; margin:10px 0; border-left:5px solid #0d6efd; border-radius:5px; }
+.solution { background:#d1e7dd; padding:10px; margin:5px 0 15px 0; border-left:5px solid #198754; border-radius:5px; display:none; }
+.lesson { display:none; }
+button { padding:5px 10px; border:none; background:#0d6efd; color:white; border-radius:5px; cursor:pointer; }
+button:hover { background:#0b5ed7; }
+.whatsapp { display:inline-block; margin-top:20px; padding:15px 25px; background:#25D366; color:white; text-decoration:none; font-weight:bold; border-radius:10px; }
+.whatsapp:hover { background:#1ebe5d; }
+input[type=text] { padding:8px; border-radius:5px; border:1px solid #ccc; width:250px; margin-right:10px;}
+.payment { text-align:center; margin-top:20px;}
 </style>
 </head>
 <body>
 
 <h1>CalcPro – Maths Complet 1er & 2ème Semestre</h1>
-<p style="text-align:center;">Cours interactifs + Exercices corrigés</p>
+<h2 style="text-align:center; color:#198754;">Révisions complètes et interactives pour réussir</h2>
 
-<!-- ================== Exemple de Section ================== -->
-<div class="section">
-<h2>Nombres et Diviseurs</h2>
+<!-- ================== Paiement ================== -->
+<div class="payment">
+<p>Accès complet aux leçons et exercices → <strong>15 MAD / mois</strong></p>
+<a class="whatsapp" href="https://wa.me/212612345678?text=Je%20veux%20m%27abonner%20à%20CalcPro%20Maths%20Complet%2015%20MAD" target="_blank">
+Payer maintenant via WhatsApp
+</a>
+<p>Après paiement, entre le code reçu pour débloquer les leçons :</p>
+<input type="text" id="accessCode" placeholder="Entrez votre code ici">
+<button onclick="checkCode()">Valider</button>
+</div>
+
+<!-- ================== 1er Semestre ================== -->
+<div class="section lesson" id="lesson1">
+<h2>1er Semestre</h2>
 
 <h3>Cours 1 : Diviseurs communs - Nombres premiers</h3>
+<p>Contenu complet du cours ici...</p>
 <div class="exercise">
 Exercice : Trouver le PGCD de 12 et 18
 <div class="solution">
 12 = 2×2×3 <br>
 18 = 2×3×3 <br>
-PGCD = 2×3 = 6
+PGCD = 6
 </div>
 <button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher la solution</button>
 </div>
 
 <h3>Cours 2 : Plus Grand Commun Diviseur (PGCD)</h3>
+<p>Contenu complet du cours ici...</p>
 <div class="exercise">
 Exercice : PGCD de 24 et 36
 <div class="solution">
 24 = 2×2×2×3 <br>
 36 = 2×2×3×3 <br>
-PGCD = 2×2×3 = 12
+PGCD = 12
 </div>
 <button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher la solution</button>
 </div>
 
+<!-- Ajoute tous les autres cours et exercices ici avec la même structure -->
 </div>
 
-<!-- ================== Ajouter toutes les autres sections ================== -->
-<!-- Pour chaque cours/exercice, même structure : .exercise + .solution + button -->
+<!-- ================== 2ème Semestre ================== -->
+<div class="section lesson" id="lesson2">
+<h2>2ème Semestre</h2>
 
-<!-- ================== Bouton WhatsApp pour abonnement ================== -->
-<div class="section">
-<h2>Abonnement Mensuel</h2>
-<p>Accès complet à tous les cours et exercices interactifs – <strong>15 MAD par mois</strong></p>
-<a class="whatsapp" href="https://wa.me/212063013889?text=Je%20veux%20m'abonner%20à%20CalcPro%20Maths%20Complet%2015%20MAD">S'abonner maintenant via WhatsApp</a>
+<h3>Cours 1 : Fonctions</h3>
+<p>Contenu complet du cours ici...</p>
+<div class="exercise">
+Exercice : Tracer f(x) = 2x+1 pour x=0,1,2,3
+<div class="solution">
+f(0)=1, f(1)=3, f(2)=5, f(3)=7
+</div>
+<button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher la solution</button>
+</div>
+
+<!-- Ajoute tous les autres cours et exercices ici avec la même structure -->
 </div>
 
 <script>
-    // Script générique pour basculer la solution
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const sol = btn.previousElementSibling;
-            sol.style.display = sol.style.display === 'block' ? 'none' : 'block';
-        });
-    });
+// Code pour débloquer les leçons
+const correctCode = "CALCPRO15"; // Code à donner après paiement
+const correctCode = "CALCPRO16"; // Code à donne après paiement 
+
+function checkCode() {
+    const userCode = document.getElementById("accessCode").value;
+    if(userCode === correctCode){
+        const lessons = document.querySelectorAll(".lesson");
+        lessons.forEach(lesson => lesson.style.display = "block");
+        alert("Accès accordé ✅ Bon apprentissage !");
+    } else {
+        alert("Code incorrect ❌ Veuillez payer pour obtenir le code.");
+    }
+}
 </script>
 
 </body>
