@@ -141,14 +141,15 @@ async function envoyer() {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        let response = await fetch("http://localhost:5502/ai.html", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message: question })
-        });
+        let response = await fetch("http://127.0.0.1:3000/ask-ia", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message: question })
 
+});
+         
         let data = await response.json();
         loader.remove();
         ajouterMessage(data.response, "ia");
