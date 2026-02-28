@@ -3,96 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>C.P.IA - Chat IA</title>
+<title>C.P.IA - CalcPro</title>
+
 <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #1e1e1e;
-    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+    color: white;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 50px;
+    height: 100vh;
+}
+
+header {
+    padding: 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    background: rgba(0,0,0,0.6);
+    border-bottom: 1px solid #222;
 }
 
 #chatBox {
-    width: 400px;
-    max-width: 90%;
-    height: 400px;
-    background: #2e2e2e;
-    padding: 10px;
+    flex: 1;
+    padding: 20px;
     overflow-y: auto;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-input[type="text"] {
-    width: 300px;
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    margin-right: 5px;
-}
-
-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background: #ff9500;
-    color: #fff;
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .message {
-    margin: 5px 0;
+    padding: 12px 16px;
+    border-radius: 20px;
+    max-width: 75%;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease-in-out;
+    word-wrap: break-word;
 }
 
-.user { color: #4bd6ff; }
-.ia { color: #ff9500; }
+.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #007aff, #00c6ff);
+}
+
+.ia {
+    align-self: flex-start;
+    background: #2a2a2a;
+}
+
+#inputArea {
+    display: flex;
+    padding: 15px;
+    background: rgba(0,0,0,0.6);
+    border-top: 1px solid #222;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    background: #2a2a2a;
+    color: white;
+    font-size: 14px;
+}
+
+button {
+    margin-left: 10px;
+    padding: 12px 18px;
+    border-radius: 25px;
+    border: none;
+    background: linear-gradient(135deg, #007aff, #00c6ff);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.loader {
+    font-size: 13px;
+    opacity: 0.7;
+    font-style: italic;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
+
 <body>
 
-<h2>C.P.IA - Chat IA</h2>
+<header>🤖 C.P.IA - CalcPro</header>
+
 <div id="chatBox"></div>
-<input type="text" id="userInput" placeholder="Pose ta question...">
-<button onclick="envoyer()">Envoyer</button>
+
+<div id="inputArea">
+    <input type="text" id="userInput" placeholder="Pose ta question..." />
+    <button onclick="envoyer()">Envoyer</button>
+</div>
 
 <script>
-let chatBox = document.getElementById('chatBox');
+let chatBox = document.getElementById("chatBox");
+let input = document.getElementById("userInput");
 
 function ajouterMessage(message, type) {
-    let msgDiv = document.createElement('div');
-    msgDiv.className = type;
-    msgDiv.textContent = message;
-    msgDiv.style.margin = "5px 0";
-    msgDiv.style.color = (type === 'user') ? "#4bd6ff" : "#ff9500";
-    chatBox.appendChild(msgDiv);
+    let div = document.createElement("div");
+    div.className = "message " + type;
+    div.textContent = message;
+    chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 async function envoyer() {
-    let userInput = document.getElementById('userInput');
-    let question = userInput.value.trim();
-    if(question === "") return;
+    let question = input.value.trim();
+    if (!question) return;
 
-    ajouterMessage(question, 'user');
-    userInput.value = "";
-    userInput.focus();
+    ajouterMessage(question, "user");
+    input.value = "";
+
+    let loader = document.createElement("div");
+    loader.className = "message ia loader";
+    loader.textContent = "C.P.IA réfléchit...";
+    chatBox.appendChild(loader);
+    chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        let response = await fetch('http://127.0.0.1:3000/ask-ia', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: question })
+        let response = await fetch("http://localhost:5502/ai.html", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: question })
         });
 
         let data = await response.json();
-        ajouterMessage(data.text, 'ia');
-    } catch (err) {
-        ajouterMessage("Erreur : impossible de contacter C.P.IA.", 'ia');
+        loader.remove();
+        ajouterMessage(data.response, "ia");
+
+    } catch (error) {
+        loader.remove();
+        ajouterMessage("Erreur de connexion au serveur.", "ia");
     }
 }
+
+input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        envoyer();
+    }
+});
 </script>
 
 </body>
