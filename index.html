@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <title>CalcPro | Calculatrices & Cours</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 :root{
-  --bg:#0f0f0f;
   --card:#1b1b1b;
   --accent:#00ffcc;
   --text:#ffffff;
@@ -20,19 +18,15 @@ body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
   color:var(--text);
-  
-  /* FRACTAL GLASS BACKGROUND ANIMÉ */
-  background: radial-gradient(circle at 50% 50%, rgba(0,255,204,0.05), rgba(0,0,0,0.9)),
-              repeating-conic-gradient(from 0deg, rgba(0,255,204,0.02) 0deg 10deg, transparent 10deg 20deg);
+  background: radial-gradient(circle at 50% 50%, rgba(255,50,50,0.08), rgba(0,128,64,0.08)),
+              repeating-conic-gradient(from 0deg, rgba(255,50,50,0.05) 0deg 10deg, rgba(0,128,64,0.05) 10deg 20deg);
   backdrop-filter: blur(12px);
   background-blend-mode: overlay;
-  animation: fractalMove 20s infinite linear;
+  animation: fractalMove 25s infinite linear;
 }
-
-/* Animation des motifs fractals */
 @keyframes fractalMove {
   0% { background-position: 0 0, 0 0; }
-  50% { background-position: 100px 50px, 50px 100px; }
+  50% { background-position: 120px 60px, 60px 120px; }
   100% { background-position: 0 0, 0 0; }
 }
 
@@ -204,7 +198,6 @@ footer{
 }
 </style>
 </head>
-
 <body>
 
 <!-- LOGIN SCREEN -->
@@ -221,7 +214,6 @@ footer{
 
 <!-- MAIN CONTENT -->
 <div id="mainContent" style="display:none;">
-
 <header>
   <h1>CalcPro</h1>
   <p>Calculatrices avancées & cours de soutien</p>
@@ -230,69 +222,20 @@ footer{
 </header>
 
 <section class="tool-list">
-  <div class="tool" onclick="location.href='maths.html'">
-    <div class="icon">📕</div>
-    <h3>Révisions complètes de Maths </h3>
-    <span>Révisions complètes et interactives pour tous les niveaux</span>
-  </div>
-  <div class="tool" onclick="location.href='graphique.html'">
-    <div class="icon">📈</div>
-    <h3>Calculatrice graphique</h3>
-    <span>Tracer des fonctions</span>
-  </div>
-  <div class="tool" onclick="location.href='scientifique.html'">
-    <div class="icon">🧠</div>
-    <h3>Calculatrice scientifique</h3>
-    <span>Mode iPhone, fonctions avancées</span>
-  </div>
-  <div class="tool" onclick="location.href='matrices.html'">
-    <div class="icon">📊</div>
-    <h3>Calculatrice matrices</h3>
-    <span>Déterminant, inverse</span>
-  </div>
-  <div class="tool" onclick="location.href='geometrie.html'">
-    <div class="icon">📐</div>
-    <h3>Outil géométrie</h3>
-    <span>Figures et mesures</span>
-  </div>
-  <div class="tool" onclick="location.href='3d.html'">
-    <div class="icon">🪩</div>
-    <h3>Algorithme 3D</h3>
-    <span>Visualisation spatiale</span>
-  </div>
-  <div class="tool" onclick="location.href='pc.html'">
-    <div class="icon">⚡️</div>
-    <h3>Calculatrice P.C</h3>
-    <span>Physique & chimie</span>
-  </div>
-  <div class="tool" onclick="location.href='symbolique.html'">
-    <div class="icon">🧮</div>
-    <h3>Calculatrice symbolique</h3>
-    <span>Factoriser, développer</span>
-  </div>
-  <div class="tool" onclick="location.href='integrale.html'">
-    <div class="icon">∫</div>
-    <h3>Intégrale numérique</h3>
-    <span>Méthode des trapèzes</span>
-  </div>
-  <div class="tool" onclick="location.href='OT_Geometrie_Pro2.html'">
-    <div class="icon">✨</div>
-    <h3>Géométrie</h3>
-    <span>Les figures 2D & 3D</span>
-  </div>
-  <div class="tool" onclick="location.href='svt.html'">
-    <div class="icon">🧬</div>
-    <h3>SVT</h3>
-    <span>Calculs rapides SVT</span>
-  </div>
-  <div class="tool" onclick="location.href='conversion_binaire.html'">
-    <div class="icon">🖥</div>
-    <h3>Conversion Binaire / Décimal</h3>
-    <span>Comprendre le code des ordinateurs</span>
-  </div>
+  <div class="tool" onclick="location.href='maths.html'"><div class="icon">📕</div><h3>Révisions complètes de Maths </h3><span>Révisions complètes et interactives pour tous les niveaux</span></div>
+  <div class="tool" onclick="location.href='graphique.html'"><div class="icon">📈</div><h3>Calculatrice graphique</h3><span>Tracer des fonctions</span></div>
+  <div class="tool" onclick="location.href='scientifique.html'"><div class="icon">🧠</div><h3>Calculatrice scientifique</h3><span>Mode iPhone, fonctions avancées</span></div>
+  <div class="tool" onclick="location.href='matrices.html'"><div class="icon">📊</div><h3>Calculatrice matrices</h3><span>Déterminant, inverse</span></div>
+  <div class="tool" onclick="location.href='geometrie.html'"><div class="icon">📐</div><h3>Outil géométrie</h3><span>Figures et mesures</span></div>
+  <div class="tool" onclick="location.href='3d.html'"><div class="icon">🪩</div><h3>Algorithme 3D</h3><span>Visualisation spatiale</span></div>
+  <div class="tool" onclick="location.href='pc.html'"><div class="icon">⚡️</div><h3>Calculatrice P.C</h3><span>Physique & chimie</span></div>
+  <div class="tool" onclick="location.href='symbolique.html'"><div class="icon">🧮</div><h3>Calculatrice symbolique</h3><span>Factoriser, développer</span></div>
+  <div class="tool" onclick="location.href='integrale.html'"><div class="icon">∫</div><h3>Intégrale numérique</h3><span>Méthode des trapèzes</span></div>
+  <div class="tool" onclick="location.href='OT_Geometrie_Pro2.html'"><div class="icon">✨</div><h3>Géométrie</h3><span>Les figures 2D & 3D</span></div>
+  <div class="tool" onclick="location.href='svt.html'"><div class="icon">🧬</div><h3>SVT</h3><span>Calculs rapides SVT</span></div>
+  <div class="tool" onclick="location.href='conversion_binaire.html'"><div class="icon">🖥</div><h3>Conversion Binaire / Décimal</h3><span>Comprendre le code des ordinateurs</span></div>
 </section>
 
-<!-- Historique -->
 <section id="historySection">
   <h2>📝 Historique des calculs</h2>
   <ul id="calcHistory"></ul>
@@ -311,52 +254,25 @@ footer{
 <footer>
   Développeur : <strong>Lebbar Yahya</strong>
 </footer>
-
 </div>
 
 <script>
-// LOGIN / INSCRIPTION
+// LOGIN / INSCRIPTION AUTOMATIQUE
 function register(){
     let user = document.getElementById("username").value.trim();
     let pass = document.getElementById("password").value.trim();
-
-    if(!user || !pass){
-        document.getElementById("loginMsg").innerText="Remplis tous les champs !";
-        return;
-    }
-
+    if(!user || !pass){document.getElementById("loginMsg").innerText="Remplis tous les champs !"; return;}
     let savedUser = localStorage.getItem("calcpro_user");
-    if(savedUser === user){
-        document.getElementById("loginMsg").innerText="Ce compte existe déjà ! Connexion automatique...";
-        localStorage.setItem("loggedIn","true");
-        showCalcPro();
-        return;
-    }
-
-    localStorage.setItem("calcpro_user", user);
-    localStorage.setItem("calcpro_pass", pass);
-    document.getElementById("loginMsg").innerText="Compte créé avec succès ! Connexion...";
-    localStorage.setItem("loggedIn","true");
-    showCalcPro();
+    if(savedUser === user){localStorage.setItem("loggedIn","true"); document.getElementById("loginMsg").innerText="Compte déjà existant ! Connexion automatique..."; showCalcPro(); return;}
+    localStorage.setItem("calcpro_user", user); localStorage.setItem("calcpro_pass", pass); localStorage.setItem("loggedIn","true"); document.getElementById("loginMsg").innerText="Compte créé ! Connexion en cours..."; showCalcPro();
 }
 
 function login(){
     let user = document.getElementById("username").value.trim();
     let pass = document.getElementById("password").value.trim();
-    let savedUser = localStorage.getItem("calcpro_user");
-    let savedPass = localStorage.getItem("calcpro_pass");
-
-    if(!savedUser){
-        document.getElementById("loginMsg").innerText="Aucun compte trouvé. Veuillez vous inscrire.";
-        return;
-    }
-
-    if(user===savedUser && pass===savedPass){
-        localStorage.setItem("loggedIn","true");
-        showCalcPro();
-    } else {
-        document.getElementById("loginMsg").innerText="Identifiants incorrects !";
-    }
+    let savedUser = localStorage.getItem("calcpro_user"); let savedPass = localStorage.getItem("calcpro_pass");
+    if(!savedUser){document.getElementById("loginMsg").innerText="Aucun compte trouvé. Veuillez vous inscrire."; return;}
+    if(user===savedUser && pass===savedPass){localStorage.setItem("loggedIn","true"); showCalcPro();} else {document.getElementById("loginMsg").innerText="Identifiants incorrects !";}
 }
 
 function showCalcPro(){
@@ -366,44 +282,19 @@ function showCalcPro(){
     displayHistory();
 }
 
-// HISTORIQUE
 function addToHistory(calc){
-    let history=JSON.parse(localStorage.getItem("calcHistory")||"[]");
-    history.push(calc);
-    localStorage.setItem("calcHistory",JSON.stringify(history));
-    displayHistory();
+    let history=JSON.parse(localStorage.getItem("calcHistory")||"[]"); history.push(calc);
+    localStorage.setItem("calcHistory",JSON.stringify(history)); displayHistory();
 }
 
 function displayHistory(){
-    let history=JSON.parse(localStorage.getItem("calcHistory")||"[]");
-    let ul=document.getElementById("calcHistory");
-    ul.innerHTML="";
-    history.slice().reverse().forEach(h=>{
-        let li=document.createElement("li");
-        li.textContent=h;
-        ul.appendChild(li);
-    });
+    let history=JSON.parse(localStorage.getItem("calcHistory")||"[]"); let ul=document.getElementById("calcHistory"); ul.innerHTML="";
+    history.slice().reverse().forEach(h=>{ let li=document.createElement("li"); li.textContent=h; ul.appendChild(li); });
 }
 
-// CERCLE UTILISATEUR / MENU
-document.getElementById("userCircle").onclick = function(){
-    let menu = document.getElementById("userMenu");
-    menu.style.display = (menu.style.display==="block") ? "none" : "block";
-};
-
-// DÉCONNECTÉ
-function logout(){
-    localStorage.removeItem("loggedIn");
-    document.getElementById("userMenu").style.display="none";
-    location.reload();
-}
-
-// AUTO LOGIN
-window.onload=function(){
-    if(localStorage.getItem("loggedIn")==="true"){
-        showCalcPro();
-    }
-}
+document.getElementById("userCircle").onclick = function(){ let menu = document.getElementById("userMenu"); menu.style.display = (menu.style.display==="block") ? "none" : "block";};
+function logout(){ localStorage.removeItem("loggedIn"); document.getElementById("userMenu").style.display="none"; location.reload();}
+window.onload=function(){ if(localStorage.getItem("loggedIn")==="true"){showCalcPro();}};
 </script>
 
 </body>
