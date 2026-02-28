@@ -3,136 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CalcPro - Maths Simple</title>
+<title>CalcPro – Maths Complet</title>
 <style>
-body {font-family: Arial; background:#f0f4f8; padding:20px; color:#222;}
-h1 {text-align:center; color:#0d6efd;}
-.card {display:none; background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:800px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
-input, select, button {padding:10px; margin:5px; border-radius:5px; border:1px solid #ccc;}
-button {background:#198754; color:white; border:none; cursor:pointer;}
-button:hover {background:#157347;}
-.whatsapp {display:inline-block; margin-top:10px; padding:10px 15px; background:#25D366; color:white; text-decoration:none; border-radius:10px; font-weight:bold;}
+body { font-family: Arial, sans-serif; background:#f0f4f8; color:#222; margin:0; padding:20px; line-height:1.6; }
+h1,h2,h3 { color:#0d6efd; }
+h1 { text-align:center; }
+.card { display:none; background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:900px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+button { padding:5px 10px; border:none; background:#198754; color:white; border-radius:5px; cursor:pointer; }
+button:hover { background:#157347; }
+input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-right:10px;}
+.whatsapp { display:inline-block; margin-top:20px; padding:12px 20px; background:#25D366; color:white; text-decoration:none; font-weight:bold; border-radius:10px;}
 </style>
 </head>
 <body>
 
-<h1>CalcPro - Maths Simple</h1>
+<h1>CalcPro – Maths Complet</h1>
+<h2 style="text-align:center; color:#198754;">Révisions complètes pour 3ème, 5ème, 1ère Bac et 2ème Bac</h2>
 
-<p>Sélectionnez votre niveau et entrez le code pour débloquer le semestre.</p>
-
+<!-- Choix niveau et code -->
+<div style="text-align:center;">
 <select id="niveau">
-<option value="">Choisir niveau</option>
+<option value="">-- Sélectionne ton niveau --</option>
 <option value="3eme">3ème</option>
 <option value="5eme">5ème</option>
 <option value="1bac">1ère Bac</option>
 <option value="2bac">2ème Bac</option>
 </select>
-
-<br>
-
-<input type="text" id="code" placeholder="Entrer votre code">
-<button onclick="verifier()">Activer</button>
-
-<br>
-<a id="whatsappBtn" class="whatsapp" target="_blank">
-Payer 20 MAD et recevoir le code
-</a>
+<br><br>
+<input type="text" id="code" placeholder="Entrez votre code">
+<button onclick="verifier()">Activer le semestre</button>
+<br><br>
+<a id="whatsappBtn" class="whatsapp" target="_blank">Payer 20 MAD et recevoir le code</a>
+</div>
 
 <!-- ================= COURS ================= -->
-
 <div id="3eme_sem1" class="card">
-<h2>3ème - Semestre 1</h2>
-<p>Nombres relatifs</p>
-<p>Calcul littéral</p>
-<p>Équations du premier degré</p>
+<h2>3ème – Semestre 1</h2>
+<h3>Cours 1 : Diviseurs communs – Nombres premiers</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Plus Grand Commun Diviseur (PGCD)</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
 <div id="3eme_sem2" class="card">
-<h2>3ème - Semestre 2</h2>
-<p>Fonctions</p>
-<p>Systèmes</p>
-<p>Trigonométrie</p>
+<h2>3ème – Semestre 2</h2>
+<h3>Cours 1 : Fractions – Addition et soustraction</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Racines carrées – Multiplication et division</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
 <div id="5eme_sem1" class="card">
-<h2>5ème - Semestre 1</h2>
-<p>Fractions</p>
-<p>Nombres décimaux</p>
-<p>Proportionnalité</p>
+<h2>5ème – Semestre 1</h2>
+<h3>Cours 1 : Fonctions</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Proportionnalité</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
 <div id="5eme_sem2" class="card">
-<h2>5ème - Semestre 2</h2>
-<p>Équations simples</p>
-<p>Volumes</p>
-<p>Statistiques</p>
+<h2>5ème – Semestre 2</h2>
+<h3>Cours 1 : Équations simples</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Volumes et statistiques</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
 <div id="1bac_sem1" class="card">
-<h2>1ère Bac - Semestre 1</h2>
-<p>Suites numériques</p>
-<p>Fonctions</p>
-<p>Dérivation</p>
+<h2>1ère Bac – Semestre 1</h2>
+<h3>Cours 1 : Suites numériques</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Fonctions et dérivation</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
 <div id="1bac_sem2" class="card">
-<h2>1ère Bac - Semestre 2</h2>
-<p>Limites</p>
-<p>Probabilités</p>
-<p>Produit scalaire</p>
+<h2>1ère Bac – Semestre 2</h2>
+<h3>Cours 1 : Limites</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Probabilités et produit scalaire</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
 <div id="2bac_sem1" class="card">
-<h2>2ème Bac - Semestre 1</h2>
-<p>Nombres complexes</p>
-<p>Logarithmes</p>
-<p>Suites et récurrence</p>
+<h2>2ème Bac – Semestre 1</h2>
+<h3>Cours 1 : Nombres complexes</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Logarithmes et suites</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
 <div id="2bac_sem2" class="card">
-<h2>2ème Bac - Semestre 2</h2>
-<p>Intégrales</p>
-<p>Matrices</p>
-<p>Préparation examen national</p>
+<h2>2ème Bac – Semestre 2</h2>
+<h3>Cours 1 : Intégrales</h3>
+<p>Contenu du cours ici...</p>
+<h3>Cours 2 : Matrices et préparation examen</h3>
+<p>Contenu du cours ici...</p>
 </div>
 
+<!-- ================= SCRIPTS ================= -->
 <script>
 const whatsappNumber = "212663013889";
 const select = document.getElementById("niveau");
 const whatsappBtn = document.getElementById("whatsappBtn");
 
+// Mettre à jour lien WhatsApp selon le niveau
 select.addEventListener("change", function(){
-let niveau = select.value;
-if(niveau){
-let message = "Bonjour, je veux m'abonner au niveau " + niveau + " pour 20 MAD.";
-whatsappBtn.href = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
-}
+  let niveau = select.value;
+  if(niveau){
+    let message = "Bonjour, je veux m'abonner au niveau " + niveau + " pour 20 MAD.";
+    whatsappBtn.href = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
+  }
 });
 
-// Codes simples à usage unique
+// ================== CODES A UTILISER ==================
 let codes = {
-"3A1":"3eme_sem1",
-"3A2":"3eme_sem2",
-"5A1":"5eme_sem1",
-"5A2":"5eme_sem2",
-"1A1":"1bac_sem1",
-"1A2":"1bac_sem2",
-"2A1":"2bac_sem1",
-"2A2":"2bac_sem2"
+  // 3ème Semestre 1
+  "3S1A001":"3eme_sem1","3S1A002":"3eme_sem1","3S1A003":"3eme_sem1","3S1A004":"3eme_sem1","3S1A005":"3eme_sem1",
+  "3S1A006":"3eme_sem1","3S1A007":"3eme_sem1","3S1A008":"3eme_sem1","3S1A009":"3eme_sem1","3S1A010":"3eme_sem1",
+  // 3ème Semestre 2
+  "3S2B001":"3eme_sem2","3S2B002":"3eme_sem2","3S2B003":"3eme_sem2","3S2B004":"3eme_sem2","3S2B005":"3eme_sem2",
+  // 5ème Semestre 1
+  "5S1C001":"5eme_sem1","5S1C002":"5eme_sem1","5S1C003":"5eme_sem1","5S1C004":"5eme_sem1","5S1C005":"5eme_sem1",
+  // 5ème Semestre 2
+  "5S2D001":"5eme_sem2","5S2D002":"5eme_sem2","5S2D003":"5eme_sem2","5S2D004":"5eme_sem2","5S2D005":"5eme_sem2",
+  // 1ère Bac Semestre 1
+  "1S1E001":"1bac_sem1","1S1E002":"1bac_sem1","1S1E003":"1bac_sem1","1S1E004":"1bac_sem1","1S1E005":"1bac_sem1",
+  // 1ère Bac Semestre 2
+  "1S2F001":"1bac_sem2","1S2F002":"1bac_sem2","1S2F003":"1bac_sem2","1S2F004":"1bac_sem2","1S2F005":"1bac_sem2",
+  // 2ème Bac Semestre 1
+  "2S1G001":"2bac_sem1","2S1G002":"2bac_sem1","2S1G003":"2bac_sem1","2S1G004":"2bac_sem1","2S1G005":"2bac_sem1",
+  // 2ème Bac Semestre 2
+  "2S2H001":"2bac_sem2","2S2H002":"2bac_sem2","2S2H003":"2bac_sem2","2S2H004":"2bac_sem2","2S2H005":"2bac_sem2"
 };
 
+// ================== FONCTION VERIFIER ==================
 function verifier(){
-let niveau = select.value;
-let code = document.getElementById("code").value;
-let section = codes[code];
+  let niveau = select.value;
+  let code = document.getElementById("code").value;
+  let section = codes[code];
 
-if(section && section.startsWith(niveau)){
-document.getElementById(section).style.display = "block";
-delete codes[code]; // Supprime le code après usage
-alert("Accès activé !");
-}else{
-alert("Code incorrect ou déjà utilisé. Contactez WhatsApp pour payer.");
-}
+  if(section && section.startsWith(niveau)){
+    document.getElementById(section).style.display = "block";
+    delete codes[code]; // ✅ Supprime le code après usage
+    alert("Abonnement activé ! ✅");
+  }else{
+    alert("Code incorrect ou déjà utilisé ❌. Contactez WhatsApp pour obtenir un code.");
+  }
 }
 </script>
 
