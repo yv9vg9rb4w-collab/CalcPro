@@ -21,6 +21,7 @@ input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-ri
 <h2 style="text-align:center; color:#198754;">Révisions complètes pour 3ème, 5ème, 1ère Bac et 2ème Bac</h2>
 
 <div style="text-align:center;">
+<!-- Niveau -->
 <select id="niveau">
 <option value="">-- Sélectionne ton niveau --</option>
 <option value="3eme">3ème</option>
@@ -28,7 +29,18 @@ input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-ri
 <option value="1bac">1ère Bac</option>
 <option value="2bac">2ème Bac</option>
 </select>
+
 <br><br>
+
+<!-- Semestre -->
+<select id="semestre" disabled>
+<option value="">-- Sélectionne le semestre --</option>
+<option value="sem1">Semestre 1</option>
+<option value="sem2">Semestre 2</option>
+</select>
+
+<br><br>
+
 <input type="text" id="code" placeholder="Entrez votre code">
 <button onclick="verifier()">Activer le semestre</button>
 <br><br>
@@ -36,22 +48,24 @@ input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-ri
 </div>
 
 <!-- ================= COURS ================= -->
+<!-- 3ème -->
 <div id="3eme_sem1" class="card">
 <h2>3ème – Semestre 1</h2>
 <h3>Cours 1 : Diviseurs communs – Nombres premiers</h3>
 <p>Contenu du cours ici...</p>
-<h3>Cours 2 : Plus Grand Commun Diviseur (PGCD)</h3>
+<h3>Cours 2 : PGCD – Nombres premiers entre eux</h3>
 <p>Contenu du cours ici...</p>
 </div>
 
 <div id="3eme_sem2" class="card">
 <h2>3ème – Semestre 2</h2>
-<h3>Cours 1 : Fractions – Addition et soustraction</h3>
+<h3>Cours 1 : Fractions irréductibles – Addition et soustraction</h3>
 <p>Contenu du cours ici...</p>
 <h3>Cours 2 : Racines carrées – Multiplication et division</h3>
 <p>Contenu du cours ici...</p>
 </div>
 
+<!-- 5ème -->
 <div id="5eme_sem1" class="card">
 <h2>5ème – Semestre 1</h2>
 <h3>Cours 1 : Fonctions</h3>
@@ -68,6 +82,7 @@ input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-ri
 <p>Contenu du cours ici...</p>
 </div>
 
+<!-- 1ère Bac -->
 <div id="1bac_sem1" class="card">
 <h2>1ère Bac – Semestre 1</h2>
 <h3>Cours 1 : Suites numériques</h3>
@@ -84,6 +99,7 @@ input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-ri
 <p>Contenu du cours ici...</p>
 </div>
 
+<!-- 2ème Bac -->
 <div id="2bac_sem1" class="card">
 <h2>2ème Bac – Semestre 1</h2>
 <h3>Cours 1 : Nombres complexes</h3>
@@ -103,21 +119,23 @@ input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-ri
 <!-- ================= SCRIPTS ================= -->
 <script>
 const whatsappNumber = "212663013889";
-const select = document.getElementById("niveau");
+const selectNiveau = document.getElementById("niveau");
+const selectSemestre = document.getElementById("semestre");
 const whatsappBtn = document.getElementById("whatsappBtn");
 
-// Mettre à jour lien WhatsApp selon le niveau
-select.addEventListener("change", function(){
-  let niveau = select.value;
-  if(niveau){
-    let message = "Bonjour, je veux m'abonner au niveau " + niveau + " pour 20 MAD.";
-    whatsappBtn.href = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
-  }
+// Activer le semestre après sélection du niveau
+selectNiveau.addEventListener("change", function(){
+    if(selectNiveau.value){
+        selectSemestre.disabled = false;
+        let message = "Bonjour, je veux m'abonner au niveau " + selectNiveau.value + " pour 20 MAD.";
+        whatsappBtn.href = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
+    } else {
+        selectSemestre.disabled = true;
+    }
 });
 
 // ================== CODES ==================
 let codes = {
-  // Exemple : beaucoup de codes par semestre
   "3S1A001":"3eme_sem1","3S1A002":"3eme_sem1","3S1A003":"3eme_sem1","3S1A004":"3eme_sem1","3S1A005":"3eme_sem1",
   "3S2B001":"3eme_sem2","3S2B002":"3eme_sem2","3S2B003":"3eme_sem2","3S2B004":"3eme_sem2","3S2B005":"3eme_sem2",
   "5S1C001":"5eme_sem1","5S1C002":"5eme_sem1","5S1C003":"5eme_sem1","5S1C004":"5eme_sem1","5S1C005":"5eme_sem1",
@@ -128,60 +146,66 @@ let codes = {
   "2S2H001":"2bac_sem2","2S2H002":"2bac_sem2","2S2H003":"2bac_sem2","2S2H004":"2bac_sem2","2S2H005":"2bac_sem2"
 };
 
-// ================== FONCTION VERIFIER ==================
+// ================== VERIFICATION CODE ==================
 function verifier(){
-  let niveau = select.value;
-  let code = document.getElementById("code").value;
-  let section = codes[code];
+    let niveau = selectNiveau.value;
+    let semestre = selectSemestre.value;
+    let code = document.getElementById("code").value;
 
-  if(section && section.startsWith(niveau)){
-    // Débloquer le cours
-    document.getElementById(section).style.display = "block";
+    let sectionId = null;
 
-    // Définir date d'expiration : 2 semaines
-    let expiration = new Date();
-    expiration.setDate(expiration.getDate() + 14);
-    localStorage.setItem(code, expiration);
-
-    // Supprimer le code pour qu'il ne soit plus utilisable
-    delete codes[code];
-
-    alert("Abonnement activé pour 2 semaines ✅");
-
-  } else if(localStorage.getItem(code)){
-    let expDate = new Date(localStorage.getItem(code));
-    if(expDate > new Date()){
-      alert("Ce code est déjà utilisé et actif jusqu'à " + expDate.toLocaleDateString() + " ❌");
-    } else {
-      alert("Ce code a expiré. Veuillez payer pour obtenir un nouveau code ✅");
+    if(code && codes[code] && codes[code].startsWith(niveau)){
+        if(semestre === "sem1" && codes[code].includes("sem1")){
+            sectionId = codes[code];
+        } else if(semestre === "sem2" && codes[code].includes("sem2")){
+            sectionId = codes[code];
+        }
     }
-  } else {
-    alert("Code incorrect ❌. Contactez WhatsApp pour obtenir un code.");
-  }
+
+    if(sectionId){
+        document.getElementById(sectionId).style.display = "block";
+
+        // Expiration 2 semaines
+        let expiration = new Date();
+        expiration.setDate(expiration.getDate() + 14);
+        localStorage.setItem(code, expiration);
+
+        delete codes[code];
+        alert("Abonnement activé pour 2 semaines ✅");
+
+    } else if(localStorage.getItem(code)){
+        let expDate = new Date(localStorage.getItem(code));
+        if(expDate > new Date()){
+            alert("Ce code est déjà utilisé et actif jusqu'à " + expDate.toLocaleDateString() + " ❌");
+        } else {
+            alert("Ce code a expiré. Veuillez payer pour obtenir un nouveau code ✅");
+        }
+    } else {
+        alert("Code incorrect ❌. Contactez WhatsApp pour obtenir un code.");
+    }
 }
 
-// Vérifier à chaque chargement si des codes sont encore actifs
+// Vérification au chargement pour codes encore actifs
 window.onload = function(){
-  for(let key in localStorage){
-    let exp = new Date(localStorage.getItem(key));
-    if(exp > new Date()){
-      let section = key.startsWith("3S1") ? "3eme_sem1" :
-                    key.startsWith("3S2") ? "3eme_sem2" :
-                    key.startsWith("5S1") ? "5eme_sem1" :
-                    key.startsWith("5S2") ? "5eme_sem2" :
-                    key.startsWith("1S1") ? "1bac_sem1" :
-                    key.startsWith("1S2") ? "1bac_sem2" :
-                    key.startsWith("2S1") ? "2bac_sem1" :
-                    key.startsWith("2S2") ? "2bac_sem2" : null;
-      if(section){
-        document.getElementById(section).style.display = "block";
-      }
-    } else {
-      localStorage.removeItem(key); // Supprime les codes expirés
+    for(let key in localStorage){
+        let exp = new Date(localStorage.getItem(key));
+        if(exp > new Date()){
+            let section = key.startsWith("3S1") ? "3eme_sem1" :
+                          key.startsWith("3S2") ? "3eme_sem2" :
+                          key.startsWith("5S1") ? "5eme_sem1" :
+                          key.startsWith("5S2") ? "5eme_sem2" :
+                          key.startsWith("1S1") ? "1bac_sem1" :
+                          key.startsWith("1S2") ? "1bac_sem2" :
+                          key.startsWith("2S1") ? "2bac_sem1" :
+                          key.startsWith("2S2") ? "2bac_sem2" : null;
+            if(section){
+                document.getElementById(section).style.display = "block";
+            }
+        } else {
+            localStorage.removeItem(key);
+        }
     }
-  }
 }
 </script>
-
 </body>
 </html>
