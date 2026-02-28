@@ -15,6 +15,8 @@ h1,h2 { color:#0d6efd; text-align:center; }
 input[type=text], select { padding:8px; border-radius:5px; border:1px solid #ccc; width:250px; margin-right:10px;}
 button { padding:8px 12px; border:none; border-radius:5px; background:#198754; color:white; cursor:pointer;}
 button:hover { background:#157347;}
+.whatsapp { display:inline-block; padding:10px 20px; background:#25D366; color:white; text-decoration:none; border-radius:10px; font-weight:bold; margin-top:10px;}
+.whatsapp:hover { background:#1ebe5d;}
 </style>
 </head>
 <body>
@@ -34,6 +36,8 @@ button:hover { background:#157347;}
   <br><br>
   <input type="text" id="userCode" placeholder="Entrez votre code ici">
   <button onclick="checkCode()">Valider</button>
+  <br><br>
+  <a id="whatsappBtn" class="whatsapp" target="_blank">Demander le code sur WhatsApp</a>
 </div>
 
 <!-- 3ème Semestres -->
@@ -77,23 +81,45 @@ button:hover { background:#157347;}
 </div>
 
 <script>
+// Ton numéro WhatsApp
+const whatsappNumber = "212663013889";
+
+// Texte WhatsApp en fonction du niveau sélectionné
+const niveauText = {
+  "3eme": "Je veux m'abonner aux cours de 3ème",
+  "5eme": "Je veux m'abonner aux cours de 5ème",
+  "1bac": "Je veux m'abonner aux cours de 1ère Bac",
+  "2bac": "Je veux m'abonner aux cours de 2ème Bac"
+};
+
+const select = document.getElementById("niveauSelect");
+const whatsappBtn = document.getElementById("whatsappBtn");
+
+select.addEventListener("change", function() {
+  const niveau = select.value;
+  if(niveau && niveauText[niveau]){
+    whatsappBtn.href = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(niveauText[niveau]);
+    whatsappBtn.textContent = `Demander le code pour ${niveau.toUpperCase()} sur WhatsApp`;
+  } else {
+    whatsappBtn.href = "#";
+    whatsappBtn.textContent = "Demander le code sur WhatsApp";
+  }
+});
+
 // Codes multiples pour chaque semestre
 const codes = {
   "3SEM1A":"3eme_sem1", "3SEM1B":"3eme_sem1", "3SEM1C":"3eme_sem1",
   "3SEM2A":"3eme_sem2", "3SEM2B":"3eme_sem2",
-
   "5SEM1A":"5eme_sem1", "5SEM1B":"5eme_sem1",
   "5SEM2A":"5eme_sem2", "5SEM2B":"5eme_sem2",
-
   "1BSEM1A":"1bac_sem1", "1BSEM1B":"1bac_sem1",
   "1BSEM2A":"1bac_sem2", "1BSEM2B":"1bac_sem2",
-
   "2BSEM1A":"2bac_sem1", "2BSEM1B":"2bac_sem1",
   "2BSEM2A":"2bac_sem2", "2BSEM2B":"2bac_sem2"
 };
 
 function checkCode(){
-  const niveau = document.getElementById("niveauSelect").value;
+  const niveau = select.value;
   const userCode = document.getElementById("userCode").value.trim();
   if(!niveau){
     alert("Veuillez sélectionner votre niveau !");
@@ -105,7 +131,7 @@ function checkCode(){
     lessons.forEach(lesson => lesson.style.display="block");
     alert("Accès débloqué ✅");
   } else {
-    alert("Code incorrect ❌ Veuillez payer pour obtenir le code.");
+    alert("Code incorrect ❌ Veuillez demander le code sur WhatsApp.");
   }
 }
 </script>
