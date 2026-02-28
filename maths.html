@@ -3,136 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CalcPro – Maths Semestres par Niveau</title>
+<title>CalcPro - Maths Simple</title>
 <style>
-body { font-family: Arial, sans-serif; background:#f0f4f8; color:#222; margin:0; padding:20px; line-height:1.6; }
-h1,h2 { color:#0d6efd; text-align:center; }
-.section { background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:800px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
-.lesson { display:none; }
-.btn { display:inline-block; padding:10px 20px; background:#0d6efd; color:white; text-decoration:none; border-radius:5px; margin-top:10px;}
-.btn:hover { background:#0b5ed7;}
-.payment { text-align:center; margin-top:20px;}
-input[type=text], select { padding:8px; border-radius:5px; border:1px solid #ccc; width:250px; margin-right:10px;}
-button { padding:8px 12px; border:none; border-radius:5px; background:#198754; color:white; cursor:pointer;}
-button:hover { background:#157347;}
-.whatsapp { display:inline-block; padding:10px 20px; background:#25D366; color:white; text-decoration:none; border-radius:10px; font-weight:bold; margin-top:10px;}
-.whatsapp:hover { background:#1ebe5d;}
+body {font-family: Arial; background:#f0f4f8; padding:20px; color:#222;}
+h1 {text-align:center; color:#0d6efd;}
+.card {display:none; background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:800px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+input, select, button {padding:10px; margin:5px; border-radius:5px; border:1px solid #ccc;}
+button {background:#198754; color:white; border:none; cursor:pointer;}
+button:hover {background:#157347;}
+.whatsapp {display:inline-block; margin-top:10px; padding:10px 15px; background:#25D366; color:white; text-decoration:none; border-radius:10px; font-weight:bold;}
 </style>
 </head>
 <body>
 
-<h1>CalcPro – Maths Complet</h1>
-<h2 style="color:#198754;">Sélectionnez votre niveau et débloquez les semestres</h2>
+<h1>CalcPro - Maths Simple</h1>
 
-<div class="payment">
-  <h2>Choisissez votre niveau :</h2>
-  <select id="niveauSelect">
-    <option value="">-- Sélectionnez votre niveau --</option>
-    <option value="3eme">3ème</option>
-    <option value="5eme">5ème</option>
-    <option value="1bac">1ère Bac</option>
-    <option value="2bac">2ème Bac</option>
-  </select>
-  <br><br>
-  <input type="text" id="userCode" placeholder="Entrez votre code ici">
-  <button onclick="checkCode()">Valider</button>
-  <br><br>
-  <a id="whatsappBtn" class="whatsapp" target="_blank">Demander le code sur WhatsApp</a>
-</div>
+<p>Sélectionnez votre niveau et entrez le code pour débloquer le semestre.</p>
 
-<!-- 3ème Semestres -->
-<div class="section lesson" data-level="3eme_sem1">
-  <h2>3ème – 1er Semestre</h2>
-  <a href="PDF/3eme_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
-</div>
-<div class="section lesson" data-level="3eme_sem2">
-  <h2>3ème – 2ème Semestre</h2>
-  <a href="PDF/3eme_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
-</div>
+<select id="niveau">
+<option value="">Choisir niveau</option>
+<option value="3eme">3ème</option>
+<option value="5eme">5ème</option>
+<option value="1bac">1ère Bac</option>
+<option value="2bac">2ème Bac</option>
+</select>
 
-<!-- 5ème Semestres -->
-<div class="section lesson" data-level="5eme_sem1">
-  <h2>5ème – 1er Semestre</h2>
-  <a href="PDF/5eme_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
-</div>
-<div class="section lesson" data-level="5eme_sem2">
-  <h2>5ème – 2ème Semestre</h2>
-  <a href="PDF/5eme_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
+<br>
+
+<input type="text" id="code" placeholder="Entrer votre code">
+<button onclick="verifier()">Activer</button>
+
+<br>
+<a id="whatsappBtn" class="whatsapp" target="_blank">
+Payer 20 MAD et recevoir le code
+</a>
+
+<!-- ================= COURS ================= -->
+
+<div id="3eme_sem1" class="card">
+<h2>3ème - Semestre 1</h2>
+<p>Nombres relatifs</p>
+<p>Calcul littéral</p>
+<p>Équations du premier degré</p>
 </div>
 
-<!-- 1ère Bac Semestres -->
-<div class="section lesson" data-level="1bac_sem1">
-  <h2>1ère Bac – 1er Semestre</h2>
-  <a href="PDF/1bac_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
-</div>
-<div class="section lesson" data-level="1bac_sem2">
-  <h2>1ère Bac – 2ème Semestre</h2>
-  <a href="PDF/1bac_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
+<div id="3eme_sem2" class="card">
+<h2>3ème - Semestre 2</h2>
+<p>Fonctions</p>
+<p>Systèmes</p>
+<p>Trigonométrie</p>
 </div>
 
-<!-- 2ème Bac Semestres -->
-<div class="section lesson" data-level="2bac_sem1">
-  <h2>2ème Bac – 1er Semestre</h2>
-  <a href="PDF/2bac_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
+<div id="5eme_sem1" class="card">
+<h2>5ème - Semestre 1</h2>
+<p>Fractions</p>
+<p>Nombres décimaux</p>
+<p>Proportionnalité</p>
 </div>
-<div class="section lesson" data-level="2bac_sem2">
-  <h2>2ème Bac – 2ème Semestre</h2>
-  <a href="PDF/2bac_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
+
+<div id="5eme_sem2" class="card">
+<h2>5ème - Semestre 2</h2>
+<p>Équations simples</p>
+<p>Volumes</p>
+<p>Statistiques</p>
+</div>
+
+<div id="1bac_sem1" class="card">
+<h2>1ère Bac - Semestre 1</h2>
+<p>Suites numériques</p>
+<p>Fonctions</p>
+<p>Dérivation</p>
+</div>
+
+<div id="1bac_sem2" class="card">
+<h2>1ère Bac - Semestre 2</h2>
+<p>Limites</p>
+<p>Probabilités</p>
+<p>Produit scalaire</p>
+</div>
+
+<div id="2bac_sem1" class="card">
+<h2>2ème Bac - Semestre 1</h2>
+<p>Nombres complexes</p>
+<p>Logarithmes</p>
+<p>Suites et récurrence</p>
+</div>
+
+<div id="2bac_sem2" class="card">
+<h2>2ème Bac - Semestre 2</h2>
+<p>Intégrales</p>
+<p>Matrices</p>
+<p>Préparation examen national</p>
 </div>
 
 <script>
-// Ton numéro WhatsApp
 const whatsappNumber = "212663013889";
-
-// Texte WhatsApp en fonction du niveau sélectionné
-const niveauText = {
-  "3eme": "Je veux m'abonner aux cours de 3ème",
-  "5eme": "Je veux m'abonner aux cours de 5ème",
-  "1bac": "Je veux m'abonner aux cours de 1ère Bac",
-  "2bac": "Je veux m'abonner aux cours de 2ème Bac"
-};
-
-const select = document.getElementById("niveauSelect");
+const select = document.getElementById("niveau");
 const whatsappBtn = document.getElementById("whatsappBtn");
 
-select.addEventListener("change", function() {
-  const niveau = select.value;
-  if(niveau && niveauText[niveau]){
-    whatsappBtn.href = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(niveauText[niveau]);
-    whatsappBtn.textContent = `Demander le code pour ${niveau.toUpperCase()} sur WhatsApp`;
-  } else {
-    whatsappBtn.href = "#";
-    whatsappBtn.textContent = "Demander le code sur WhatsApp";
-  }
+select.addEventListener("change", function(){
+let niveau = select.value;
+if(niveau){
+let message = "Bonjour, je veux m'abonner au niveau " + niveau + " pour 20 MAD.";
+whatsappBtn.href = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
+}
 });
 
-// Codes multiples pour chaque semestre
-const codes = {
-  "3SEM1A":"3eme_sem1", "3SEM1B":"3eme_sem1", "3SEM1C":"3eme_sem1",
-  "3SEM2A":"3eme_sem2", "3SEM2B":"3eme_sem2",
-  "5SEM1A":"5eme_sem1", "5SEM1B":"5eme_sem1",
-  "5SEM2A":"5eme_sem2", "5SEM2B":"5eme_sem2",
-  "1BSEM1A":"1bac_sem1", "1BSEM1B":"1bac_sem1",
-  "1BSEM2A":"1bac_sem2", "1BSEM2B":"1bac_sem2",
-  "2BSEM1A":"2bac_sem1", "2BSEM1B":"2bac_sem1",
-  "2BSEM2A":"2bac_sem2", "2BSEM2B":"2bac_sem2"
+// Codes simples à usage unique
+let codes = {
+"3A1":"3eme_sem1",
+"3A2":"3eme_sem2",
+"5A1":"5eme_sem1",
+"5A2":"5eme_sem2",
+"1A1":"1bac_sem1",
+"1A2":"1bac_sem2",
+"2A1":"2bac_sem1",
+"2A2":"2bac_sem2"
 };
 
-function checkCode(){
-  const niveau = select.value;
-  const userCode = document.getElementById("userCode").value.trim();
-  if(!niveau){
-    alert("Veuillez sélectionner votre niveau !");
-    return;
-  }
-  const levelId = codes[userCode];
-  if(levelId && levelId.startsWith(niveau)){
-    const lessons = document.querySelectorAll(`.lesson[data-level="${levelId}"]`);
-    lessons.forEach(lesson => lesson.style.display="block");
-    alert("Accès débloqué ✅");
-  } else {
-    alert("Code incorrect ❌ Veuillez demander le code sur WhatsApp.");
-  }
+function verifier(){
+let niveau = select.value;
+let code = document.getElementById("code").value;
+let section = codes[code];
+
+if(section && section.startsWith(niveau)){
+document.getElementById(section).style.display = "block";
+delete codes[code]; // Supprime le code après usage
+alert("Accès activé !");
+}else{
+alert("Code incorrect ou déjà utilisé. Contactez WhatsApp pour payer.");
+}
 }
 </script>
 
