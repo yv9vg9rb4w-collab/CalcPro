@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalcPro – Maths Complet 1er & 2ème Semestre</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #f0f4f8; color: #222; margin:0; padding:20px; line-height:1.6; }
+    h1, h2, h3 { color: #0d6efd; }
+    h1 { text-align:center; }
+    .section { background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:1000px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+    .exercise { background:#e8f0fe; padding:15px; margin:10px 0; border-left:5px solid #0d6efd; border-radius:5px; }
+    .solution { background:#d1e7dd; padding:10px; margin:5px 0 15px 0; border-left:5px solid #198754; border-radius:5px; display:none; }
+    button { padding:5px 10px; border:none; background:#0d6efd; color:white; border-radius:5px; cursor:pointer; }
+    button:hover { background:#0b5ed7; }
+    .whatsapp { display:inline-block; margin-top:20px; padding:15px 25px; background:#25D366; color:white; text-decoration:none; font-weight:bold; border-radius:10px; }
+    .whatsapp:hover { background:#1ebe5d; }
+</style>
+</head>
+<body>
+
+<h1>CalcPro – Maths Complet 1er & 2ème Semestre</h1>
+<p style="text-align:center;">Cours interactifs + Exercices corrigés</p>
+
+<!-- ================== Exemple de Section ================== -->
+<div class="section">
+<h2>Nombres et Diviseurs</h2>
+
+<h3>Cours 1 : Diviseurs communs - Nombres premiers</h3>
+<div class="exercise">
+Exercice : Trouver le PGCD de 12 et 18
+<div class="solution">
+12 = 2×2×3 <br>
+18 = 2×3×3 <br>
+PGCD = 2×3 = 6
+</div>
+<button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher la solution</button>
+</div>
+
+<h3>Cours 2 : Plus Grand Commun Diviseur (PGCD)</h3>
+<div class="exercise">
+Exercice : PGCD de 24 et 36
+<div class="solution">
+24 = 2×2×2×3 <br>
+36 = 2×2×3×3 <br>
+PGCD = 2×2×3 = 12
+</div>
+<button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher la solution</button>
+</div>
+
+</div>
+
+<!-- ================== Ajouter toutes les autres sections ================== -->
+<!-- Pour chaque cours/exercice, même structure : .exercise + .solution + button -->
+
+<!-- ================== Bouton WhatsApp pour abonnement ================== -->
+<div class="section">
+<h2>Abonnement Mensuel</h2>
+<p>Accès complet à tous les cours et exercices interactifs – <strong>15 MAD par mois</strong></p>
+<a class="whatsapp" href="https://wa.me/212 06.63.01.38.89?text=Je%20veux%20m'abonner%20à%20CalcPro%20Maths%20Complet%2015%20MAD">S'abonner maintenant via WhatsApp</a>
+</div>
+
+<script>
+    // Script générique pour basculer la solution
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sol = btn.previousElementSibling;
+            sol.style.display = sol.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+</script>
+
+</body>
+</html>
