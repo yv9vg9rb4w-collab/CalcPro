@@ -25,20 +25,21 @@ input[type=text] { padding:8px; border-radius:5px; border:1px solid #ccc; width:
 <h1>CalcPro – Maths Complet</h1>
 <h2 style="text-align:center; color:#198754;">Révisions complètes pour 3ème, 5ème, 1ère Bac et 2ème Bac</h2>
 
-<!-- Paiement et code -->
+<!-- Sélection du niveau -->
 <div class="payment">
-<p>Accès complet aux leçons et exercices → <strong>15 MAD / mois</strong></p>
-<a class="whatsapp" href="https://wa.me/212612345678?text=Je%20veux%20m%27abonner%20à%20CalcPro%20Maths%20Complet%2015%20MAD" target="_blank">
-Payer maintenant via WhatsApp
-</a>
-<p>Après paiement, entre le code reçu pour débloquer les leçons :</p>
-<input type="text" id="accessCode" placeholder="Entrez votre code ici">
-<button onclick="checkCode()">Valider</button>
+  <h2>Choisis ton niveau pour débloquer les leçons :</h2>
+  <select id="niveauSelect">
+    <option value="">-- Sélectionne ton niveau --</option>
+    <option value="3eme">3ème</option>
+    <option value="5eme">5ème</option>
+    <option value="1bac">1ère Bac</option>
+    <option value="2bac">2ème Bac</option>
+  </select>
+  <br><br>
+  <a id="whatsappBtn" class="whatsapp" target="_blank">Contacte-moi pour le code</a>
 </div>
 
-<!-- ================== Exemples de leçons ================== -->
-
-<!-- 3ème Semestre 1 -->
+<!-- Exemples de leçons masquées -->
 <div class="section lesson" data-level="3eme_sem1">
 <h2>3ème – Semestre 1</h2>
 <h3>Cours 1 : Diviseurs communs – Nombres premiers</h3>
@@ -50,7 +51,8 @@ Exercice : Trouver le PGCD de 12 et 18
 </div>
 </div>
 
-<!-- 5ème Semestre 1 -->
+<!-- Ajoute toutes les leçons de A à Z ici pour tous les niveaux -->
+<!-- Exemple pour 5ème -->
 <div class="section lesson" data-level="5eme_sem1">
 <h2>5ème – Semestre 1</h2>
 <h3>Cours 1 : Fonctions</h3>
@@ -62,32 +64,28 @@ Exercice : Tracer f(x) = 2x+1 pour x=0,1,2,3
 </div>
 </div>
 
-<!-- 1ère Bac Semestre 1 -->
-<div class="section lesson" data-level="1bac_sem1">
-<h2>1ère Bac – Semestre 1</h2>
-<h3>Cours 1 : Algèbre</h3>
-<p>Contenu du cours ici...</p>
-<div class="exercise">
-Exercice : Développer (x+2)(x-3)
-<div class="solution">x² - x - 6</div>
-<button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher solution</button>
-</div>
-</div>
-
-<!-- 2ème Bac Semestre 1 -->
-<div class="section lesson" data-level="2bac_sem1">
-<h2>2ème Bac – Semestre 1</h2>
-<h3>Cours 1 : Analyse</h3>
-<p>Contenu du cours ici...</p>
-<div class="exercise">
-Exercice : Calculer la dérivée de f(x) = x² + 3x
-<div class="solution">f'(x) = 2x + 3</div>
-<button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher solution</button>
-</div>
-</div>
-
-<!-- ================== Script codes A→Z ================== -->
+<!-- Script codes A→Z et WhatsApp -->
 <script>
+const whatsappBase = "https://wa.me/212612345678?text=";
+const niveauText = {
+  "3eme": "Je veux m'abonner aux cours de 3ème",
+  "5eme": "Je veux m'abonner aux cours de 5ème",
+  "1bac": "Je veux m'abonner aux cours de 1ère Bac",
+  "2bac": "Je veux m'abonner aux cours de 2ème Bac"
+};
+const select = document.getElementById("niveauSelect");
+const btn = document.getElementById("whatsappBtn");
+select.addEventListener("change", function() {
+  const niveau = select.value;
+  if(niveau && niveauText[niveau]){
+    btn.href = whatsappBase + encodeURIComponent(niveauText[niveau]);
+    btn.textContent = `Contacte-moi pour débloquer les cours de ${niveau.toUpperCase()}`;
+  } else {
+    btn.href = "#";
+    btn.textContent = "Contacte-moi pour le code";
+  }
+});
+
 const codes = {
   "CALC3A":"3eme_sem1",
   "CALC3B":"3eme_sem2",
@@ -125,11 +123,10 @@ const codes = {
   "CALC1B":"1bac_sem2",
   "CALC2A":"2bac_sem1",
   "CALC2B":"2bac_sem2"
-  // Ajoute les autres codes pour tous les chapitres ici
 };
 
 function checkCode(){
-  const userCode = document.getElementById("accessCode").value;
+  const userCode = prompt("Entrez votre code :");
   if(codes[userCode]){
     const levelId = codes[userCode];
     const lessons = document.querySelectorAll(`.lesson[data-level="${levelId}"]`);
