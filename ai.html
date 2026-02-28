@@ -2,57 +2,98 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CalcPro IA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C.P.IA - Chat IA</title>
 <style>
-  body { background: #111; color: #fff; font-family: Arial, sans-serif; display:flex; flex-direction:column; align-items:center; padding:50px; }
-  #question { width: 400px; padding:10px; font-size:18px; }
-  #reply { margin-top:20px; font-size:20px; color:#0f0; white-space:pre-line; }
-  #suggestions { margin-top:10px; color:#0ff; }
+body {
+    font-family: Arial, sans-serif;
+    background: #1e1e1e;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+}
+
+#chatBox {
+    width: 400px;
+    max-width: 90%;
+    height: 400px;
+    background: #2e2e2e;
+    padding: 10px;
+    overflow-y: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+input[type="text"] {
+    width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    margin-right: 5px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #ff9500;
+    color: #fff;
+    cursor: pointer;
+}
+
+.message {
+    margin: 5px 0;
+}
+
+.user { color: #4bd6ff; }
+.ia { color: #ff9500; }
 </style>
 </head>
 <body>
-<h1>CalcPro IA</h1>
-<input type="text" id="question" placeholder="Écris ton équation..." autofocus />
-<div id="reply"></div>
-<div id="suggestions"></div>
+
+<h2>C.P.IA - Chat IA</h2>
+<div id="chatBox"></div>
+<input type="text" id="userInput" placeholder="Pose ta question...">
+<button onclick="envoyer()">Envoyer</button>
 
 <script>
-const input = document.getElementById("question");
-const reply = document.getElementById("reply");
-const suggestions = document.getElementById("suggestions");
-let timeout;
+let chatBox = document.getElementById('chatBox');
 
-// Fonction pour appeler le serveur
-async function askAI(question) {
-  try {
-    const res = await fetch("http://localhost:3000/ask-ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question })
-    });
-    const data = await res.json();
-    reply.textContent = data.reply;
-
-    // Suggestions basiques (offline)
-    suggestions.textContent = "";
-    if(question.includes("x")) {
-      suggestions.textContent = "💡 Suggestions : Factoriser | Développer | Résoudre | Dériver | Intégrer";
-    }
-
-  } catch (err) {
-    reply.textContent = "Erreur serveur IA.";
-  }
+function ajouterMessage(message, type) {
+    let msgDiv = document.createElement('div');
+    msgDiv.className = type;
+    msgDiv.textContent = message;
+    msgDiv.style.margin = "5px 0";
+    msgDiv.style.color = (type === 'user') ? "#4bd6ff" : "#ff9500";
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Détecte en continu pendant que l’utilisateur tape
-input.addEventListener("input", () => {
-  clearTimeout(timeout);
-  timeout = setTimeout(() => {
-    const q = input.value.trim();
-    if(q) askAI(q);
-    else { reply.textContent=""; suggestions.textContent=""; }
-  }, 300); // 300ms après la dernière frappe
-});
+async function envoyer() {
+    let userInput = document.getElementById('userInput');
+    let question = userInput.value.trim();
+    if(question === "") return;
+
+    ajouterMessage(question, 'user');
+    userInput.value = "";
+    userInput.focus();
+
+    try {
+        let response = await fetch('http://127.0.0.1:3000/ask-ia', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: question })
+        });
+
+        let data = await response.json();
+        ajouterMessage(data.text, 'ia');
+    } catch (err) {
+        ajouterMessage("Erreur : impossible de contacter C.P.IA.", 'ia');
+    }
+}
 </script>
+
 </body>
 </html>
