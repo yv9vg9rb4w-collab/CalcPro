@@ -20,7 +20,6 @@ input, select { padding:8px; border-radius:5px; border:1px solid #ccc; margin-ri
 <h1>CalcPro – Maths Complet</h1>
 <h2 style="text-align:center; color:#198754;">Révisions complètes pour 3ème, 5ème, 1ère Bac et 2ème Bac</h2>
 
-<!-- Choix niveau et code -->
 <div style="text-align:center;">
 <select id="niveau">
 <option value="">-- Sélectionne ton niveau --</option>
@@ -116,24 +115,16 @@ select.addEventListener("change", function(){
   }
 });
 
-// ================== CODES A UTILISER ==================
+// ================== CODES ==================
 let codes = {
-  // 3ème Semestre 1
+  // Exemple : beaucoup de codes par semestre
   "3S1A001":"3eme_sem1","3S1A002":"3eme_sem1","3S1A003":"3eme_sem1","3S1A004":"3eme_sem1","3S1A005":"3eme_sem1",
-  "3S1A006":"3eme_sem1","3S1A007":"3eme_sem1","3S1A008":"3eme_sem1","3S1A009":"3eme_sem1","3S1A010":"3eme_sem1",
-  // 3ème Semestre 2
   "3S2B001":"3eme_sem2","3S2B002":"3eme_sem2","3S2B003":"3eme_sem2","3S2B004":"3eme_sem2","3S2B005":"3eme_sem2",
-  // 5ème Semestre 1
   "5S1C001":"5eme_sem1","5S1C002":"5eme_sem1","5S1C003":"5eme_sem1","5S1C004":"5eme_sem1","5S1C005":"5eme_sem1",
-  // 5ème Semestre 2
   "5S2D001":"5eme_sem2","5S2D002":"5eme_sem2","5S2D003":"5eme_sem2","5S2D004":"5eme_sem2","5S2D005":"5eme_sem2",
-  // 1ère Bac Semestre 1
   "1S1E001":"1bac_sem1","1S1E002":"1bac_sem1","1S1E003":"1bac_sem1","1S1E004":"1bac_sem1","1S1E005":"1bac_sem1",
-  // 1ère Bac Semestre 2
   "1S2F001":"1bac_sem2","1S2F002":"1bac_sem2","1S2F003":"1bac_sem2","1S2F004":"1bac_sem2","1S2F005":"1bac_sem2",
-  // 2ème Bac Semestre 1
   "2S1G001":"2bac_sem1","2S1G002":"2bac_sem1","2S1G003":"2bac_sem1","2S1G004":"2bac_sem1","2S1G005":"2bac_sem1",
-  // 2ème Bac Semestre 2
   "2S2H001":"2bac_sem2","2S2H002":"2bac_sem2","2S2H003":"2bac_sem2","2S2H004":"2bac_sem2","2S2H005":"2bac_sem2"
 };
 
@@ -144,11 +135,50 @@ function verifier(){
   let section = codes[code];
 
   if(section && section.startsWith(niveau)){
+    // Débloquer le cours
     document.getElementById(section).style.display = "block";
-    delete codes[code]; // ✅ Supprime le code après usage
-    alert("Abonnement activé ! ✅");
-  }else{
-    alert("Code incorrect ou déjà utilisé ❌. Contactez WhatsApp pour obtenir un code.");
+
+    // Définir date d'expiration : 2 semaines
+    let expiration = new Date();
+    expiration.setDate(expiration.getDate() + 14);
+    localStorage.setItem(code, expiration);
+
+    // Supprimer le code pour qu'il ne soit plus utilisable
+    delete codes[code];
+
+    alert("Abonnement activé pour 2 semaines ✅");
+
+  } else if(localStorage.getItem(code)){
+    let expDate = new Date(localStorage.getItem(code));
+    if(expDate > new Date()){
+      alert("Ce code est déjà utilisé et actif jusqu'à " + expDate.toLocaleDateString() + " ❌");
+    } else {
+      alert("Ce code a expiré. Veuillez payer pour obtenir un nouveau code ✅");
+    }
+  } else {
+    alert("Code incorrect ❌. Contactez WhatsApp pour obtenir un code.");
+  }
+}
+
+// Vérifier à chaque chargement si des codes sont encore actifs
+window.onload = function(){
+  for(let key in localStorage){
+    let exp = new Date(localStorage.getItem(key));
+    if(exp > new Date()){
+      let section = key.startsWith("3S1") ? "3eme_sem1" :
+                    key.startsWith("3S2") ? "3eme_sem2" :
+                    key.startsWith("5S1") ? "5eme_sem1" :
+                    key.startsWith("5S2") ? "5eme_sem2" :
+                    key.startsWith("1S1") ? "1bac_sem1" :
+                    key.startsWith("1S2") ? "1bac_sem2" :
+                    key.startsWith("2S1") ? "2bac_sem1" :
+                    key.startsWith("2S2") ? "2bac_sem2" : null;
+      if(section){
+        document.getElementById(section).style.display = "block";
+      }
+    } else {
+      localStorage.removeItem(key); // Supprime les codes expirés
+    }
   }
 }
 </script>
