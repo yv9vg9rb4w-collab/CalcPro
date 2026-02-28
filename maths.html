@@ -3,135 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CalcPro – Maths Complet</title>
+<title>CalcPro – Maths Semestres par Niveau</title>
 <style>
 body { font-family: Arial, sans-serif; background:#f0f4f8; color:#222; margin:0; padding:20px; line-height:1.6; }
-h1,h2,h3 { color:#0d6efd; }
-h1 { text-align:center; }
-.section { background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:1000px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
-.exercise { background:#e8f0fe; padding:15px; margin:10px 0; border-left:5px solid #0d6efd; border-radius:5px; }
-.solution { background:#d1e7dd; padding:10px; margin:5px 0 15px 0; border-left:5px solid #198754; border-radius:5px; display:none; }
+h1,h2 { color:#0d6efd; text-align:center; }
+.section { background:white; padding:20px; margin:20px auto; border-radius:10px; max-width:800px; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
 .lesson { display:none; }
-button { padding:5px 10px; border:none; background:#0d6efd; color:white; border-radius:5px; cursor:pointer; }
-button:hover { background:#0b5ed7; }
-.whatsapp { display:inline-block; margin-top:20px; padding:15px 25px; background:#25D366; color:white; text-decoration:none; font-weight:bold; border-radius:10px; }
-.whatsapp:hover { background:#1ebe5d; }
-input[type=text] { padding:8px; border-radius:5px; border:1px solid #ccc; width:250px; margin-right:10px;}
+.btn { display:inline-block; padding:10px 20px; background:#0d6efd; color:white; text-decoration:none; border-radius:5px; margin-top:10px;}
+.btn:hover { background:#0b5ed7;}
 .payment { text-align:center; margin-top:20px;}
+input[type=text], select { padding:8px; border-radius:5px; border:1px solid #ccc; width:250px; margin-right:10px;}
+button { padding:8px 12px; border:none; border-radius:5px; background:#198754; color:white; cursor:pointer;}
+button:hover { background:#157347;}
 </style>
 </head>
 <body>
 
 <h1>CalcPro – Maths Complet</h1>
-<h2 style="text-align:center; color:#198754;">Révisions complètes pour 3ème, 5ème, 1ère Bac et 2ème Bac</h2>
+<h2 style="color:#198754;">Sélectionnez votre niveau et débloquez les semestres</h2>
 
-<!-- Sélection du niveau -->
 <div class="payment">
-  <h2>Choisis ton niveau pour débloquer les leçons :</h2>
+  <h2>Choisissez votre niveau :</h2>
   <select id="niveauSelect">
-    <option value="">-- Sélectionne ton niveau --</option>
+    <option value="">-- Sélectionnez votre niveau --</option>
     <option value="3eme">3ème</option>
     <option value="5eme">5ème</option>
     <option value="1bac">1ère Bac</option>
     <option value="2bac">2ème Bac</option>
   </select>
   <br><br>
-  <a id="whatsappBtn" class="whatsapp" target="_blank">Contacte-moi pour le code</a>
+  <input type="text" id="userCode" placeholder="Entrez votre code ici">
+  <button onclick="checkCode()">Valider</button>
 </div>
 
-<!-- Exemples de leçons masquées -->
+<!-- 3ème Semestres -->
 <div class="section lesson" data-level="3eme_sem1">
-<h2>3ème – Semestre 1</h2>
-<h3>Cours 1 : Diviseurs communs – Nombres premiers</h3>
-<p>Contenu du cours ici...</p>
-<div class="exercise">
-Exercice : Trouver le PGCD de 12 et 18
-<div class="solution">12 = 2×2×3 <br> 18 = 2×3×3 <br> PGCD = 6</div>
-<button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher solution</button>
+  <h2>3ème – 1er Semestre</h2>
+  <a href="PDF/3eme_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
 </div>
+<div class="section lesson" data-level="3eme_sem2">
+  <h2>3ème – 2ème Semestre</h2>
+  <a href="PDF/3eme_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
 </div>
 
-<!-- Ajoute toutes les leçons de A à Z ici pour tous les niveaux -->
-<!-- Exemple pour 5ème -->
+<!-- 5ème Semestres -->
 <div class="section lesson" data-level="5eme_sem1">
-<h2>5ème – Semestre 1</h2>
-<h3>Cours 1 : Fonctions</h3>
-<p>Contenu du cours ici...</p>
-<div class="exercise">
-Exercice : Tracer f(x) = 2x+1 pour x=0,1,2,3
-<div class="solution">f(0)=1, f(1)=3, f(2)=5, f(3)=7</div>
-<button onclick="this.previousElementSibling.style.display = this.previousElementSibling.style.display === 'block' ? 'none' : 'block'">Afficher solution</button>
+  <h2>5ème – 1er Semestre</h2>
+  <a href="PDF/5eme_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
 </div>
+<div class="section lesson" data-level="5eme_sem2">
+  <h2>5ème – 2ème Semestre</h2>
+  <a href="PDF/5eme_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
 </div>
 
-<!-- Script codes A→Z et WhatsApp -->
+<!-- 1ère Bac Semestres -->
+<div class="section lesson" data-level="1bac_sem1">
+  <h2>1ère Bac – 1er Semestre</h2>
+  <a href="PDF/1bac_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
+</div>
+<div class="section lesson" data-level="1bac_sem2">
+  <h2>1ère Bac – 2ème Semestre</h2>
+  <a href="PDF/1bac_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
+</div>
+
+<!-- 2ème Bac Semestres -->
+<div class="section lesson" data-level="2bac_sem1">
+  <h2>2ème Bac – 1er Semestre</h2>
+  <a href="PDF/2bac_sem1.pdf" target="_blank" class="btn">Voir le PDF</a>
+</div>
+<div class="section lesson" data-level="2bac_sem2">
+  <h2>2ème Bac – 2ème Semestre</h2>
+  <a href="PDF/2bac_sem2.pdf" target="_blank" class="btn">Voir le PDF</a>
+</div>
+
 <script>
-const whatsappBase = "https://wa.me/212663013889?text=";
-const niveauText = {
-  "3eme": "Je veux m'abonner aux cours de 3ème",
-  "5eme": "Je veux m'abonner aux cours de 5ème",
-  "1bac": "Je veux m'abonner aux cours de 1ère Bac",
-  "2bac": "Je veux m'abonner aux cours de 2ème Bac"
-};
-const select = document.getElementById("niveauSelect");
-const btn = document.getElementById("whatsappBtn");
-select.addEventListener("change", function() {
-  const niveau = select.value;
-  if(niveau && niveauText[niveau]){
-    btn.href = whatsappBase + encodeURIComponent(niveauText[niveau]);
-    btn.textContent = `Contacte-moi pour débloquer les cours de ${niveau.toUpperCase()}`;
-  } else {
-    btn.href = "#";
-    btn.textContent = "Contacte-moi pour le code";
-  }
-});
-
+// Codes multiples pour chaque semestre
 const codes = {
-  "CALC3A":"3eme_sem1",
-  "CALC3B":"3eme_sem2",
-  "CALC3C":"3eme_nombres",
-  "CALC3D":"3eme_fractions",
-  "CALC3E":"3eme_racines",
-  "CALC3F":"3eme_alg_identites",
-  "CALC3G":"3eme_alg_equations",
-  "CALC3H":"3eme_inegalites",
-  "CALC3I":"3eme_trigo",
-  "CALC3J":"3eme_geom_pavages",
-  "CALC3K":"3eme_geom_homotheties",
-  "CALC3L":"3eme_geom_espace",
-  "CALC3M":"3eme_fonctions",
-  "CALC3N":"3eme_statistiques",
-  "CALC3O":"3eme_probabilites",
-  "CALC3P":"3eme_synthese",
-  "CALC5A":"5eme_sem1",
-  "CALC5B":"5eme_sem2",
-  "CALC5C":"5eme_nombres",
-  "CALC5D":"5eme_fractions",
-  "CALC5E":"5eme_racines",
-  "CALC5F":"5eme_alg_identites",
-  "CALC5G":"5eme_alg_equations",
-  "CALC5H":"5eme_inegalites",
-  "CALC5I":"5eme_trigo",
-  "CALC5J":"5eme_geom_pavages",
-  "CALC5K":"5eme_geom_homotheties",
-  "CALC5L":"5eme_geom_espace",
-  "CALC5M":"5eme_fonctions",
-  "CALC5N":"5eme_statistiques",
-  "CALC5O":"5eme_probabilites",
-  "CALC5P":"5eme_synthese",
-  "CALC1A":"1bac_sem1",
-  "CALC1B":"1bac_sem2",
-  "CALC2A":"2bac_sem1",
-  "CALC2B":"2bac_sem2"
+  "3SEM1A":"3eme_sem1", "3SEM1B":"3eme_sem1", "3SEM1C":"3eme_sem1",
+  "3SEM2A":"3eme_sem2", "3SEM2B":"3eme_sem2",
+
+  "5SEM1A":"5eme_sem1", "5SEM1B":"5eme_sem1",
+  "5SEM2A":"5eme_sem2", "5SEM2B":"5eme_sem2",
+
+  "1BSEM1A":"1bac_sem1", "1BSEM1B":"1bac_sem1",
+  "1BSEM2A":"1bac_sem2", "1BSEM2B":"1bac_sem2",
+
+  "2BSEM1A":"2bac_sem1", "2BSEM1B":"2bac_sem1",
+  "2BSEM2A":"2bac_sem2", "2BSEM2B":"2bac_sem2"
 };
 
 function checkCode(){
-  const userCode = prompt("Entrez votre code :");
-  if(codes[userCode]){
-    const levelId = codes[userCode];
+  const niveau = document.getElementById("niveauSelect").value;
+  const userCode = document.getElementById("userCode").value.trim();
+  if(!niveau){
+    alert("Veuillez sélectionner votre niveau !");
+    return;
+  }
+  const levelId = codes[userCode];
+  if(levelId && levelId.startsWith(niveau)){
     const lessons = document.querySelectorAll(`.lesson[data-level="${levelId}"]`);
     lessons.forEach(lesson => lesson.style.display="block");
-    alert(`Accès ${levelId} accordé ✅`);
+    alert("Accès débloqué ✅");
   } else {
     alert("Code incorrect ❌ Veuillez payer pour obtenir le code.");
   }
